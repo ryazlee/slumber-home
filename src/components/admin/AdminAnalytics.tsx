@@ -4,34 +4,24 @@ import {
   type AnalyticsFilters,
   type AnalyticsMetrics,
   type DailyActivityRow,
-  type RecentUserRow,
 } from '../../lib/admin';
 import { formatRangeLabel } from '../../lib/analyticsRange';
-import { ADMIN_GRID_CLIENT_FILTER_HINT } from '../../lib/adminCopy';
 import { Link } from 'react-router-dom';
 import { useAdmin } from '../../context/AdminContext';
-import { useAdminAnalyticsBundle, useAdminRecentUsers, useAppVersions } from '../../hooks/useAdmin';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { usePaginatedFilters } from '../../hooks/usePaginatedFilters';
+import { useAdminAnalyticsBundle, useAppVersions } from '../../hooks/useAdmin';
 import type { AdminAnalyticsScreenProps } from './adminAnalyticsTypes';
 import AdminActivityChart from './AdminActivityChart';
 import AdminAnalyticsFilters from './AdminAnalyticsFilters';
-import AdminDataGrid from './AdminDataGrid';
 import AdminHealthSnapshot from './AdminHealthSnapshot';
 import AdminMetricCard from './AdminMetricCard';
 import AdminSection, { AdminTableSummary } from './AdminSection';
-import AdminSubsection from './AdminSubsection';
 import AdminTabs from './AdminTabs';
-import { formatWhen } from './format';
-import { buildRecentSignupColumns } from './userGridColumns';
 
-type AnalyticsTab = 'health' | 'overview' | 'users' | 'social' | 'tags';
+type AnalyticsTab = 'health' | 'overview' | 'tags';
 
 const TABS: { id: AnalyticsTab; label: string }[] = [
   { id: 'health', label: 'Health' },
   { id: 'overview', label: 'Overview' },
-  { id: 'users', label: 'Users' },
-  { id: 'social', label: 'Social' },
   { id: 'tags', label: 'Tags' },
 ];
 
@@ -91,7 +81,6 @@ export default function AdminAnalytics({
   const postsPerActive = metrics && metrics.active_users > 0
     ? (metrics.posts / metrics.active_users).toFixed(1)
     : '—';
-  const showVersion = versions.length > 0;
 
   return (
     <AdminSection className="admin-overview">
@@ -132,26 +121,6 @@ export default function AdminAnalytics({
               versionLabel={versionLabel}
               postsPerActive={postsPerActive}
               appliedVersion={appVersion}
-            />
-          )}
-
-          {tab === 'users' && (
-            <UsersPanel
-              metrics={metrics}
-              activity={activity}
-              filters={filters}
-              rangeLabel={rangeLabel}
-              versionLabel={versionLabel}
-              showVersion={showVersion}
-            />
-          )}
-
-          {tab === 'social' && (
-            <SocialPanel
-              metrics={metrics}
-              activity={activity}
-              rangeLabel={rangeLabel}
-              versionLabel={versionLabel}
             />
           )}
 
@@ -263,110 +232,6 @@ function OverviewPanel({
   );
 }
 
-function UsersPanel({
-  metrics,
-  activity,
-  filters,
-  rangeLabel,
-  versionLabel,
-  showVersion,
-}: {
-  metrics: AnalyticsMetrics;
-  activity: DailyActivityRow[];
-  filters: AnalyticsFilters;
-  rangeLabel: string;
-  versionLabel: string;
-  showVersion: boolean;
-}) {
-  const { paginationModel, setPaginationModel, filters: userFilters } = usePaginatedFilters(
-    filters,
-    [filters.start, filters.end, filters.appVersion],
-  );
-
-  const usersQuery = useAdminRecentUsers(userFilters);
-  const users = usersQuery.data?.rows ?? [];
-  const usersTotal = usersQuery.data?.total ?? 0;
-
-  return (
-    <div className="admin-analytics-panel">
-      <FilterSummary rangeLabel={rangeLabel} versionLabel={versionLabel} metrics={metrics} />
-      <div className="admin-metric-grid admin-metric-grid--dense">
-        <AdminMetricCard
-          label="Signups"
-          value={metrics.signups}
-          sub={`Joined ${rangeLabel}`}
-          to="/admin/users?filter=new"
-        />
-        <AdminMetricCard
-          label="Active posters"
-          value={metrics.active_users}
-          sub="Posted at least once in range"
-          to="/admin/users"
-        />
-      </div>
-
-      {activity.length > 0 && (
-        <div className="admin-chart-grid admin-chart-grid--pair">
-          <AdminActivityChart title="Daily signups" rows={activity} series="signups" color="var(--deep)" />
-          <AdminActivityChart title="Daily active posters" rows={activity} series="active_users" color="var(--accent)" />
-        </div>
-      )}
-
-      <AdminSubsection
-        title="Signups in range"
-        meta={metrics.signups > usersTotal ? `${usersTotal} matching filters` : undefined}
-        footer={ADMIN_GRID_CLIENT_FILTER_HINT}
-      >
-        {usersTotal === 0 ? (
-          <p className="admin-muted">No signups match your filters.</p>
-        ) : (
-          <RecentSignupsList
-            users={users}
-            usersTotal={usersTotal}
-            showVersion={showVersion}
-            paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
-            loading={usersQuery.isFetching}
-          />
-        )}
-      </AdminSubsection>
-    </div>
-  );
-}
-
-function SocialPanel({
-  metrics,
-  activity,
-  rangeLabel,
-  versionLabel,
-}: {
-  metrics: AnalyticsMetrics;
-  activity: DailyActivityRow[];
-  rangeLabel: string;
-  versionLabel: string;
-}) {
-  return (
-    <div className="admin-analytics-panel">
-      <FilterSummary rangeLabel={rangeLabel} versionLabel={versionLabel} metrics={metrics} />
-      <div className="admin-metric-grid admin-metric-grid--dense">
-        <AdminMetricCard label="Comments" value={metrics.comments} sub={rangeLabel} />
-        <AdminMetricCard label="Kudos" value={metrics.kudos} sub={rangeLabel} />
-        <AdminMetricCard
-          label="New friendships"
-          value={metrics.friendships_accepted}
-          sub="Accepted in range"
-        />
-      </div>
-
-      {activity.length > 0 && (
-        <div className="admin-chart-grid admin-chart-grid--single">
-          <AdminActivityChart title="Daily comments" rows={activity} series="comments" color="var(--rem)" />
-        </div>
-      )}
-    </div>
-  );
-}
-
 function TagsPanel({
   tags,
   rangeLabel,
@@ -403,172 +268,5 @@ function TagsPanel({
         </div>
       )}
     </div>
-  );
-}
-
-function RecentSignupsList({
-  users,
-  usersTotal,
-  showVersion,
-  paginationModel,
-  onPaginationModelChange,
-  loading,
-}: {
-  users: RecentUserRow[];
-  usersTotal: number;
-  showVersion: boolean;
-  paginationModel: { page: number; pageSize: number };
-  onPaginationModelChange: (model: { page: number; pageSize: number }) => void;
-  loading: boolean;
-}) {
-  const isNarrow = useMediaQuery('(max-width: 720px)');
-
-  if (isNarrow) {
-    return (
-      <SignupMobileCards
-        users={users}
-        usersTotal={usersTotal}
-        showVersion={showVersion}
-        paginationModel={paginationModel}
-        onPaginationModelChange={onPaginationModelChange}
-        loading={loading}
-      />
-    );
-  }
-
-  return (
-    <RecentSignupsGrid
-      users={users}
-      usersTotal={usersTotal}
-      showVersion={showVersion}
-      paginationModel={paginationModel}
-      onPaginationModelChange={onPaginationModelChange}
-      loading={loading}
-    />
-  );
-}
-
-function SignupMobileCards({
-  users,
-  usersTotal,
-  showVersion,
-  paginationModel,
-  onPaginationModelChange,
-  loading,
-}: {
-  users: RecentUserRow[];
-  usersTotal: number;
-  showVersion: boolean;
-  paginationModel: { page: number; pageSize: number };
-  onPaginationModelChange: (model: { page: number; pageSize: number }) => void;
-  loading: boolean;
-}) {
-  const pageCount = Math.max(1, Math.ceil(usersTotal / paginationModel.pageSize));
-  const canPrev = paginationModel.page > 0;
-  const canNext = paginationModel.page + 1 < pageCount;
-
-  return (
-    <div className={`admin-mobile-card-list${loading ? ' admin-mobile-card-list--loading' : ''}`}>
-      <ul className="admin-mobile-card-list-items">
-        {users.map((user) => (
-          <li key={user.id} className="admin-mobile-card">
-            <div className="admin-mobile-card-header">
-              <Link to={`/admin/users?q=${encodeURIComponent(user.username)}`} className="admin-mobile-card-title">
-                @{user.username}
-              </Link>
-              <span className="admin-mobile-card-meta">{formatWhen(user.created_at)}</span>
-            </div>
-            <dl className="admin-mobile-card-facts">
-              <div>
-                <dt>Posts</dt>
-                <dd>{user.posts_count}</dd>
-              </div>
-              {user.is_premium ? (
-                <div>
-                  <dt>Premium</dt>
-                  <dd>Yes</dd>
-                </div>
-              ) : null}
-              {showVersion && user.last_app_version ? (
-                <div>
-                  <dt>Version</dt>
-                  <dd>v{user.last_app_version}</dd>
-                </div>
-              ) : null}
-            </dl>
-            {user.email ? <p className="admin-mobile-card-email">{user.email}</p> : null}
-          </li>
-        ))}
-      </ul>
-
-      {pageCount > 1 ? (
-        <div className="admin-mobile-card-pager">
-          <button
-            type="button"
-            className="admin-button admin-button-ghost admin-button-sm"
-            disabled={!canPrev || loading}
-            onClick={() => onPaginationModelChange({ ...paginationModel, page: paginationModel.page - 1 })}
-          >
-            Previous
-          </button>
-          <span className="admin-muted">
-            Page {paginationModel.page + 1} of {pageCount}
-          </span>
-          <button
-            type="button"
-            className="admin-button admin-button-ghost admin-button-sm"
-            disabled={!canNext || loading}
-            onClick={() => onPaginationModelChange({ ...paginationModel, page: paginationModel.page + 1 })}
-          >
-            Next
-          </button>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function RecentSignupsGrid({
-  users,
-  usersTotal,
-  showVersion,
-  paginationModel,
-  onPaginationModelChange,
-  loading,
-}: {
-  users: RecentUserRow[];
-  usersTotal: number;
-  showVersion: boolean;
-  paginationModel: { page: number; pageSize: number };
-  onPaginationModelChange: (model: { page: number; pageSize: number }) => void;
-  loading: boolean;
-}) {
-  const columns = useMemo(
-    () => buildRecentSignupColumns({ showVersion }),
-    [showVersion],
-  );
-
-  return (
-    <AdminDataGrid
-      persistKey="admin-analytics-signups"
-      rows={users}
-      columns={columns}
-      getRowId={(row) => row.id}
-      label="Signups in range"
-      loading={loading}
-      serverPagination={{
-        rowCount: usersTotal,
-        paginationModel,
-        onPaginationModelChange,
-      }}
-      initialState={{
-        sorting: { sortModel: [{ field: 'created_at', sort: 'desc' }] },
-        columns: {
-          columnVisibilityModel: {
-            id: false,
-          },
-        },
-      }}
-    />
   );
 }

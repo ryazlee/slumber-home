@@ -132,8 +132,6 @@ export default function AdminHealthSnapshot() {
                 sub={`${postsPerActive} posts per poster`}
                 to="/admin/users"
               />
-              <AdminMetricCard label="Comments" value={health.engagement.comments} sub="In range" />
-              <AdminMetricCard label="Kudos" value={health.engagement.kudos} sub="In range" />
               <AdminMetricCard
                 label="Dream log rate"
                 value={dreamRate}
@@ -186,24 +184,6 @@ export default function AdminHealthSnapshot() {
       <div className="admin-chart-grid admin-chart-grid--pair">
         <AdminVersionChart versions={versions} />
         <AdminCohortChart rows={cohort} />
-      </div>
-
-      <div className="admin-quick-actions">
-        <p className="admin-field-group-title">Shortcuts</p>
-        <div className="admin-quick-actions-grid">
-          {[
-            { to: '/admin/reports', label: 'Review reports', hint: 'Dismiss or remove content' },
-            { to: '/admin/users', label: 'Find a user', hint: 'Detail panel · roles · suspend' },
-            { to: '/admin/posts', label: 'Browse posts', hint: 'Fix stages · soft-delete' },
-            { to: '/admin/community', label: 'Community', hint: 'Challenges & clubs' },
-            { to: '/admin/notify', label: 'Notify', hint: 'DM or broadcast' },
-          ].map((action) => (
-            <Link key={action.to} to={action.to} className="admin-quick-action">
-              <span className="admin-quick-action-label">{action.label}</span>
-              <span className="admin-quick-action-hint">{action.hint}</span>
-            </Link>
-          ))}
-        </div>
       </div>
     </div>
   );

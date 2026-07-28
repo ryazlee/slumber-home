@@ -16,7 +16,6 @@ import {
   fetchPremiumMetrics,
   fetchPremiumUsers,
   fetchRecentPosts,
-  fetchRecentUsers,
   searchAdminUsers,
   sendAdminNotification,
   updateUserPremium,
@@ -221,15 +220,6 @@ export function useAdminUserSearch(filters: UserSearchFilters, enabled = true) {
     queryKey: queryKeys.admin.userSearch(filters),
     queryFn: () => searchAdminUsers(filters),
     enabled,
-    placeholderData: keepPreviousData,
-    ...adminQueryOptions,
-  });
-}
-
-export function useAdminRecentUsers(filters: AnalyticsFilters) {
-  return useQuery({
-    queryKey: queryKeys.admin.analyticsUsers(filters),
-    queryFn: () => fetchRecentUsers(filters),
     placeholderData: keepPreviousData,
     ...adminQueryOptions,
   });

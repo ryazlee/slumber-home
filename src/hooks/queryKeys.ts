@@ -45,7 +45,6 @@ export const queryKeys = {
     appVersions: ['admin', 'app-versions'] as const,
     analyticsMetrics: (filters: AnalyticsFilters) => ['admin', 'analytics', 'metrics', filters] as const,
     analyticsActivity: (filters: AnalyticsFilters) => ['admin', 'analytics', 'activity', filters] as const,
-    analyticsUsers: (filters: AnalyticsFilters) => ['admin', 'analytics', 'users', filters] as const,
     analyticsPosts: (filters: AnalyticsFilters) => ['admin', 'analytics', 'posts', filters] as const,
     recentPosts: (filters: AnalyticsFilters) => ['admin', 'posts', 'list', filters] as const,
     postsPageMetrics: (filters: AnalyticsFilters) => ['admin', 'posts', 'metrics', filters] as const,
