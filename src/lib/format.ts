@@ -56,7 +56,7 @@ export const PENDING_COMPLETION_BANNER_PREFIX = 'Finalizing — ';
 export const PENDING_COMPLETION_BANNER_PREFIX_GOAL_HIT = 'Goal hit — ';
 export const PENDING_COMPLETION_BANNER_SUFFIX = ' left';
 export const PENDING_COMPLETION_TOOLTIP =
-  'Sync wearables or post missing nights before the timer ends. Scores lock then — nights without a wearable post count as zero.';
+  'Post wearable nights before the timer ends. Missing nights count as zero.';
 
 export function formatChallengeRaceType(challenge: {
   isGroup: boolean;

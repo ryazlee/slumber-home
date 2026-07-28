@@ -1,10 +1,4 @@
 import { Link } from 'react-router-dom';
-import AdminCohortChart from '../../components/admin/AdminCohortChart';
-import AdminMetricCard from '../../components/admin/AdminMetricCard';
-import AdminSection from '../../components/admin/AdminSection';
-import AdminSubsection from '../../components/admin/AdminSubsection';
-import AdminVersionChart from '../../components/admin/AdminVersionChart';
-import { formatNumber } from '../../components/admin/format';
 import { useAdmin } from '../../context/AdminContext';
 import {
   useAppVersions,
@@ -12,13 +6,18 @@ import {
   useHealthMetrics,
   useRepairInflatedStages,
 } from '../../hooks/useAdmin';
+import AdminCohortChart from './AdminCohortChart';
+import AdminMetricCard from './AdminMetricCard';
+import AdminSubsection from './AdminSubsection';
+import AdminVersionChart from './AdminVersionChart';
+import { formatNumber } from './format';
 
 function pct(part: number, whole: number): string {
   if (!whole) return '0%';
   return `${Math.round((part / whole) * 1000) / 10}%`;
 }
 
-export default function AdminHomePage() {
+export default function AdminHealthSnapshot() {
   const { metrics } = useAdmin();
   const healthQuery = useHealthMetrics(7);
   const versionsQuery = useAppVersions();
@@ -58,7 +57,7 @@ export default function AdminHomePage() {
   };
 
   return (
-    <AdminSection className="admin-home">
+    <div className="admin-home admin-analytics-panel">
       {pendingReports > 0 ? (
         <Link to="/admin/reports" className="admin-attention-banner">
           <span className="admin-attention-banner-title">
@@ -96,29 +95,25 @@ export default function AdminHomePage() {
                 label="Signups"
                 value={health.activation.signups}
                 sub={`${health.activation.first_time_posters} first-time posters`}
+                to="/admin/users?filter=new"
               />
               <AdminMetricCard
                 label="Never logged sleep"
                 value={health.activation.never_posted_in_window}
-                sub={(
-                  <Link to="/admin/users?filter=never-posted">
-                    {health.activation.never_posted_in_window > 0 ? 'View users →' : 'In signup window'}
-                  </Link>
-                )}
+                sub={health.activation.never_posted_in_window > 0 ? 'View users' : 'In signup window'}
+                to="/admin/users?filter=never-posted"
               />
               <AdminMetricCard
                 label="Inactive posters"
                 value={health.activation.inactive_posters}
-                sub={(
-                  <Link to="/admin/users?filter=inactive">
-                    No post in 14 days · view →
-                  </Link>
-                )}
+                sub="No post in 14 days"
+                to="/admin/users?filter=inactive"
               />
               <AdminMetricCard
                 label="Never posted (all time)"
                 value={health.activation.never_posted_total}
                 sub="Accounts with zero sleep logs"
+                to="/admin/users?filter=never-posted"
               />
             </div>
           </AdminSubsection>
@@ -129,11 +124,13 @@ export default function AdminHomePage() {
                 label="Sleep posts"
                 value={health.engagement.posts}
                 sub={`${health.engagement.wearable_posts} wearable · ${health.engagement.manual_posts} manual`}
+                to="/admin/posts"
               />
               <AdminMetricCard
                 label="Active posters"
                 value={health.engagement.active_posters}
                 sub={`${postsPerActive} posts per poster`}
+                to="/admin/users"
               />
               <AdminMetricCard label="Comments" value={health.engagement.comments} sub="In range" />
               <AdminMetricCard label="Kudos" value={health.engagement.kudos} sub="In range" />
@@ -141,6 +138,7 @@ export default function AdminHomePage() {
                 label="Dream log rate"
                 value={dreamRate}
                 sub={`${health.engagement.posts_with_dreams} with dream text`}
+                to="/admin/posts"
               />
               <AdminMetricCard
                 label="Push enabled"
@@ -167,17 +165,14 @@ export default function AdminHomePage() {
                   <AdminMetricCard
                     label="Challenges"
                     value={metrics.active_challenges}
-                    sub={(
-                      <>
-                        {metrics.pending_challenges} pending ·{' '}
-                        <Link to="/admin/community">Community →</Link>
-                      </>
-                    )}
+                    sub={`${metrics.pending_challenges} pending`}
+                    to="/admin/community"
                   />
                   <AdminMetricCard
                     label="Premium"
                     value={metrics.premium_users}
                     sub={`${metrics.total_users ? pct(metrics.premium_users, metrics.total_users) : '0%'} of ${formatNumber(metrics.total_users)} users`}
+                    to="/admin/premium"
                   />
                 </>
               ) : null}
@@ -201,7 +196,6 @@ export default function AdminHomePage() {
             { to: '/admin/users', label: 'Find a user', hint: 'Detail panel · roles · suspend' },
             { to: '/admin/posts', label: 'Browse posts', hint: 'Fix stages · soft-delete' },
             { to: '/admin/community', label: 'Community', hint: 'Challenges & clubs' },
-            { to: '/admin/analytics', label: 'Analytics', hint: 'Charts & date filters' },
             { to: '/admin/notify', label: 'Notify', hint: 'DM or broadcast' },
           ].map((action) => (
             <Link key={action.to} to={action.to} className="admin-quick-action">
@@ -211,6 +205,6 @@ export default function AdminHomePage() {
           ))}
         </div>
       </div>
-    </AdminSection>
+    </div>
   );
 }

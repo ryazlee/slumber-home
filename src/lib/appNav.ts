@@ -30,6 +30,12 @@ export function profileNavItem(userId: string | undefined): PrimaryNavItem {
   };
 }
 
+export const ADMIN_NAV_ITEM: PrimaryNavItem = {
+  to: '/admin',
+  label: 'Admin',
+  matchPrefix: '/admin',
+};
+
 export function isNavActive(
   pathname: string,
   item: Pick<PrimaryNavItem, 'to' | 'end' | 'matchPrefix'>,

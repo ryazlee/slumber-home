@@ -1,9 +1,9 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useIsModerator } from '../hooks/useAdmin';
-import { isNavActive, MAIN_NAV_ITEMS } from '../lib/appNav';
+import { isNavActive } from '../lib/appNav';
 import { APP_STORE_URL } from '../lib/deepLinks';
-import AppBottomNav, { useBottomNavItems } from './AppBottomNav';
+import AppBottomNav, { useBottomNavItems, usePrimaryNavItems } from './AppBottomNav';
 import HeaderMenu from './HeaderMenu';
 import HeaderProfileLink from './HeaderProfileLink';
 import HeaderSearch from './HeaderSearch';
@@ -20,6 +20,7 @@ export default function SiteHeader() {
   const moderatorQuery = useIsModerator(isLoggedIn);
   const isModerator = moderatorQuery.data === true;
   const location = useLocation();
+  const primaryNav = usePrimaryNavItems();
   const bottomNav = useBottomNavItems();
   const adminActive = location.pathname === '/admin' || location.pathname.startsWith('/admin/');
   const brandTarget = isLoggedIn ? '/feed' : '/home';
@@ -36,7 +37,7 @@ export default function SiteHeader() {
 
             {isLoggedIn ? (
               <nav className="site-app-nav site-app-nav--desktop" aria-label="App">
-                {MAIN_NAV_ITEMS.map((item) => {
+                {primaryNav.map((item) => {
                   const active = isNavActive(location.pathname, item);
                   return (
                     <NavLink

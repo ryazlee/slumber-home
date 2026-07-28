@@ -3429,15 +3429,19 @@ button.app-back-link {
   font-variant-numeric: tabular-nums;
 }
 
-.stats-pr-grid {
+.stats-pr-strip {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stats-pr-row {
+  display: flex;
   gap: 8px;
 }
 
 .stats-pr-tile {
-  flex: 1 1 calc(50% - 8px);
-  min-width: calc(50% - 8px);
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -3447,6 +3451,11 @@ button.app-back-link {
   background: var(--bg);
   text-decoration: none;
   color: inherit;
+}
+
+.stats-pr-tile--spacer {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .stats-pr-tile--link:hover {

@@ -16,7 +16,6 @@ import SocialFriends from './pages/app/SocialFriends';
 import SocialLayout from './pages/app/SocialLayout';
 import StatsLayout from './pages/app/StatsLayout';
 import AdminLayout from './pages/admin/AdminLayout';
-import AdminHomePage from './pages/admin/AdminHomePage';
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 import AdminPostsPage from './pages/admin/AdminPostsPage';
 import AdminPremiumPage from './pages/admin/AdminPremiumPage';
@@ -59,8 +58,8 @@ export default function App() {
         <Route path="challenges/:id" element={<GatedChallengeDetail />} />
 
         <Route path="admin" element={<AdminLayout />}>
-          <Route index element={<AdminHomePage />} />
-          <Route path="analytics" element={<AdminAnalyticsPage />} />
+          <Route index element={<AdminAnalyticsPage />} />
+          <Route path="analytics" element={<Navigate to="/admin" replace />} />
           <Route path="posts" element={<AdminPostsPage />} />
           <Route path="reports" element={<AdminReportsPage />} />
           <Route path="users" element={<AdminUsersPage />} />

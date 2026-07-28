@@ -17,6 +17,7 @@ import type { AdminAnalyticsScreenProps } from './adminAnalyticsTypes';
 import AdminActivityChart from './AdminActivityChart';
 import AdminAnalyticsFilters from './AdminAnalyticsFilters';
 import AdminDataGrid from './AdminDataGrid';
+import AdminHealthSnapshot from './AdminHealthSnapshot';
 import AdminMetricCard from './AdminMetricCard';
 import AdminSection, { AdminTableSummary } from './AdminSection';
 import AdminSubsection from './AdminSubsection';
@@ -24,9 +25,10 @@ import AdminTabs from './AdminTabs';
 import { formatWhen } from './format';
 import { buildRecentSignupColumns } from './userGridColumns';
 
-type AnalyticsTab = 'overview' | 'users' | 'social' | 'tags';
+type AnalyticsTab = 'health' | 'overview' | 'users' | 'social' | 'tags';
 
 const TABS: { id: AnalyticsTab; label: string }[] = [
+  { id: 'health', label: 'Health' },
   { id: 'overview', label: 'Overview' },
   { id: 'users', label: 'Users' },
   { id: 'social', label: 'Social' },
@@ -62,7 +64,8 @@ export default function AdminAnalytics({
   onAppVersionChange,
 }: Props) {
   const { refreshing } = useAdmin();
-  const [tab, setTab] = useState<AnalyticsTab>('overview');
+  const [tab, setTab] = useState<AnalyticsTab>('health');
+  const showRangeFilters = tab !== 'health';
 
   const filters = useMemo<AnalyticsFilters>(() => ({
     start: range.start,
@@ -92,18 +95,6 @@ export default function AdminAnalytics({
 
   return (
     <AdminSection className="admin-overview">
-      <AdminAnalyticsFilters
-        range={range}
-        preset={preset}
-        appVersion={appVersion}
-        versions={versions}
-        versionsLoading={versionsLoading}
-        loading={(loading || fetching || refreshing) && !metrics}
-        onPresetChange={onPresetChange}
-        onRangeChange={onRangeChange}
-        onAppVersionChange={onAppVersionChange}
-      />
-
       <AdminTabs
         ariaLabel="Analytics sections"
         active={tab}
@@ -111,11 +102,27 @@ export default function AdminAnalytics({
         tabs={TABS}
       />
 
-      {error ? <p className="admin-error admin-error-banner">{error}</p> : null}
+      {showRangeFilters ? (
+        <AdminAnalyticsFilters
+          range={range}
+          preset={preset}
+          appVersion={appVersion}
+          versions={versions}
+          versionsLoading={versionsLoading}
+          loading={(loading || fetching || refreshing) && !metrics}
+          onPresetChange={onPresetChange}
+          onRangeChange={onRangeChange}
+          onAppVersionChange={onAppVersionChange}
+        />
+      ) : null}
 
-      {loading && !metrics ? <p className="admin-muted">Loading analytics…</p> : null}
+      {tab === 'health' ? <AdminHealthSnapshot /> : null}
 
-      {metrics ? (
+      {showRangeFilters && error ? <p className="admin-error admin-error-banner">{error}</p> : null}
+
+      {showRangeFilters && loading && !metrics ? <p className="admin-muted">Loading analytics…</p> : null}
+
+      {showRangeFilters && metrics ? (
         <div className={fetching || refreshing ? 'admin-analytics-panel-wrap--refreshing' : undefined}>
           {tab === 'overview' && (
             <OverviewPanel
@@ -181,13 +188,24 @@ function OverviewPanel({
       </p>
 
       <div className="admin-metric-grid admin-metric-grid--hero">
-        <AdminMetricCard label="Signups" value={metrics.signups} sub={`Joined ${rangeLabel}`} />
+        <AdminMetricCard
+          label="Signups"
+          value={metrics.signups}
+          sub={`Joined ${rangeLabel}`}
+          to="/admin/users?filter=new"
+        />
         <AdminMetricCard
           label="Active posters"
           value={metrics.active_users}
           sub={`${postsPerActive} posts per active user`}
+          to="/admin/users"
         />
-        <AdminMetricCard label="Sleep posts" value={metrics.posts} sub={rangeLabel} />
+        <AdminMetricCard
+          label="Sleep posts"
+          value={metrics.posts}
+          sub={rangeLabel}
+          to="/admin/posts"
+        />
       </div>
 
       <div className="admin-metric-grid admin-metric-grid--dense">
@@ -273,8 +291,18 @@ function UsersPanel({
     <div className="admin-analytics-panel">
       <FilterSummary rangeLabel={rangeLabel} versionLabel={versionLabel} metrics={metrics} />
       <div className="admin-metric-grid admin-metric-grid--dense">
-        <AdminMetricCard label="Signups" value={metrics.signups} sub={`Joined ${rangeLabel}`} />
-        <AdminMetricCard label="Active posters" value={metrics.active_users} sub="Posted at least once in range" />
+        <AdminMetricCard
+          label="Signups"
+          value={metrics.signups}
+          sub={`Joined ${rangeLabel}`}
+          to="/admin/users?filter=new"
+        />
+        <AdminMetricCard
+          label="Active posters"
+          value={metrics.active_users}
+          sub="Posted at least once in range"
+          to="/admin/users"
+        />
       </div>
 
       {activity.length > 0 && (

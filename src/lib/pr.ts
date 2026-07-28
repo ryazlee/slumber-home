@@ -1,5 +1,6 @@
 export const PR_LABELS: Record<string, string> = {
   longest_sleep: 'Longest Sleep',
+  shortest_sleep: 'Shortest Sleep',
   most_deep_sleep: 'Most Deep',
   most_rem: 'Most REM',
   most_core_sleep: 'Most Core',

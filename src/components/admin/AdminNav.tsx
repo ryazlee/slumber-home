@@ -14,8 +14,7 @@ export type AdminNavGroup = {
 };
 
 export const ADMIN_PAGE_TITLES: Record<string, string> = {
-  '/admin': 'Home',
-  '/admin/analytics': 'Analytics',
+  '/admin': 'Analytics',
   '/admin/posts': 'Posts',
   '/admin/reports': 'Reports',
   '/admin/users': 'Users',
@@ -31,8 +30,7 @@ function buildAdminNavGroups(pendingReports = 0): AdminNavGroup[] {
     {
       label: 'Overview',
       items: [
-        { to: '/admin', label: 'Home', end: true },
-        { to: '/admin/analytics', label: 'Analytics' },
+        { to: '/admin', label: 'Analytics', end: true },
       ],
     },
     {
