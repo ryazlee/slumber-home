@@ -87,7 +87,7 @@ export const privacySections = [
       'Edit or delete your own posts.',
       'Block users. They are removed from your feed, search, and challenge interactions.',
       'Report posts for moderation review.',
-      'Delete your account in Settings — removes your login, personal sleep posts, photos, health connections, and social connections; comments and likes you left on others\' posts may remain under an anonymized account name.',
+      'Delete your account in Settings, or request deletion on the web at useslumber.com/delete-account — removes your login, personal sleep posts, photos, health connections, and social connections; comments and likes you left on others\' posts may remain under an anonymized account name.',
       'Revoke Apple Health access in iOS Settings at any time.',
       'Disconnect Google Health in Slumber Settings.',
     ],

@@ -26,6 +26,8 @@ import AdminTagsPage from './pages/admin/AdminTagsPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminCommunityPage from './pages/admin/AdminCommunityPage';
 import Home from './pages/Home';
+import DeleteAccount from './pages/DeleteAccount';
+import DeleteData from './pages/DeleteData';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import InviteLandingPage from './pages/InviteLandingPage';
@@ -94,6 +96,8 @@ export default function App() {
           <Route path="home" element={<Home />} />
           <Route path="privacy" element={<Privacy />} />
           <Route path="terms" element={<Terms />} />
+          <Route path="delete-account" element={<DeleteAccount />} />
+          <Route path="delete-data" element={<DeleteData />} />
         </Route>
       </Route>
     </Routes>

@@ -32,8 +32,10 @@ npm install && npm run dev
 | `/stats/compare` | Yes | Friend compare table (wearable-only; bedtime/wake not rankable) |
 | `/challenges` | Yes | Active and completed challenges |
 | `/home` | No | Marketing / product overview |
-| `/privacy` | No | Privacy policy (App Store link) |
+| `/privacy` | No | Privacy policy (App Store / Play link) |
 | `/terms` | No | Terms of service |
+| `/delete-account` | No | Account deletion (Play Console account deletion URL) |
+| `/delete-data` | No | Data deletion request (Play Console Data safety URL) |
 | `/invite/:token` | Partial | Friend invite landing — `@username` preview; opens app to connect |
 | `/post/:id` | Partial | Post landing + app handoff |
 | `/profile/:userId` | Partial | Profile landing + app handoff |

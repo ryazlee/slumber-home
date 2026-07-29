@@ -65,6 +65,12 @@ export default function HeaderMenu({ showAdmin, adminActive }: Props) {
           <NavLink to="/terms" role="menuitem" className="header-menu-item" onClick={() => setOpen(false)}>
             Terms
           </NavLink>
+          <NavLink to="/delete-account" role="menuitem" className="header-menu-item" onClick={() => setOpen(false)}>
+            Delete account
+          </NavLink>
+          <NavLink to="/delete-data" role="menuitem" className="header-menu-item" onClick={() => setOpen(false)}>
+            Delete data
+          </NavLink>
           {!isLoggedIn ? (
             <a
               href={APP_STORE_URL}

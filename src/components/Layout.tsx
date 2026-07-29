@@ -12,6 +12,8 @@ export default function Layout() {
           <span>© {new Date().getFullYear()} Slumber</span>
           <NavLink to="/privacy">Privacy Policy</NavLink>
           <NavLink to="/terms">Terms of Service</NavLink>
+          <NavLink to="/delete-account">Delete account</NavLink>
+          <NavLink to="/delete-data">Delete data</NavLink>
           <a href="mailto:useslumber@gmail.com">useslumber@gmail.com</a>
         </div>
       </footer>

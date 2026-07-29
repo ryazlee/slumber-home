@@ -1040,6 +1040,18 @@ h1 {
   margin: 0 0 36px;
 }
 
+.legal-cta {
+  margin: -20px 0 36px;
+  font-size: 16px;
+}
+
+.legal-cta a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .legal-section {
   margin-bottom: 32px;
 }
