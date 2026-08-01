@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import type { PostSocialPatch } from '../components/PostSocial';
 import type { SleepPost } from '../lib/types';
@@ -14,10 +14,20 @@ export function useSleepPostDisplay(post: SleepPost) {
   const canReadDream = Boolean(post.dreamLog) && (!post.blurDream || isOwnPost);
   const isNapDay = !isManual && hasNapDay(post);
   const napCount = countNaps(post.sessionBreakdown) || (isNapDay ? 1 : 0);
+  const napChipLabel = isNapDay
+    ? `☀️ ${napCount === 1 ? 'nap' : `${napCount} naps`}`
+    : null;
   const sessions = post.sessionBreakdown ?? [];
   const showWearableSleep = !isManual && post.asleepMinutes > 0;
   const timelineSegments = segmentsForPost(post);
   const displayTitle = sleepPostDisplayTitle(post.title, post.sleepDate);
+  const footerDeviceLabel = useMemo(() => {
+    if (isOwnPost) return null;
+    if (isManual) return 'Manual log';
+    const device = post.sourceDevice?.trim();
+    if (!device || device === 'Unknown') return null;
+    return device;
+  }, [isOwnPost, isManual, post.sourceDevice]);
 
   return {
     isManual,
@@ -25,10 +35,12 @@ export function useSleepPostDisplay(post: SleepPost) {
     canReadDream,
     isNapDay,
     napCount,
+    napChipLabel,
     sessions,
     showWearableSleep,
     timelineSegments,
     displayTitle,
+    footerDeviceLabel,
   };
 }
 

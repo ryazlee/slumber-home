@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { prefetchCachedImageUrls } from '../lib/imageCache';
 import { useProfile } from './useProfile';
@@ -26,6 +27,7 @@ import type { CompareParticipant } from '../lib/compareTypes';
 
 export function useCompareSetup() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const friendsQuery = useFriends();
   const profileQuery = useProfile(user?.id ?? null);
 
@@ -42,6 +44,31 @@ export function useCompareSetup() {
   const [draftMetricIds, setDraftMetricIds] = useState<string[]>(DEFAULT_COMPARE_METRIC_IDS);
 
   const friends = friendsQuery.data ?? [];
+  const withUserId = searchParams.get('with');
+
+  useEffect(() => {
+    if (!withUserId || !user?.id || friendsQuery.isLoading) return;
+
+    const friendIds = new Set(friends.map((f) => f.id));
+    if (withUserId !== user.id && !friendIds.has(withUserId)) {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete('with');
+        return next;
+      }, { replace: true });
+      return;
+    }
+
+    const nextPeople = [user.id, withUserId].filter(
+      (id, index, arr) => arr.indexOf(id) === index,
+    );
+    setSelectedPeople(nextPeople);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete('with');
+      return next;
+    }, { replace: true });
+  }, [withUserId, user?.id, friends, friendsQuery.isLoading, setSearchParams]);
 
   useEffect(() => {
     if (!user?.id) return;

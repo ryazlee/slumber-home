@@ -14,6 +14,8 @@ type SleepTimelineBarProps = {
   wakeTime: string;
   sessionBreakdown?: SleepSessionData[];
   variant?: 'card' | 'detail';
+  /** Card clock labels above the bar. Default true. */
+  showClockLabels?: boolean;
 };
 
 const CARD_HEIGHT = 14;
@@ -93,6 +95,7 @@ export default function SleepTimelineBar({
   wakeTime,
   sessionBreakdown,
   variant = 'card',
+  showClockLabels = true,
 }: SleepTimelineBarProps) {
   const chartRef = useRef<HTMLDivElement>(null);
   const scrubbingRef = useRef(false);
@@ -208,10 +211,12 @@ export default function SleepTimelineBar({
   if (!isDetail) {
     return (
       <div className={`sleep-timeline sleep-timeline--${variant}`}>
-        <div className="hypno-labels">
-          <span>{bedtime}</span>
-          <span>{wakeTime}</span>
-        </div>
+        {showClockLabels ? (
+          <div className="hypno-labels">
+            <span>{bedtime}</span>
+            <span>{wakeTime}</span>
+          </div>
+        ) : null}
 
         <div
           className={scrubHostClass}

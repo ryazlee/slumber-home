@@ -30,9 +30,13 @@ export default function ExpandableMentionText({ children, className, prefix = ''
   if (!children.trim()) return null;
 
   const collapsed = needsExpand && !expanded;
+  const toggleExpanded = () => setExpanded((v) => !v);
 
   return (
-    <div className="expandable-mention-text">
+    <div
+      className="expandable-mention-text"
+      data-post-interactive={needsExpand ? true : undefined}
+    >
       <p ref={measureRef} className="expandable-mention-text-measure" aria-hidden>
         <MentionText className={className} onMentionPress={onMentionPress}>{text}</MentionText>
       </p>
@@ -41,8 +45,19 @@ export default function ExpandableMentionText({ children, className, prefix = ''
           'expandable-mention-text-body',
           className,
           collapsed ? 'expandable-mention-text-body--clamped' : '',
+          needsExpand ? 'expandable-mention-text-body--toggleable' : '',
         ].filter(Boolean).join(' ')}
         style={collapsed ? { WebkitLineClamp: PREVIEW_LINES } : undefined}
+        onClick={needsExpand ? toggleExpanded : undefined}
+        role={needsExpand ? 'button' : undefined}
+        tabIndex={needsExpand ? 0 : undefined}
+        onKeyDown={needsExpand ? (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleExpanded();
+          }
+        } : undefined}
+        aria-expanded={needsExpand ? expanded : undefined}
       >
         <MentionText onMentionPress={onMentionPress}>{text}</MentionText>
       </p>
@@ -50,7 +65,10 @@ export default function ExpandableMentionText({ children, className, prefix = ''
         <button
           type="button"
           className="expandable-mention-text-toggle"
-          onClick={() => setExpanded((v) => !v)}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleExpanded();
+          }}
           aria-expanded={expanded}
         >
           <span className="expandable-mention-text-ellipsis">… </span>

@@ -43,10 +43,11 @@ export default function PostDetailView({
     isOwnPost,
     canReadDream,
     isNapDay,
-    napCount,
+    napChipLabel,
     sessions,
     showWearableSleep,
     displayTitle,
+    footerDeviceLabel,
   } = useSleepPostDisplay(post);
 
   const todayISO = useLocalMidnightInvalidation();
@@ -76,7 +77,7 @@ export default function PostDetailView({
           {post.isPrivate ? <span className="post-badge">Private</span> : null}
           {isManual ? <span className="post-badge post-badge-manual">Manual</span> : null}
         </div>
-        <p className="post-detail-author-sub">
+        <p className="post-meta-strip post-detail-author-sub">
           {formatSleepDate(post.sleepDate)} · {timeAgo(post.createdAt)}
           {post.locationLabel ? ` · 📍 ${post.locationLabel}` : ''}
         </p>
@@ -105,10 +106,8 @@ export default function PostDetailView({
               <div className="post-sleep-hero-main">
                 <span className="post-sleep-duration">{formatMins(post.asleepMinutes)}</span>
                 <span className="post-detail-asleep-label">asleep</span>
-                {isNapDay ? (
-                  <span className="post-nap-chip">
-                    ☀️ {napCount === 1 ? 'nap' : `${napCount} naps`}
-                  </span>
+                {napChipLabel ? (
+                  <span className="post-nap-chip">{napChipLabel}</span>
                 ) : null}
               </div>
               {post.vibe ? <PostVibe vibe={post.vibe} showLabel /> : null}
@@ -219,7 +218,7 @@ export default function PostDetailView({
           kudosCount={post.kudosCount}
           hasKudoed={post.hasKudoed}
           commentCount={post.commentCount}
-          sourceDevice={isManual ? 'Manual log' : post.sourceDevice}
+          sourceDevice={footerDeviceLabel}
           defaultCommentsOpen={defaultCommentsOpen}
           onPatch={handleSocialPatch}
         />

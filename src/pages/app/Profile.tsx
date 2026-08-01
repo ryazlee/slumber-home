@@ -96,6 +96,27 @@ export default function Profile() {
             {profile.friendsCount} friends
             {canViewPosts ? ` · ${profile.postsCount} posts` : ''}
           </p>
+          {!isOwnProfile ? (
+            <div className="profile-actions">
+              {profile.friendStatus === 'friends' ? (
+                <Link
+                  to={`/stats/compare?with=${profile.id}`}
+                  className="social-btn social-btn--ghost"
+                >
+                  Compare
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  className="social-btn social-btn--ghost"
+                  disabled
+                  title="Add as a friend to compare sleep stats"
+                >
+                  Compare
+                </button>
+              )}
+            </div>
+          ) : null}
         </div>
       </header>
 

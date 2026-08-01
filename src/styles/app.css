@@ -1011,6 +1011,16 @@
   margin: 0 0 10px;
   font-size: 13px;
   color: var(--text-dim);
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.post-meta-strip::-webkit-scrollbar {
+  display: none;
 }
 
 .post-sleep-buddies {
@@ -1114,7 +1124,7 @@
 }
 
 .post-detail-author-sub {
-  margin: 0;
+  margin: 4px 0 0;
   font-size: 13px;
   color: var(--text-dim);
 }
@@ -1365,29 +1375,46 @@
 .post-pr-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 6px;
+  margin-bottom: 10px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .post-pr-badge {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 11px;
+  flex-shrink: 0;
+  gap: 3px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-size: 9px;
   font-weight: 700;
 }
 
+/* Dark feed: bright gold vs red so lifetime bests separate from worst chips. */
 .post-pr-badge--alltime {
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  color: #fbbf24;
+  background: rgba(255, 214, 10, 0.16);
+  border: 1px solid rgba(255, 214, 10, 0.45);
+  color: #ffd60a;
 }
 
 .post-pr-badge--monthly {
-  background: rgba(234, 179, 8, 0.1);
-  border: 1px solid rgba(234, 179, 8, 0.3);
-  color: #facc15;
+  background: rgba(94, 156, 245, 0.12);
+  border: 1px solid rgba(94, 156, 245, 0.35);
+  color: #7eb6ff;
+}
+
+.post-pr-badge--negative {
+  background: rgba(255, 69, 58, 0.18);
+  border: 1px solid rgba(255, 69, 58, 0.5);
+  color: #ff6b63;
+}
+
+.post-pr-diff {
+  margin-left: 4px;
+  opacity: 0.8;
+  font-weight: 500;
 }
 
 .post-photos {
@@ -1701,9 +1728,9 @@
 
 .session-timeline-card-header {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
   margin-bottom: 8px;
   font-size: 11px;
 }
@@ -1726,12 +1753,23 @@
 }
 
 .session-timeline-card-times {
-  color: var(--text-muted);
+  color: var(--text);
   font-weight: 600;
+  font-size: 12px;
 }
 
 .session-timeline-card-label {
   color: var(--text-dim);
+  font-size: 10px;
+}
+
+.session-timeline-time-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  color: var(--text-dim);
+  font-size: 11px;
 }
 
 .sleep-timeline-scrub-host {
@@ -1901,6 +1939,10 @@
   overflow: hidden;
 }
 
+.expandable-mention-text-body--toggleable {
+  cursor: pointer;
+}
+
 .expandable-mention-text-toggle {
   display: inline-flex;
   align-items: center;
@@ -1956,6 +1998,13 @@
   margin: 0 0 4px;
   font-size: 14px;
   color: var(--text-muted);
+}
+
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .profile-hero h1 {

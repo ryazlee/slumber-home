@@ -104,8 +104,9 @@ export default function Home() {
               <div>
                 <h3>Friends see the real night</h3>
                 <p>
-                  Stages, bed and wake times, vibes. Compare side by side when you want
-                  a baseline that isn&apos;t a random population average.
+                  Stages, bed and wake times, optional vibes. Compare side by side when you want
+                  a baseline that isn&apos;t a random population average — including from a
+                  friend&apos;s profile.
                 </p>
               </div>
             </li>
@@ -120,13 +121,14 @@ export default function Home() {
             <li>
               <strong>Feed</strong>
               See friends&apos; nights as they land: hypnograms, bed and wake times,
-              vibes, dream logs, PR badges, and comments in one place.
+              optional vibes, dream logs, PR badges with margins, wearables, and comments
+              in one place.
             </li>
             <li>
               <strong>Compare</strong>
-              Put your sleep next to theirs for a day, a week, a month, or forever.
-              Stages, timing, and averages side by side instead of a random
-              population score.
+              Put your sleep next to theirs for a day, a week, a month, or forever —
+              open Compare from their profile once you&apos;re friends. Stages, timing,
+              and averages side by side instead of a random population score.
             </li>
             <li>
               <strong>Challenges &amp; clubs</strong>
@@ -136,7 +138,8 @@ export default function Home() {
             <li>
               <strong>Privacy</strong>
               Mutual friends only by default. Keep posts private, blur dreams,
-              and report or block when someone shouldn&apos;t be there.
+              choose which PR chips friends see, and report or block when someone
+              shouldn&apos;t be there.
             </li>
           </ul>
         </section>

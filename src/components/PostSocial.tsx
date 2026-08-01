@@ -33,7 +33,7 @@ type PostSocialProps = {
   kudosCount: number;
   hasKudoed: boolean;
   commentCount: number;
-  sourceDevice: string;
+  sourceDevice?: string | null;
   defaultCommentsOpen?: boolean;
   onPatch?: (patch: PostSocialPatch) => void;
 };
@@ -304,7 +304,7 @@ export default function PostSocial({
             </>
           )}
         </div>
-        <span className="post-source">{sourceDevice}</span>
+        {sourceDevice ? <span className="post-source">{sourceDevice}</span> : null}
       </footer>
 
       {commentsOpen && (

@@ -144,3 +144,23 @@ export function getSessionLabel(
   }
   return 'Overnight';
 }
+
+export type LabeledSession = {
+  label: string;
+  bedtime: string;
+  wakeTime: string;
+  asleepMinutes: number;
+  isNap: boolean;
+};
+
+export function getLabeledSessions(sessions?: SleepSessionData[]): LabeledSession[] {
+  if (!sessions?.length) return [];
+  const napFlags = classifySessionNaps(sessions);
+  return sessions.map((session, index) => ({
+    label: getSessionLabel(session, index, sessions),
+    bedtime: session.bedtime,
+    wakeTime: session.wakeTime,
+    asleepMinutes: session.asleepMinutes,
+    isNap: napFlags[index],
+  }));
+}

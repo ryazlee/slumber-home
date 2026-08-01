@@ -16,6 +16,9 @@ export type UserStats = {
   prHighestDeepPct: PR;
   prHighestRemPct: PR;
   prHighestCorePct: PR;
+  prLowestDeepPct: PR;
+  prLowestRemPct: PR;
+  prLowestCorePct: PR;
 };
 
 export type TopNight = {
@@ -55,6 +58,11 @@ export type LifetimeStats = {
   highestDeepPctNights: TopNight[];
   highestRemPctNights: TopNight[];
   highestCorePctNights: TopNight[];
+  lowestDeepPctNights: TopNight[];
+  lowestRemPctNights: TopNight[];
+  lowestCorePctNights: TopNight[];
+  /** Recent wearable nights with stages — used for monthly PR diffs. */
+  stageNights: TopNight[];
   monthlyBests: MonthBest[];
 };
 

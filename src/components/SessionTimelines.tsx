@@ -68,7 +68,6 @@ function SessionBlock({
         <span className={`session-timeline-badge${sessionIsNap ? ' session-timeline-badge--nap' : ' session-timeline-badge--overnight'}`}>
           {sessionIsNap ? '☀️ NAP' : '🌙 OVERNIGHT'}
         </span>
-        <span className="session-timeline-card-times">{session.bedtime} → {session.wakeTime}</span>
         <span className="session-timeline-card-label">{sessionLabel}</span>
       </div>
       <SleepTimelineBar
@@ -76,7 +75,12 @@ function SessionBlock({
         bedtime={session.bedtime}
         wakeTime={session.wakeTime}
         variant="card"
+        showClockLabels={false}
       />
+      <div className="session-timeline-time-row">
+        <span>{session.bedtime}</span>
+        <span>{session.wakeTime}</span>
+      </div>
     </div>
   );
 }

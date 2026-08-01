@@ -3,10 +3,17 @@ import type { SleepBuddyProfile, SleepBuddyStatus, SleepPost, SleepSessionData, 
 import { avatarColorFromName } from './format';
 import { countWakes } from './wakes';
 import { SLEEP_POST_FEED_SELECT } from './sleepPostSelect';
+import { filterPrTypesByVisibility } from './pr';
 
 export const PAGE_SIZE = 20;
 
-type AuthorProfile = { username: string; avatar_url: string | null; user_roles?: string[] | null };
+type AuthorProfile = {
+  username: string;
+  avatar_url: string | null;
+  user_roles?: string[] | null;
+  show_best_prs?: boolean | null;
+  show_worst_prs?: boolean | null;
+};
 
 export type PostRow = {
   id: string;
@@ -161,7 +168,7 @@ export async function enrichSleepPostRows(rows: PostRow[]): Promise<SleepPost[]>
       .select('post_id, record_type, scope')
       .in('post_id', postIds)
       .not('post_id', 'is', null),
-    supabase.from('profiles').select('id, username, avatar_url, user_roles').in('id', authorUserIds),
+    supabase.from('profiles').select('id, username, avatar_url, user_roles, show_best_prs, show_worst_prs').in('id', authorUserIds),
     fetchMonthPostCounts(rows),
   ]);
 
@@ -249,6 +256,18 @@ export async function enrichSleepPostRows(rows: PostRow[]): Promise<SleepPost[]>
     );
     const postBuddyRows = buddiesByPost.get(row.id) ?? [];
     const isAuthor = currentUserId === row.user_id;
+
+    if (!isAuthor) {
+      const author = authorProfileMap.get(row.user_id);
+      const visibility = {
+        showBest: author?.show_best_prs ?? true,
+        showWorst: author?.show_worst_prs ?? true,
+      };
+      post.prTypes = filterPrTypesByVisibility(post.prTypes, visibility);
+      post.monthlyPrTypes = filterPrTypesByVisibility(post.monthlyPrTypes, visibility);
+      post.isPR =
+        (post.prTypes?.length ?? 0) > 0 || (post.monthlyPrTypes?.length ?? 0) > 0;
+    }
 
     const accepted = postBuddyRows
       .filter((r) => r.status === 'accepted')

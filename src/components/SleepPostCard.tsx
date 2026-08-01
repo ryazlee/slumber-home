@@ -43,9 +43,10 @@ export default function SleepPostCard({
     isOwnPost,
     canReadDream,
     isNapDay,
-    napCount,
+    napChipLabel,
     showWearableSleep,
     displayTitle,
+    footerDeviceLabel,
   } = useSleepPostDisplay(post);
 
   const handleSocialPatch = usePostSocialPatch(post.id, onSocialPatch);
@@ -103,10 +104,8 @@ export default function SleepPostCard({
           <div className="post-sleep-hero">
             <div className="post-sleep-hero-main">
               <span className="post-sleep-duration">{formatMins(post.asleepMinutes)}</span>
-              {isNapDay ? (
-                <span className="post-nap-chip">
-                  ☀️ {napCount === 1 ? 'nap' : `${napCount} naps`}
-                </span>
+              {napChipLabel ? (
+                <span className="post-nap-chip">{napChipLabel}</span>
               ) : null}
             </div>
             {post.vibe ? <PostVibe vibe={post.vibe} /> : null}
@@ -156,7 +155,7 @@ export default function SleepPostCard({
           kudosCount={post.kudosCount}
           hasKudoed={post.hasKudoed}
           commentCount={post.commentCount}
-          sourceDevice={isManual ? 'Manual log' : post.sourceDevice}
+          sourceDevice={footerDeviceLabel}
           defaultCommentsOpen={defaultCommentsOpen}
           onPatch={handleSocialPatch}
         />

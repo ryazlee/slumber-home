@@ -70,6 +70,20 @@ function topNightsByStagePct(
     .slice(0, limit);
 }
 
+function bottomNightsByStagePct(
+  nights: TopNight[],
+  stage: 'deepMinutes' | 'remMinutes' | 'coreMinutes',
+  limit = 3,
+): TopNight[] {
+  return [...nights]
+    .filter((n) => n.asleepMinutes > 0 && n[stage] > 0)
+    .sort(
+      (a, b) =>
+        stagePct(a[stage], a.asleepMinutes) - stagePct(b[stage], b.asleepMinutes),
+    )
+    .slice(0, limit);
+}
+
 function findPR(prs: PRRow[], type: string) {
   const r = prs.find((p) => p.record_type === type && p.scope === 'all_time');
   return r ? { value: r.value, date: r.achieved_at, postId: r.post_id } : null;
@@ -105,6 +119,9 @@ export async function fetchUserStats(userId: string): Promise<UserStats> {
     prHighestDeepPct: findPR(prs, 'highest_deep_pct'),
     prHighestRemPct: findPR(prs, 'highest_rem_pct'),
     prHighestCorePct: findPR(prs, 'highest_core_pct'),
+    prLowestDeepPct: findPR(prs, 'lowest_deep_pct'),
+    prLowestRemPct: findPR(prs, 'lowest_rem_pct'),
+    prLowestCorePct: findPR(prs, 'lowest_core_pct'),
   };
 }
 
@@ -145,6 +162,10 @@ async function fetchLifetimeData(userId: string) {
     highestDeepPctNights: topNightsByStagePct(stageNights, 'deepMinutes'),
     highestRemPctNights: topNightsByStagePct(stageNights, 'remMinutes'),
     highestCorePctNights: topNightsByStagePct(stageNights, 'coreMinutes'),
+    lowestDeepPctNights: bottomNightsByStagePct(stageNights, 'deepMinutes'),
+    lowestRemPctNights: bottomNightsByStagePct(stageNights, 'remMinutes'),
+    lowestCorePctNights: bottomNightsByStagePct(stageNights, 'coreMinutes'),
+    stageNights,
     allRows: filterWearableSleepRows((allRes.data ?? []) as SleepPostRow[]),
     monthlyRows: monthlyWearable,
   };
@@ -280,6 +301,10 @@ export async function fetchLifetimeStats(userId: string): Promise<LifetimeStats>
     highestDeepPctNights: data.highestDeepPctNights,
     highestRemPctNights: data.highestRemPctNights,
     highestCorePctNights: data.highestCorePctNights,
+    lowestDeepPctNights: data.lowestDeepPctNights,
+    lowestRemPctNights: data.lowestRemPctNights,
+    lowestCorePctNights: data.lowestCorePctNights,
+    stageNights: data.stageNights,
     monthlyBests: computeMonthlyBests(data.monthlyRows),
   };
 }
