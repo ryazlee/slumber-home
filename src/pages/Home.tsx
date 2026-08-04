@@ -36,23 +36,21 @@ export default function Home() {
             <p className="home-platforms">Free on iOS and Android</p>
 
             <div className="home-hero-actions">
+              <StoreBadgePair />
               {isLoggedIn ? (
-                <>
-                  <Link to="/feed" className="home-cta home-cta--primary">
-                    Open feed
+                <p className="home-login-prompt">
+                  Already signed in?{' '}
+                  <Link to="/feed" className="home-login-link">
+                    See your feed
                   </Link>
-                  <StoreBadgePair muted />
-                </>
+                </p>
               ) : (
-                <>
-                  <StoreBadgePair />
-                  <p className="home-login-prompt">
-                    Already have an account?{' '}
-                    <Link to="/login" className="home-login-link">
-                      Log in on the web
-                    </Link>
-                  </p>
-                </>
+                <p className="home-login-prompt">
+                  Already have an account?{' '}
+                  <Link to="/login" className="home-login-link">
+                    Log in on the web
+                  </Link>
+                </p>
               )}
             </div>
 
@@ -146,24 +144,22 @@ export default function Home() {
 
         <section className="home-closing" aria-labelledby="home-closing-title">
           <div className="home-closing-panel">
+            <h2 id="home-closing-title">Get Slumber</h2>
+            <StoreBadgePair className="home-closing-stores" />
             {isLoggedIn ? (
-              <>
-                <h2 id="home-closing-title">Back to your feed</h2>
-                <Link to="/feed" className="home-cta home-cta--primary home-closing-primary">
-                  Open feed
+              <p className="home-login-prompt">
+                Already signed in?{' '}
+                <Link to="/feed" className="home-login-link">
+                  See your feed
                 </Link>
-              </>
+              </p>
             ) : (
-              <>
-                <h2 id="home-closing-title">Get Slumber</h2>
-                <StoreBadgePair className="home-closing-stores" />
-                <p className="home-login-prompt">
-                  Already have an account?{' '}
-                  <Link to="/login" className="home-login-link">
-                    Log in on the web
-                  </Link>
-                </p>
-              </>
+              <p className="home-login-prompt">
+                Already have an account?{' '}
+                <Link to="/login" className="home-login-link">
+                  Log in on the web
+                </Link>
+              </p>
             )}
           </div>
         </section>
