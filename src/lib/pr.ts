@@ -47,12 +47,18 @@ type PrBadgePost = {
   monthPostCount?: number;
 };
 
+/** Wearable nights needed in a calendar month before monthly PR chips show. */
+export const MONTHLY_PR_MIN_POSTS = 5;
+
 /**
- * Hide monthly PR chips when the author has fewer than two wearable posts
- * in that calendar month — a "monthly best" among one night is not meaningful.
+ * Hide monthly PR chips until the author has enough wearable posts in that
+ * calendar month — a "monthly best" among a handful of nights is not meaningful.
+ *
+ * Missing `monthPostCount` is treated as 1 so badges stay hidden until enrichment
+ * provides a real count.
  */
 export function isMonthlyPrBadgeHidden(post: Pick<PrBadgePost, 'monthPostCount'>): boolean {
-  return (post.monthPostCount ?? 1) < 2;
+  return (post.monthPostCount ?? 1) < MONTHLY_PR_MIN_POSTS;
 }
 
 export function getVisibleMonthlyPrTypes(post: PrBadgePost): string[] {
