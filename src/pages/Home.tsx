@@ -2,14 +2,56 @@ import { Link } from 'react-router-dom';
 import HomeHypnogram from '../components/HomeHypnogram';
 import HomeScreenshots from '../components/HomeScreenshots';
 import { useAuth } from '../context/AuthContext';
-import { APP_STORE_URL } from '../lib/deepLinks';
+import { APP_STORE_URL, PLAY_STORE_URL, isAndroidUserAgent } from '../lib/deepLinks';
 import '../styles/home.css';
 
 const base = import.meta.env.BASE_URL;
 
+function StoreCta({
+  href,
+  label,
+  primary,
+}: {
+  href: string;
+  label: string;
+  primary: boolean;
+}) {
+  return (
+    <a
+      href={href}
+      className={`home-cta ${primary ? 'home-cta--primary' : 'home-cta--secondary'}`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {label}
+    </a>
+  );
+}
+
 export default function Home() {
   const { session } = useAuth();
   const isLoggedIn = Boolean(session);
+  const preferPlay = isAndroidUserAgent();
+
+  const storeButtons = (primaryStore: 'ios' | 'android' | 'none') => {
+    const ios = (
+      <StoreCta
+        key="ios"
+        href={APP_STORE_URL}
+        label="Download on the App Store"
+        primary={primaryStore === 'ios'}
+      />
+    );
+    const android = (
+      <StoreCta
+        key="android"
+        href={PLAY_STORE_URL}
+        label="Get it on Google Play"
+        primary={primaryStore === 'android'}
+      />
+    );
+    return preferPlay ? [android, ios] : [ios, android];
+  };
 
   return (
     <div className="home-marketing">
@@ -23,6 +65,7 @@ export default function Home() {
               Your sleep score isn&apos;t enough. Post last night from your wearable
               and see how friends actually slept.
             </p>
+            <p className="home-platforms">Available on iOS and Android</p>
 
             <div className="home-hero-actions">
               {isLoggedIn ? (
@@ -30,25 +73,11 @@ export default function Home() {
                   <Link to="/feed" className="home-cta home-cta--primary">
                     Open feed
                   </Link>
-                  <a
-                    href={APP_STORE_URL}
-                    className="home-cta home-cta--secondary"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Download on the App Store
-                  </a>
+                  {storeButtons('none')}
                 </>
               ) : (
                 <>
-                  <a
-                    href={APP_STORE_URL}
-                    className="home-cta home-cta--primary"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Download on the App Store
-                  </a>
+                  {storeButtons(preferPlay ? 'android' : 'ios')}
                   <Link to="/" className="home-cta home-cta--secondary">
                     Log in on the web
                   </Link>
@@ -84,8 +113,8 @@ export default function Home() {
               <div>
                 <h3>Last night shows up</h3>
                 <p>
-                  Slumber reads Apple Health or Google Health, so Watch, Oura, Garmin,
-                  Whoop, Fitbit, and friends already sync.
+                  Slumber reads Apple Health, Health Connect, or Google Health, so Watch,
+                  Oura, Garmin, Whoop, Fitbit, Pixel Watch, and friends already sync.
                 </p>
               </div>
             </li>
@@ -151,14 +180,9 @@ export default function Home() {
               Open feed
             </Link>
           ) : (
-            <a
-              href={APP_STORE_URL}
-              className="home-cta home-cta--primary"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Get Slumber free
-            </a>
+            <div className="home-closing-actions">
+              {storeButtons(preferPlay ? 'android' : 'ios')}
+            </div>
           )}
         </section>
       </div>

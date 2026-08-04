@@ -1,7 +1,7 @@
 {
   "name": "Slumber",
   "short_name": "Slumber",
-  "description": "Social sleep tracking for iOS",
+  "description": "Social sleep tracking for iOS and Android",
   "start_url": "/",
   "display": "browser",
   "background_color": "#0f0f14",

@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useIsModerator } from '../hooks/useAdmin';
 import { isNavActive } from '../lib/appNav';
-import { APP_STORE_URL } from '../lib/deepLinks';
+import { APP_STORE_URL, PLAY_STORE_URL } from '../lib/deepLinks';
 import AppBottomNav, { useBottomNavItems, usePrimaryNavItems } from './AppBottomNav';
 import HeaderMenu from './HeaderMenu';
 import HeaderProfileLink from './HeaderProfileLink';
@@ -86,6 +86,14 @@ export default function SiteHeader() {
                     rel="noopener noreferrer"
                   >
                     App Store
+                  </a>
+                  <a
+                    href={PLAY_STORE_URL}
+                    className="site-header-btn site-header-btn--ghost site-header-btn--store"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Google Play
                   </a>
                   <NavLink to="/" end className="site-header-btn site-header-btn--primary">
                     Log in

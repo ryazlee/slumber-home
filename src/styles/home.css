@@ -122,6 +122,15 @@
   max-width: 34em;
 }
 
+.home-platforms {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
 .home-hero-actions {
   display: flex;
   flex-direction: column;
@@ -539,9 +548,30 @@
   max-width: 28rem;
 }
 
+.home-closing-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 28rem;
+}
+
+.home-closing-actions .home-cta {
+  width: 100%;
+  max-width: none;
+}
+
 @media (min-width: 560px) {
   .home-closing .home-cta {
     width: auto;
+  }
+
+  .home-closing-actions {
+    max-width: 28rem;
+  }
+
+  .home-closing-actions .home-cta {
+    width: 100%;
   }
 
   .home-steps-list p,

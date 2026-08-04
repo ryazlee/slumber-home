@@ -1,13 +1,13 @@
 export const privacyMeta = {
   title: 'Privacy Policy',
-  updated: 'July 20, 2026',
+  updated: 'August 3, 2026',
 };
 
 export const privacySections = [
   {
     heading: 'Overview',
     body: [
-      'Slumber is a social sleep-tracking app for iOS. You log nights from Apple Health, Google Health (optional), or manually, add context (notes, dreams, photos, tags), and share with friends you mutually approve. An optional web companion lets signed-in users browse their feed, profile, stats, and challenges in a browser and leave kudos and comments. Sleep logging, HealthKit / Google Health sync, and most account management stay in the mobile app.',
+      'Slumber is a social sleep-tracking app for iOS and Android. You log nights from Apple Health, Health Connect, Google Health (optional), or manually, add context (notes, dreams, photos, tags), and share with friends you mutually approve. An optional web companion lets signed-in users browse their feed, profile, stats, and challenges in a browser and leave kudos and comments. Sleep logging, health sync, and most account management stay in the mobile app.',
       'This policy describes what we collect through the Slumber mobile app and website, how we use it, and the choices you have.',
     ],
   },
@@ -18,6 +18,7 @@ export const privacySections = [
       'Sleep data you create: sleep duration, bed and wake times, sleep stages (when available from a wearable), hypnogram samples, titles, location labels, vibes, tags, morning notes, dream journal entries, optional dream mood, and photos you attach to posts.',
       'Manual sleep logs: when you log a night without wearable data, we store the times and duration you enter. Manual logs appear in your social feed but are excluded from competitive stats, personal records, and challenge scoring.',
       'Apple Health data (with your permission): sleep duration and stage data read via HealthKit to populate wearable sleep logs. Slumber only reads Health data you authorize; we do not write to HealthKit on your behalf.',
+      'Health Connect data (Android, with your permission): sleep duration and stage data read via Health Connect to populate wearable sleep logs. Slumber only reads Health Connect data you authorize; we do not write sleep data back to Health Connect on your behalf.',
       'Google Health data (optional, with your permission): if you connect Google Health in Settings, we read sleep duration and stage data from your Google Health account via Google\'s API using the restricted scope googlehealth.sleep.readonly. OAuth refresh tokens are stored on our servers (never on your device) so we can fetch sleep on your behalf. Slumber only reads sleep data you authorize; we do not write sleep data to Google Health. See "Data protection" below for how we safeguard this data.',
       'Social activity: friend relationships, comments, comment likes, kudos, sleep challenges, challenge progress, sleep buddy tags, notifications, and @mentions in notes, dreams, and comments.',
       'Safety and moderation: abuse reports you submit and block lists you maintain.',
@@ -28,7 +29,7 @@ export const privacySections = [
     heading: 'How we use information',
     body: [
       'Provide core features: sleep logging, feed, profile, stats, compare views, challenges, streaks, and notifications.',
-      'Sync sleep from Apple Health when you grant access, including upgrading a manual log when newer wearable data becomes available.',
+      'Sync sleep from Apple Health or Health Connect when you grant access, including upgrading a manual log when newer wearable data becomes available.',
       'Sync sleep from Google Health when you explicitly connect that source in Settings.',
       'Show your posts to friends according to each post\'s privacy settings, and show friends\' posts to you.',
       'Operate social interactions: friend requests, comments, kudos, mentions, sleep buddy tag requests, and challenge invitations.',
@@ -42,6 +43,14 @@ export const privacySections = [
       'HealthKit data is used only inside Slumber to display sleep metrics, build hypnogram charts, compute stats, and score sleep challenges you join.',
       'Slumber does not sell, trade, or share data obtained through the Apple HealthKit framework with advertising platforms, data brokers, or third-party information resellers.',
       'You can revoke HealthKit access at any time in iOS Settings. Existing posts already saved in Slumber are not automatically deleted when you revoke access.',
+    ],
+  },
+  {
+    heading: 'Health Connect',
+    body: [
+      'Health Connect data is used only inside Slumber to display sleep metrics, build hypnogram charts, compute stats, and score sleep challenges you join.',
+      'Slumber does not sell, trade, or share data obtained through Health Connect with advertising platforms, data brokers, or third-party information resellers.',
+      'You can revoke Health Connect access at any time in Android settings. Existing posts already saved in Slumber are not automatically deleted when you revoke access.',
     ],
   },
   {
@@ -74,7 +83,7 @@ export const privacySections = [
       'Dream privacy: you can blur a dream entry so friends see that you logged a dream without reading the text. Mentioned friends may see a minimal indicator when they are @mentioned in a private dream.',
       'Sleep buddies: when you tag a friend on a post, they must accept before the tag appears to other viewers.',
       'Challenges: participants in a challenge you join can see challenge-related sleep contributions according to challenge rules.',
-      'Web companion: when you sign in on the website, you can view the same friend-visible content your account can access in the app and interact with kudos and comments. The website does not sync HealthKit or Google Health data and does not support sleep logging.',
+      'Web companion: when you sign in on the website, you can view the same friend-visible content your account can access in the app and interact with kudos and comments. The website does not sync Apple Health, Health Connect, or Google Health data and does not support sleep logging.',
       'Service providers: we use infrastructure providers (e.g. Supabase) to host authentication, database, and file storage under contractual safeguards.',
       'Legal requirements: we may disclose information when required by law or to protect the safety of users and the service.',
     ],
@@ -89,6 +98,7 @@ export const privacySections = [
       'Report posts for moderation review.',
       'Delete your account in Settings, or request deletion on the web at useslumber.com/delete-account — removes your login, personal sleep posts, photos, health connections, and social connections; comments and likes you left on others\' posts may remain under an anonymized account name.',
       'Revoke Apple Health access in iOS Settings at any time.',
+      'Revoke Health Connect access in Android settings at any time.',
       'Disconnect Google Health in Slumber Settings.',
     ],
   },

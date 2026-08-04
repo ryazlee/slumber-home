@@ -9,6 +9,15 @@ export { isRestrictedInAppBrowser } from './inAppBrowserEscape';
 
 export const APP_STORE_URL = 'https://apps.apple.com/app/id6772449516';
 
+/** Play internal testing invite until public listing has enough testers. */
+export const PLAY_STORE_URL =
+  'https://play.google.com/apps/internaltest/4700340789434908709';
+
+export function isAndroidUserAgent(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return /Android/i.test(navigator.userAgent || '');
+}
+
 export type InviteLinkTarget =
   | { kind: 'friend'; token: string; schemePath: string }
   | { kind: 'challenge'; token: string; schemePath: string }

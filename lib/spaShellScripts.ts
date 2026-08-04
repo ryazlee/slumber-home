@@ -10,11 +10,11 @@ export type SocialMetaVariant = 'site' | 'deeplink';
 
 const SITE_TITLE = 'Slumber';
 const SITE_DESCRIPTION =
-  'Social sleep tracking for iOS. Log from Apple Health or Google Health, share with friends, and join sleep challenges.';
+  'Social sleep tracking for iOS and Android. Log from Apple Health, Health Connect, or Google Health, share with friends, and join sleep challenges.';
 
 const DEEPLINK_TITLE = 'Join on Slumber';
 const DEEPLINK_DESCRIPTION =
-  "You're invited to try social sleep tracking for iOS. Log sleep with friends, compare stats, and join challenges.";
+  "You're invited to try social sleep tracking for iOS and Android. Log sleep with friends, compare stats, and join challenges.";
 
 const OG_IMAGE_WIDTH = 1200;
 const OG_IMAGE_HEIGHT = 630;
@@ -61,7 +61,7 @@ export function buildSocialMetaHead(
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="${OG_IMAGE_WIDTH}" />
     <meta property="og:image:height" content="${OG_IMAGE_HEIGHT}" />
-    <meta property="og:image:alt" content="Slumber, social sleep tracking for iOS" />
+    <meta property="og:image:alt" content="Slumber, social sleep tracking for iOS and Android" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${title}" />

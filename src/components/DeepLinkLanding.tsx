@@ -2,7 +2,9 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   APP_STORE_URL,
+  PLAY_STORE_URL,
   buildSchemeUrl,
+  isAndroidUserAgent,
   isRestrictedInAppBrowser,
   scheduleAppOpen,
   tryOpenInApp,
@@ -49,6 +51,20 @@ type Props = {
 
 const base = import.meta.env.BASE_URL;
 
+function storeLinks() {
+  const preferPlay = isAndroidUserAgent();
+  return {
+    primaryHref: preferPlay ? PLAY_STORE_URL : APP_STORE_URL,
+    primaryLabel: preferPlay
+      ? 'Get Slumber on Google Play'
+      : 'Get Slumber on the App Store',
+    secondaryHref: preferPlay ? APP_STORE_URL : PLAY_STORE_URL,
+    secondaryLabel: preferPlay
+      ? 'Get Slumber on the App Store'
+      : 'Get Slumber on Google Play',
+  };
+}
+
 export default function DeepLinkLanding({
   intent,
   title,
@@ -61,6 +77,7 @@ export default function DeepLinkLanding({
 }: Props) {
   const schemeUrl = buildSchemeUrl(schemePath);
   const previewIcon = previewEmoji?.trim() || INTENT_ICON[intent];
+  const stores = storeLinks();
 
   useEffect(() => {
     return scheduleAppOpen(schemeUrl);
@@ -122,12 +139,20 @@ export default function DeepLinkLanding({
           {captiveApp ? 'Continue in Safari' : 'Open in Slumber'}
         </button>
         <a
-          href={APP_STORE_URL}
+          href={stores.primaryHref}
           className="deeplink-cta-store"
           target="_blank"
           rel="noreferrer"
         >
-          Get Slumber on the App Store
+          {stores.primaryLabel}
+        </a>
+        <a
+          href={stores.secondaryHref}
+          className="deeplink-cta-store"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {stores.secondaryLabel}
         </a>
         <p className="deeplink-cta-hint">
           {captiveApp === 'instagram' ? (
@@ -150,6 +175,8 @@ export default function DeepLinkLanding({
 }
 
 export function DeepLinkNotFound({ message }: { message: string }) {
+  const stores = storeLinks();
+
   return (
     <main className="deeplink-page">
       <header className="deeplink-brand">
@@ -163,8 +190,21 @@ export function DeepLinkNotFound({ message }: { message: string }) {
         <p className="deeplink-preview-subtitle">{message}</p>
       </section>
       <div className="deeplink-cta">
-        <a href={APP_STORE_URL} className="deeplink-cta-primary deeplink-cta-primary--link" rel="noreferrer" target="_blank">
-          Get Slumber on the App Store
+        <a
+          href={stores.primaryHref}
+          className="deeplink-cta-primary deeplink-cta-primary--link"
+          rel="noreferrer"
+          target="_blank"
+        >
+          {stores.primaryLabel}
+        </a>
+        <a
+          href={stores.secondaryHref}
+          className="deeplink-cta-store"
+          rel="noreferrer"
+          target="_blank"
+        >
+          {stores.secondaryLabel}
         </a>
       </div>
       <footer className="deeplink-footer">

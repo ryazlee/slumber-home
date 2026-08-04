@@ -1,20 +1,20 @@
 export const termsMeta = {
   title: 'Terms of Service',
-  updated: 'July 2026',
+  updated: 'August 2026',
 };
 
 export const termsSections = [
   {
     heading: 'The short version',
     body: [
-      'Slumber is a social sleep-tracking app for iOS. You sync sleep from Apple Health or Google Health (optional), log context around your nights, and share with friends you approve. By using Slumber you agree to these terms.',
+      'Slumber is a social sleep-tracking app for iOS and Android. You sync sleep from Apple Health, Health Connect, or Google Health (optional), log context around your nights, and share with friends you approve. By using Slumber you agree to these terms.',
     ],
   },
   {
     heading: 'Eligibility',
     body: [
       'You must be at least 13 years old to use Slumber.',
-      'You need a compatible iOS device (iOS 16.4+) and, for automatic sleep sync, a source that writes to Apple Health or Google Health (Apple Watch, Oura, Garmin, Pixel Watch, Fitbit, etc.).',
+      'You need a compatible iOS device (iOS 16.4+) or Android device (Android 8.0+), and for automatic sleep sync, a source that writes to Apple Health, Health Connect, or Google Health (Apple Watch, Oura, Garmin, Pixel Watch, Fitbit, etc.).',
     ],
   },
   {
@@ -30,7 +30,7 @@ export const termsSections = [
     body: [
       'You own the sleep logs, photos, notes, and dreams you post. You grant Slumber a license to store, display, and process that content so the app works: showing your feed, stats, challenges, and notifications.',
       'Don\'t post anything illegal, harassing, or that violates someone else\'s rights. We can remove content and suspend accounts that break these rules or that get valid abuse reports.',
-      'Sleep metrics pulled from Apple Health or Google Health are tied to your device or account data. You can edit titles, notes, tags, and privacy settings, but the underlying sleep numbers come from the source you connected.',
+      'Sleep metrics pulled from Apple Health, Health Connect, or Google Health are tied to your device or account data. You can edit titles, notes, tags, and privacy settings, but the underlying sleep numbers come from the source you connected.',
     ],
   },
   {
@@ -59,6 +59,13 @@ export const termsSections = [
     body: [
       'HealthKit access is optional but required for automatic Apple Health sync. You can revoke access in iOS Settings at any time.',
       'We handle HealthKit data as described in our Privacy Policy.',
+    ],
+  },
+  {
+    heading: 'Health Connect',
+    body: [
+      'Health Connect access is optional but required for automatic Health Connect sync on Android. You can revoke access in Android settings at any time.',
+      'We handle Health Connect data as described in our Privacy Policy.',
     ],
   },
   {
