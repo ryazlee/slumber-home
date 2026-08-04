@@ -1,9 +1,11 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import AppShell from './components/AppShell';
 import Layout from './components/Layout';
 import RequireAuth from './components/RequireAuth';
 import SiteLayout from './components/SiteLayout';
 import { withDeepLinkAuthGate } from './components/DeepLinkAuthGate';
+import { trackPageview } from './lib/analytics';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 import AdminPostsPage from './pages/admin/AdminPostsPage';
@@ -47,9 +49,21 @@ function ProtectedAppShell() {
   );
 }
 
+function RouteAnalytics() {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackPageview();
+  }, [location.pathname, location.search, location.hash]);
+
+  return null;
+}
+
 export default function App() {
   return (
-    <Routes>
+    <>
+      <RouteAnalytics />
+      <Routes>
       <Route element={<SiteLayout />}>
         <Route path="invite/:token" element={<InviteLandingPage />} />
         <Route path="challenge/join/:token" element={<InviteLandingPage />} />
@@ -101,6 +115,7 @@ export default function App() {
           <Route path="delete-data" element={<DeleteData />} />
         </Route>
       </Route>
-    </Routes>
+      </Routes>
+    </>
   );
 }
