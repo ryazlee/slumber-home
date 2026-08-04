@@ -1,57 +1,15 @@
 import { Link } from 'react-router-dom';
 import HomeHypnogram from '../components/HomeHypnogram';
 import HomeScreenshots from '../components/HomeScreenshots';
+import { StoreBadgePair } from '../components/StoreBadges';
 import { useAuth } from '../context/AuthContext';
-import { APP_STORE_URL, PLAY_STORE_URL, isAndroidUserAgent } from '../lib/deepLinks';
 import '../styles/home.css';
 
 const base = import.meta.env.BASE_URL;
 
-function StoreCta({
-  href,
-  label,
-  primary,
-}: {
-  href: string;
-  label: string;
-  primary: boolean;
-}) {
-  return (
-    <a
-      href={href}
-      className={`home-cta ${primary ? 'home-cta--primary' : 'home-cta--secondary'}`}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {label}
-    </a>
-  );
-}
-
 export default function Home() {
   const { session } = useAuth();
   const isLoggedIn = Boolean(session);
-  const preferPlay = isAndroidUserAgent();
-
-  const storeButtons = (primaryStore: 'ios' | 'android' | 'none') => {
-    const ios = (
-      <StoreCta
-        key="ios"
-        href={APP_STORE_URL}
-        label="Download on the App Store"
-        primary={primaryStore === 'ios'}
-      />
-    );
-    const android = (
-      <StoreCta
-        key="android"
-        href={PLAY_STORE_URL}
-        label="Get it on Google Play"
-        primary={primaryStore === 'android'}
-      />
-    );
-    return preferPlay ? [android, ios] : [ios, android];
-  };
 
   return (
     <div className="home-marketing">
@@ -59,13 +17,23 @@ export default function Home() {
         <div className="home-hero-glow" aria-hidden="true" />
         <div className="home-hero-inner content-wrap">
           <div className="home-hero-copy">
-            <p className="home-brand">Slumber</p>
+            <div className="home-brand-lockup">
+              <img
+                className="home-app-icon"
+                src={`${base}icon-512.png`}
+                alt=""
+                width={72}
+                height={72}
+                decoding="async"
+              />
+              <p className="home-brand">Slumber</p>
+            </div>
             <h1 id="home-headline">Sleep socially, together.</h1>
             <p className="home-lead">
               Your sleep score isn&apos;t enough. Post last night from your wearable
               and see how friends actually slept.
             </p>
-            <p className="home-platforms">Available on iOS and Android</p>
+            <p className="home-platforms">Free on iOS and Android</p>
 
             <div className="home-hero-actions">
               {isLoggedIn ? (
@@ -73,14 +41,17 @@ export default function Home() {
                   <Link to="/feed" className="home-cta home-cta--primary">
                     Open feed
                   </Link>
-                  {storeButtons('none')}
+                  <StoreBadgePair muted />
                 </>
               ) : (
                 <>
-                  {storeButtons(preferPlay ? 'android' : 'ios')}
-                  <Link to="/" className="home-cta home-cta--secondary">
-                    Log in on the web
-                  </Link>
+                  <StoreBadgePair />
+                  <p className="home-login-prompt">
+                    Already have an account?{' '}
+                    <Link to="/login" className="home-login-link">
+                      Log in on the web
+                    </Link>
+                  </p>
                 </>
               )}
             </div>
@@ -173,17 +144,28 @@ export default function Home() {
           </ul>
         </section>
 
-        <section className="home-closing">
-          <h2>{isLoggedIn ? 'Back to your feed' : 'Bring a couple friends'}</h2>
-          {isLoggedIn ? (
-            <Link to="/feed" className="home-cta home-cta--primary">
-              Open feed
-            </Link>
-          ) : (
-            <div className="home-closing-actions">
-              {storeButtons(preferPlay ? 'android' : 'ios')}
-            </div>
-          )}
+        <section className="home-closing" aria-labelledby="home-closing-title">
+          <div className="home-closing-panel">
+            {isLoggedIn ? (
+              <>
+                <h2 id="home-closing-title">Back to your feed</h2>
+                <Link to="/feed" className="home-cta home-cta--primary home-closing-primary">
+                  Open feed
+                </Link>
+              </>
+            ) : (
+              <>
+                <h2 id="home-closing-title">Get Slumber</h2>
+                <StoreBadgePair className="home-closing-stores" />
+                <p className="home-login-prompt">
+                  Already have an account?{' '}
+                  <Link to="/login" className="home-login-link">
+                    Log in on the web
+                  </Link>
+                </p>
+              </>
+            )}
+          </div>
         </section>
       </div>
     </div>

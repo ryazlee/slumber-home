@@ -109,7 +109,7 @@ export default function HeaderMenu({ showAdmin, adminActive }: Props) {
             </button>
           ) : (
             <NavLink
-              to="/"
+              to="/login"
               end
               role="menuitem"
               className="header-menu-item"

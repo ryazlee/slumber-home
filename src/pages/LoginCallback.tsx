@@ -57,7 +57,7 @@ export default function LoginCallback() {
           <div className="admin-card admin-card-narrow login-card">
             <h1>Sign in failed</h1>
             <p className="admin-error">{error}</p>
-            <Link className="admin-button" to="/">Back to sign in</Link>
+            <Link className="admin-button" to="/login">Back to sign in</Link>
           </div>
         </main>
       </div>

@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import LoginForm from '../../components/LoginForm';
 import { useAuth } from '../../context/AuthContext';
 
@@ -25,8 +25,11 @@ export default function AppEntry() {
     <div className="login-page">
       <main className="login-page-main">
         <LoginForm
-          description="Browse your feed, stats, and challenges and leave kudos and comments. Log sleep, accept invites, and manage friends in the iOS app. Use the email tied to your Slumber account."
+          description="Browse your feed, stats, and challenges and leave kudos and comments. Log sleep, accept invites, and manage friends in the mobile app. Use the email tied to your Slumber account."
         />
+        <p className="login-page-foot">
+          <Link to="/">← Back to Slumber</Link>
+        </p>
       </main>
     </div>
   );

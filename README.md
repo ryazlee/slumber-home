@@ -24,14 +24,15 @@ npm install && npm run dev
 
 | Route | Auth | Purpose |
 |-------|------|---------|
-| `/` | Login | App entry — email OTP, Google, magic link; redirects to `/feed` when signed in |
+| `/` | Partial | Marketing when logged out; redirects to `/feed` when signed in |
+| `/login` | Login | Web sign-in — email OTP, Google, magic link; redirects to `/feed` when signed in |
 | `/login-callback` | — | Supabase auth return (magic link + Google OAuth) |
 | `/feed` | Yes | Friends feed — kudos + comments; stage metrics on one line (dynamic sizing) |
 | `/profile` | Yes | Your profile and recent posts |
 | `/stats` | Yes | My Stats (30-day averages, charts, PRs) |
 | `/stats/compare` | Yes | Friend compare table (wearable-only; bedtime/wake not rankable) |
 | `/challenges` | Yes | Active and completed challenges |
-| `/home` | No | Marketing / product overview |
+| `/home` | No | Marketing alias — redirects logged-out visitors to `/`; About page when signed in |
 | `/privacy` | No | Privacy policy (App Store / Play link) |
 | `/terms` | No | Terms of service |
 | `/delete-account` | No | Account deletion (Play Console account deletion URL) |

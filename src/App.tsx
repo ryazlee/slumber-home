@@ -3,18 +3,7 @@ import AppShell from './components/AppShell';
 import Layout from './components/Layout';
 import RequireAuth from './components/RequireAuth';
 import SiteLayout from './components/SiteLayout';
-import AppEntry from './pages/app/AppEntry';
-import ChallengeDetail from './pages/app/ChallengeDetail';
-import Challenges from './pages/app/Challenges';
-import Compare from './pages/app/Compare';
-import Feed from './pages/app/Feed';
-import MyStats from './pages/app/MyStats';
-import PostDetail from './pages/app/PostDetail';
-import Profile from './pages/app/Profile';
-import SocialClubs from './pages/app/SocialClubs';
-import SocialFriends from './pages/app/SocialFriends';
-import SocialLayout from './pages/app/SocialLayout';
-import StatsLayout from './pages/app/StatsLayout';
+import { withDeepLinkAuthGate } from './components/DeepLinkAuthGate';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 import AdminPostsPage from './pages/admin/AdminPostsPage';
@@ -25,15 +14,26 @@ import AdminRolesPage from './pages/admin/AdminRolesPage';
 import AdminTagsPage from './pages/admin/AdminTagsPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminCommunityPage from './pages/admin/AdminCommunityPage';
-import Home from './pages/Home';
+import AppEntry from './pages/app/AppEntry';
+import ChallengeDetail from './pages/app/ChallengeDetail';
+import Challenges from './pages/app/Challenges';
+import Compare from './pages/app/Compare';
+import Feed from './pages/app/Feed';
+import IndexRoute, { HomeAliasRoute } from './pages/app/IndexRoute';
+import MyStats from './pages/app/MyStats';
+import PostDetail from './pages/app/PostDetail';
+import Profile from './pages/app/Profile';
+import SocialClubs from './pages/app/SocialClubs';
+import SocialFriends from './pages/app/SocialFriends';
+import SocialLayout from './pages/app/SocialLayout';
+import StatsLayout from './pages/app/StatsLayout';
 import DeleteAccount from './pages/DeleteAccount';
 import DeleteData from './pages/DeleteData';
-import Privacy from './pages/Privacy';
-import Terms from './pages/Terms';
+import HealthCallback from './pages/HealthCallback';
 import InviteLandingPage from './pages/InviteLandingPage';
 import LoginCallback from './pages/LoginCallback';
-import HealthCallback from './pages/HealthCallback';
-import { withDeepLinkAuthGate } from './components/DeepLinkAuthGate';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
 
 const GatedPostDetail = withDeepLinkAuthGate(PostDetail);
 const GatedProfile = withDeepLinkAuthGate(Profile);
@@ -76,7 +76,7 @@ export default function App() {
         </Route>
         <Route path="login-callback" element={<LoginCallback />} />
         <Route path="health-callback" element={<HealthCallback />} />
-        <Route index element={<AppEntry />} />
+        <Route path="login" element={<AppEntry />} />
         <Route element={<ProtectedAppShell />}>
           <Route path="feed" element={<Feed />} />
           <Route path="stats" element={<StatsLayout />}>
@@ -93,7 +93,8 @@ export default function App() {
           <Route path="challenges" element={<Challenges />} />
         </Route>
         <Route element={<Layout />}>
-          <Route path="home" element={<Home />} />
+          <Route index element={<IndexRoute />} />
+          <Route path="home" element={<HomeAliasRoute />} />
           <Route path="privacy" element={<Privacy />} />
           <Route path="terms" element={<Terms />} />
           <Route path="delete-account" element={<DeleteAccount />} />

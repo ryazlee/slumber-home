@@ -23,7 +23,7 @@ export default function SiteHeader() {
   const primaryNav = usePrimaryNavItems();
   const bottomNav = useBottomNavItems();
   const adminActive = location.pathname === '/admin' || location.pathname.startsWith('/admin/');
-  const brandTarget = isLoggedIn ? '/feed' : '/home';
+  const brandTarget = isLoggedIn ? '/feed' : '/';
 
   return (
     <>
@@ -58,7 +58,11 @@ export default function SiteHeader() {
           <div className="site-header-end">
             {!isLoggedIn ? (
               <nav className="site-header-links" aria-label="Site">
-                <NavLink to="/home" className={({ isActive }) => (isActive ? 'site-header-link active' : 'site-header-link')}>
+                <NavLink
+                  to="/"
+                  end
+                  className={({ isActive }) => (isActive ? 'site-header-link active' : 'site-header-link')}
+                >
                   Home
                 </NavLink>
                 <NavLink to="/privacy" className={({ isActive }) => (isActive ? 'site-header-link active' : 'site-header-link')}>
@@ -95,7 +99,7 @@ export default function SiteHeader() {
                   >
                     Google Play
                   </a>
-                  <NavLink to="/" end className="site-header-btn site-header-btn--primary">
+                  <NavLink to="/login" end className="site-header-btn site-header-btn--primary">
                     Log in
                   </NavLink>
                   <div className="site-header-mobile-menu">
