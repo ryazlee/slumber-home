@@ -7,11 +7,11 @@ export function buildMonthMetrics(month: PeriodStats): StatsMetric[] {
   if (!month || month.postsCount === 0) return [];
 
   return [
-    { label: 'Avg sleep', value: month.asleep != null ? formatMins(month.asleep) : '—', accent: 'var(--accent)' },
+    { label: 'Avg sleep', value: month.asleep != null ? formatMins(month.asleep) : '—' },
     { label: 'Deep', value: month.deepPct != null ? `${month.deepPct}%` : '—', accent: stageColor('deep') },
     { label: 'REM', value: month.remPct != null ? `${month.remPct}%` : '—', accent: stageColor('rem') },
     { label: 'Core', value: month.corePct != null ? `${month.corePct}%` : '—', accent: stageColor('core') },
-    { label: 'Avg wakes', value: month.awakeEvents != null ? String(month.awakeEvents) : '—', accent: stageColor('awake') },
+    { label: 'Avg wakes', value: month.awakeEvents != null ? String(month.awakeEvents) : '—' },
     { label: 'Dream rate', value: month.dreamRate != null ? `${month.dreamRate}%` : '—' },
     { label: 'Avg in bed', value: month.inBed != null ? formatMins(month.inBed) : '—' },
     { label: 'Avg bedtime', value: month.avgBedtime ?? '—' },

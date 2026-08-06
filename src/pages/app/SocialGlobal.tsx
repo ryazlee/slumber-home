@@ -17,6 +17,11 @@ const METRICS: {
   subtitle: string;
 }[] = [
   {
+    key: 'avgHours',
+    label: 'Average hours',
+    subtitle: 'Average nightly asleep time',
+  },
+  {
     key: 'deepPct',
     label: 'Deep %',
     subtitle: 'Share of asleep time in deep sleep',
@@ -30,11 +35,6 @@ const METRICS: {
     key: 'corePct',
     label: 'Core %',
     subtitle: 'Share of asleep time in core / light',
-  },
-  {
-    key: 'avgHours',
-    label: 'Avg hours',
-    subtitle: 'Average nightly asleep time',
   },
   {
     key: 'dreamRate',
@@ -106,7 +106,7 @@ function LeaderboardRow({
 
 export default function SocialGlobal() {
   const { user } = useAuth();
-  const [metric, setMetric] = useState<GlobalLeaderboardMetric>('deepPct');
+  const [metric, setMetric] = useState<GlobalLeaderboardMetric>('avgHours');
   const { data, isLoading, isError, refetch, isFetching } = useGlobalSleepLeaderboard(true);
 
   const activeMeta = METRICS.find((m) => m.key === metric) ?? METRICS[0];
@@ -144,7 +144,7 @@ export default function SocialGlobal() {
     return (
       <section className="app-section social-section">
         <p className="social-empty app-muted">
-          No rankings yet. Need at least {data?.minNights ?? 7} wearable nights in the last{' '}
+          No rankings yet. Need at least {data?.minNights ?? 5} wearable nights in the last{' '}
           {data?.days ?? 60} days.
         </p>
       </section>
@@ -154,22 +154,24 @@ export default function SocialGlobal() {
   return (
     <section className="app-section social-section global-lb">
       <div className="global-lb-header">
-        <div className="app-tab-bar global-lb-metrics" role="tablist" aria-label="Leaderboard metrics">
-          {METRICS.map((m) => {
-            const active = m.key === metric;
-            return (
-              <button
-                key={m.key}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                className={`app-tab-bar-link${active ? ' active' : ''}`}
-                onClick={() => setMetric(m.key)}
-              >
-                {m.label}
-              </button>
-            );
-          })}
+        <div className="global-lb-chip-scroll">
+          <div className="global-lb-chips" role="tablist" aria-label="Leaderboard metrics">
+            {METRICS.map((m) => {
+              const active = m.key === metric;
+              return (
+                <button
+                  key={m.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  className={`global-lb-chip${active ? ' global-lb-chip--active' : ''}`}
+                  onClick={() => setMetric(m.key)}
+                >
+                  {m.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
         <p className="global-lb-subtitle">{activeMeta.subtitle}</p>
         <p className="global-lb-intro app-muted">

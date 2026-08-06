@@ -10,6 +10,8 @@ export type StatsPrItem = {
   pr: PR;
   format: (v: number) => string;
   tone?: StatsPrTone;
+  /** Full-width hero tile (e.g. Longest sleep). */
+  featured?: boolean;
 };
 
 export type StatsPrSection = {
@@ -35,15 +37,15 @@ export default function StatsPrStrip({ sections }: Props) {
     <div className="stats-pr-sections">
       {visibleSections.map((section) => (
         <div key={section.title} className="stats-pr-section">
-          <div className={`stats-pr-section-title stats-pr-section-title--${section.kind}`}>
+          <div className="stats-pr-section-title">
             {section.title}
           </div>
           <div className="stats-pr-grid">
             {section.items.map((item) => {
               const className = [
                 'stats-pr-tile',
-                section.kind === 'best' ? 'stats-pr-tile--best' : 'stats-pr-tile--rough',
                 item.tone ? `stats-pr-tile--${item.tone}` : '',
+                item.featured ? 'stats-pr-tile--featured' : '',
                 item.pr?.postId ? 'stats-pr-tile--link' : '',
               ].filter(Boolean).join(' ');
 

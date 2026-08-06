@@ -84,7 +84,7 @@ export default function MyStats() {
         title: 'Highlights',
         kind: 'best' as const,
         items: [
-          { emoji: '🏆', label: 'Longest sleep', pr: resolvePr(stats.prLongestSleep, best, 'asleepMinutes'), format: formatMins, tone: 'best' as const },
+          { emoji: '🏆', label: 'Longest sleep', pr: resolvePr(stats.prLongestSleep, best, 'asleepMinutes'), format: formatMins, tone: 'best' as const, featured: true },
           { emoji: '💜', label: 'Most deep', pr: resolvePr(stats.prMostDeep, deep, 'deepMinutes'), format: formatMins, tone: 'deep' as const },
           { emoji: '💗', label: 'Most REM', pr: resolvePr(stats.prMostRem, rem, 'remMinutes'), format: formatMins, tone: 'rem' as const },
           { emoji: '💙', label: 'Most core', pr: resolvePr(stats.prMostCore, core, 'coreMinutes'), format: formatMins, tone: 'core' as const },
@@ -97,11 +97,11 @@ export default function MyStats() {
         title: 'Rough nights',
         kind: 'rough' as const,
         items: [
-          { emoji: '⏱️', label: 'Shortest sleep', pr: resolvePr(stats.prShortestSleep, shortest, 'asleepMinutes'), format: formatMins, tone: 'rough' as const },
-          { emoji: '😵', label: 'Most wakes', pr: resolvePr(stats.prMostWakes, wakes, 'awakeEvents'), format: formatCount, tone: 'awake' as const },
           { emoji: '🧊', label: 'Lowest deep %', pr: resolvePctPr(stats.prLowestDeepPct, lowDeepPct, 'deepMinutes'), format: formatPct, tone: 'deep' as const },
           { emoji: '🧊', label: 'Lowest REM %', pr: resolvePctPr(stats.prLowestRemPct, lowRemPct, 'remMinutes'), format: formatPct, tone: 'rem' as const },
           { emoji: '🧊', label: 'Lowest core %', pr: resolvePctPr(stats.prLowestCorePct, lowCorePct, 'coreMinutes'), format: formatPct, tone: 'core' as const },
+          { emoji: '⏱️', label: 'Shortest sleep', pr: resolvePr(stats.prShortestSleep, shortest, 'asleepMinutes'), format: formatMins, tone: 'rough' as const },
+          { emoji: '😵', label: 'Most wakes', pr: resolvePr(stats.prMostWakes, wakes, 'awakeEvents'), format: formatCount, tone: 'awake' as const },
         ],
       },
     ];
@@ -162,40 +162,38 @@ export default function MyStats() {
         />
       ) : null}
 
-      {stats ? (
+      {(stats || lifetime) ? (
         <section className="stats-section">
           <h2 className="stats-section-label">Personal records</h2>
-          <StatsPrStrip sections={personalRecordSections} />
-        </section>
-      ) : null}
-
-      {lifetime ? (
-        <section className="stats-section">
-          <h2 className="stats-section-label">All time</h2>
-          <div className="stats-summary-row">
-            <div className="stats-summary-card">
-              <span className="stats-summary-value">{lifetime.totalNights}</span>
-              <span className="stats-summary-label">Nights</span>
-            </div>
-            <div className="stats-summary-card">
-              <span className="stats-summary-value">{formatMins(lifetime.avgAsleepMinutes)}</span>
-              <span className="stats-summary-label">Avg Sleep</span>
-            </div>
-            <div className="stats-summary-card">
-              <span className="stats-summary-value">{stats?.longestStreak ?? 0}</span>
-              <span className="stats-summary-label">Best Streak</span>
-            </div>
-          </div>
-          {(lifetime.avgBedtime || lifetime.avgWakeTime) ? (
-            <div className="stats-summary-row">
-              <div className="stats-summary-card">
-                <span className="stats-summary-value">{lifetime.avgBedtime ?? '—'}</span>
-                <span className="stats-summary-label">Avg Bedtime</span>
+          {stats ? <StatsPrStrip sections={personalRecordSections} /> : null}
+          {lifetime ? (
+            <div className="stats-lifetime-summary">
+              <div className="stats-summary-row">
+                <div className="stats-summary-card">
+                  <span className="stats-summary-value">{lifetime.totalNights}</span>
+                  <span className="stats-summary-label">Nights</span>
+                </div>
+                <div className="stats-summary-card">
+                  <span className="stats-summary-value">{formatMins(lifetime.avgAsleepMinutes)}</span>
+                  <span className="stats-summary-label">Avg Sleep</span>
+                </div>
+                <div className="stats-summary-card">
+                  <span className="stats-summary-value">{stats?.longestStreak ?? 0}</span>
+                  <span className="stats-summary-label">Best Streak</span>
+                </div>
               </div>
-              <div className="stats-summary-card">
-                <span className="stats-summary-value">{lifetime.avgWakeTime ?? '—'}</span>
-                <span className="stats-summary-label">Avg Wake-up</span>
-              </div>
+              {(lifetime.avgBedtime || lifetime.avgWakeTime) ? (
+                <div className="stats-summary-row">
+                  <div className="stats-summary-card">
+                    <span className="stats-summary-value">{lifetime.avgBedtime ?? '—'}</span>
+                    <span className="stats-summary-label">Avg Bedtime</span>
+                  </div>
+                  <div className="stats-summary-card">
+                    <span className="stats-summary-value">{lifetime.avgWakeTime ?? '—'}</span>
+                    <span className="stats-summary-label">Avg Wake-up</span>
+                  </div>
+                </div>
+              ) : null}
             </div>
           ) : null}
         </section>

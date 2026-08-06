@@ -99,9 +99,10 @@ export default function App() {
             <Route path="compare" element={<Compare />} />
           </Route>
           <Route path="social" element={<SocialLayout />}>
-            <Route index element={<SocialFriends />} />
-            <Route path="clubs" element={<SocialClubs />} />
+            <Route index element={<Navigate to="/social/global" replace />} />
             <Route path="global" element={<SocialGlobal />} />
+            <Route path="clubs" element={<SocialClubs />} />
+            <Route path="friends" element={<SocialFriends />} />
           </Route>
           <Route path="compare" element={<Navigate to="/stats/compare" replace />} />
           <Route path="social/compare" element={<Navigate to="/stats/compare" replace />} />

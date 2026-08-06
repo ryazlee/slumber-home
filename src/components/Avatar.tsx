@@ -20,6 +20,7 @@ const SLOT_PX: Record<NonNullable<AvatarProps['size']>, number> = {
   compact: AVATAR_SIZE.compact,
   sm: AVATAR_SIZE.tab,
   md: AVATAR_SIZE.row,
+  featured: AVATAR_SIZE.featured,
   lg: AVATAR_SIZE.hero,
 };
 
@@ -50,7 +51,7 @@ type AvatarProps = {
   username: string;
   avatarUrl?: string;
   userRoles?: string[] | null;
-  size?: 'compact' | 'sm' | 'md' | 'lg';
+  size?: 'compact' | 'sm' | 'md' | 'featured' | 'lg';
   className?: string;
 };
 
@@ -58,6 +59,7 @@ const SLOT_CLASS: Record<NonNullable<AvatarProps['size']>, string> = {
   compact: 'avatar-slot avatar-slot--compact',
   sm: 'avatar-slot avatar-slot--sm',
   md: 'avatar-slot avatar-slot--md',
+  featured: 'avatar-slot avatar-slot--featured',
   lg: 'avatar-slot avatar-slot--lg',
 };
 

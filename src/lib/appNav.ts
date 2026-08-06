@@ -18,9 +18,9 @@ export const STATS_SUBNAV: { to: string; label: string; end?: boolean }[] = [
 ];
 
 export const SOCIAL_SUBNAV: { to: string; label: string; end?: boolean }[] = [
-  { to: '/social', label: 'Friends', end: true },
-  { to: '/social/clubs', label: 'Clubs' },
   { to: '/social/global', label: 'Global' },
+  { to: '/social/clubs', label: 'Clubs' },
+  { to: '/social/friends', label: 'Friends' },
 ];
 
 export const ADMIN_NAV_ITEM: PrimaryNavItem = {

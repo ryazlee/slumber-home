@@ -28,12 +28,13 @@
   --dream-neutral: var(--text-muted);
   --dream-good: #e8c45a;
   --dream-vivid: var(--accent-bright);
+  --streak-flame: #ff453a;
   --max-width: 720px;
   --wide-width: 960px;
   --app-width: 1280px;
   --feed-width: 920px;
   --stream-width: var(--feed-width);
-  --nav-height: 60px;
+  --nav-height: 72px;
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 0, 0, 0.22);
   --content-padding-x: clamp(16px, 2.5vw, 28px);
   --page-header-gap: 16px;
@@ -282,8 +283,8 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   text-decoration: none;
   border: 2px solid transparent;
@@ -307,8 +308,8 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   border: 2px solid transparent;
   background: transparent;
@@ -419,24 +420,30 @@ textarea {
 }
 
 .header-menu-trigger {
-  min-height: 36px;
-  padding: 0 10px;
-  border: 0;
-  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  min-height: 56px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
   background: transparent;
   color: var(--text-muted);
   font: inherit;
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.08em;
   cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
 
 .header-menu-trigger:hover,
 .header-menu-trigger--open {
   color: var(--text);
-  background: color-mix(in srgb, var(--text-muted) 10%, transparent);
+  background: var(--surface);
 }
 
 .header-menu-panel {
@@ -4149,9 +4156,9 @@ a.admin-metric-card--link:focus-visible {
   .header-menu-trigger,
   .header-search-trigger,
   .header-profile-link {
-    width: 44px;
-    height: 44px;
-    min-height: 44px;
+    width: 56px;
+    height: 56px;
+    min-height: 56px;
   }
 
   .header-menu-item {

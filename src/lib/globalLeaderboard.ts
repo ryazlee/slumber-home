@@ -9,7 +9,12 @@ export type GlobalLeaderboardEntry = {
   value: number;
 };
 
-export type GlobalLeaderboardMetric = 'deepPct' | 'remPct' | 'corePct' | 'avgHours' | 'dreamRate';
+export type GlobalLeaderboardMetric =
+  | 'deepPct'
+  | 'remPct'
+  | 'corePct'
+  | 'avgHours'
+  | 'dreamRate';
 
 export type GlobalSleepLeaderboard = {
   days: number;
@@ -57,14 +62,14 @@ export async function fetchGlobalSleepLeaderboard(opts?: {
   const { data, error } = await supabase.rpc('get_global_sleep_leaderboard', {
     p_days: opts?.days ?? 60,
     p_limit: opts?.limit ?? 10,
-    p_min_nights: opts?.minNights ?? 7,
+    p_min_nights: opts?.minNights ?? 5,
   });
   if (error) throw error;
 
   const payload = (data ?? {}) as Record<string, unknown>;
   return {
     days: typeof payload.days === 'number' ? payload.days : 60,
-    minNights: typeof payload.minNights === 'number' ? payload.minNights : 7,
+    minNights: typeof payload.minNights === 'number' ? payload.minNights : 5,
     deepPct: mapList(payload.deepPct),
     remPct: mapList(payload.remPct),
     corePct: mapList(payload.corePct),

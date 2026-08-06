@@ -124,7 +124,7 @@ export function filterPrTypesByVisibility(
   return next.length > 0 ? next : undefined;
 }
 
-/** Format margin vs #2 — bests as +time/+%, worsts as -time/-%, counts as ±N. */
+/** Format margin vs #2 — bests as +time/+%; min anti-records as -time/-%; max anti-records (most wakes) as +N. */
 export function formatPrDiffLabel(
   type: string,
   value: number,
@@ -137,7 +137,10 @@ export function formatPrDiffLabel(
     : isCountPrType(type)
       ? String(Math.round(value))
       : formatMins(value);
-  return isNegativePrType(type) ? `-${mag}` : `+${mag}`;
+  // Most wakes ranks by maximum (more = worse) so the margin is still a +.
+  // Shortest / lowest % rank by minimum, so the margin is a -.
+  if (isNegativePrType(type) && !isCountPrType(type)) return `-${mag}`;
+  return `+${mag}`;
 }
 
 export function hasVisiblePrBadges(post: PrBadgePost): boolean {

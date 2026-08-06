@@ -27,7 +27,7 @@ export default function HeaderProfileLink() {
         username={profile?.username ?? 'you'}
         avatarUrl={profile?.avatarUrl}
         userRoles={profile?.userRoles}
-        size="sm"
+        size="featured"
       />
     </NavLink>
   );
