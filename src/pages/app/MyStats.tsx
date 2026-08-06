@@ -63,10 +63,11 @@ export default function MyStats() {
     [compare?.month],
   );
 
-  const personalRecordRows = useMemo(() => {
+  const personalRecordSections = useMemo(() => {
     if (!stats) return [];
     const best = lifetime?.bestNights[0];
     const shortest = lifetime?.shortestNights[0];
+    const wakes = lifetime?.mostWakesNights[0];
     const deep = lifetime?.mostDeepNights[0];
     const rem = lifetime?.mostRemNights[0];
     const core = lifetime?.mostCoreNights[0];
@@ -76,30 +77,33 @@ export default function MyStats() {
     const lowDeepPct = lifetime?.lowestDeepPctNights[0];
     const lowRemPct = lifetime?.lowestRemPctNights[0];
     const lowCorePct = lifetime?.lowestCorePctNights[0];
+    const formatCount = (v: number) => String(Math.round(v));
+
     return [
-      [
-        { emoji: '🏆', label: 'Longest', pr: resolvePr(stats.prLongestSleep, best, 'asleepMinutes'), format: formatMins },
-        { emoji: '⏱️', label: 'Shortest', pr: resolvePr(stats.prShortestSleep, shortest, 'asleepMinutes'), format: formatMins },
-      ],
-      [
-        { emoji: '💜', label: 'Most deep', pr: resolvePr(stats.prMostDeep, deep, 'deepMinutes'), format: formatMins },
-        { emoji: '💜', label: 'Deep %', pr: resolvePctPr(stats.prHighestDeepPct, deepPct, 'deepMinutes'), format: formatPct },
-      ],
-      [
-        { emoji: '🧊', label: 'Low deep %', pr: resolvePctPr(stats.prLowestDeepPct, lowDeepPct, 'deepMinutes'), format: formatPct },
-        { emoji: '🧊', label: 'Low REM %', pr: resolvePctPr(stats.prLowestRemPct, lowRemPct, 'remMinutes'), format: formatPct },
-      ],
-      [
-        { emoji: '💗', label: 'Most REM', pr: resolvePr(stats.prMostRem, rem, 'remMinutes'), format: formatMins },
-        { emoji: '💗', label: 'REM %', pr: resolvePctPr(stats.prHighestRemPct, remPct, 'remMinutes'), format: formatPct },
-      ],
-      [
-        { emoji: '💙', label: 'Most core', pr: resolvePr(stats.prMostCore, core, 'coreMinutes'), format: formatMins },
-        { emoji: '💙', label: 'Core %', pr: resolvePctPr(stats.prHighestCorePct, corePct, 'coreMinutes'), format: formatPct },
-      ],
-      [
-        { emoji: '🧊', label: 'Low core %', pr: resolvePctPr(stats.prLowestCorePct, lowCorePct, 'coreMinutes'), format: formatPct },
-      ],
+      {
+        title: 'Highlights',
+        kind: 'best' as const,
+        items: [
+          { emoji: '🏆', label: 'Longest sleep', pr: resolvePr(stats.prLongestSleep, best, 'asleepMinutes'), format: formatMins, tone: 'best' as const },
+          { emoji: '💜', label: 'Most deep', pr: resolvePr(stats.prMostDeep, deep, 'deepMinutes'), format: formatMins, tone: 'deep' as const },
+          { emoji: '💗', label: 'Most REM', pr: resolvePr(stats.prMostRem, rem, 'remMinutes'), format: formatMins, tone: 'rem' as const },
+          { emoji: '💙', label: 'Most core', pr: resolvePr(stats.prMostCore, core, 'coreMinutes'), format: formatMins, tone: 'core' as const },
+          { emoji: '💜', label: 'Highest deep %', pr: resolvePctPr(stats.prHighestDeepPct, deepPct, 'deepMinutes'), format: formatPct, tone: 'deep' as const },
+          { emoji: '💗', label: 'Highest REM %', pr: resolvePctPr(stats.prHighestRemPct, remPct, 'remMinutes'), format: formatPct, tone: 'rem' as const },
+          { emoji: '💙', label: 'Highest core %', pr: resolvePctPr(stats.prHighestCorePct, corePct, 'coreMinutes'), format: formatPct, tone: 'core' as const },
+        ],
+      },
+      {
+        title: 'Rough nights',
+        kind: 'rough' as const,
+        items: [
+          { emoji: '⏱️', label: 'Shortest sleep', pr: resolvePr(stats.prShortestSleep, shortest, 'asleepMinutes'), format: formatMins, tone: 'rough' as const },
+          { emoji: '😵', label: 'Most wakes', pr: resolvePr(stats.prMostWakes, wakes, 'awakeEvents'), format: formatCount, tone: 'awake' as const },
+          { emoji: '🧊', label: 'Lowest deep %', pr: resolvePctPr(stats.prLowestDeepPct, lowDeepPct, 'deepMinutes'), format: formatPct, tone: 'deep' as const },
+          { emoji: '🧊', label: 'Lowest REM %', pr: resolvePctPr(stats.prLowestRemPct, lowRemPct, 'remMinutes'), format: formatPct, tone: 'rem' as const },
+          { emoji: '🧊', label: 'Lowest core %', pr: resolvePctPr(stats.prLowestCorePct, lowCorePct, 'coreMinutes'), format: formatPct, tone: 'core' as const },
+        ],
+      },
     ];
   }, [stats, lifetime]);
 
@@ -161,7 +165,7 @@ export default function MyStats() {
       {stats ? (
         <section className="stats-section">
           <h2 className="stats-section-label">Personal records</h2>
-          <StatsPrStrip rows={personalRecordRows} />
+          <StatsPrStrip sections={personalRecordSections} />
         </section>
       ) : null}
 

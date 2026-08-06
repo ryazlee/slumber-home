@@ -129,7 +129,7 @@ export default function SocialFriends() {
       <section className="app-section social-section">
         <h2>Friends</h2>
         {friends.length === 0 ? (
-          <p className="app-muted">No friends yet. Add people from the iOS app.</p>
+          <p className="app-muted">No friends yet. Open a profile to send a request.</p>
         ) : (
           <div className="social-list">
             {friends.map((friend) => (

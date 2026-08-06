@@ -13,6 +13,7 @@ import {
 import { useLongPress } from '../hooks/useLongPress';
 import { useMentionProfilePress } from '../hooks/useMentionProfilePress';
 import { pluralCount, timeAgo } from '../lib/format';
+import { useAutosizeCommentTextarea } from '../lib/commentInputGrow';
 import { buildCommentReplyPrefix } from '../lib/mentions';
 import type { Comment } from '../lib/types';
 import CommentActionIcon from './CommentActionIcon';
@@ -72,6 +73,7 @@ export default function PostSocial({
   const updateCommentMutation = useUpdateComment(postId);
   const deleteCommentMutation = useDeleteComment(postId);
   const composeRef = useRef<HTMLTextAreaElement>(null);
+  useAutosizeCommentTextarea(composeRef, commentText);
 
   const patchParent = useCallback((patch: PostSocialPatch) => {
     onPatch?.(patch);
@@ -349,7 +351,7 @@ export default function PostSocial({
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 maxLength={300}
-                rows={2}
+                rows={1}
                 disabled={addCommentMutation.isPending || commentsQuery.isLoading}
               />
               <button

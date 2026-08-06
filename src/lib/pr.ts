@@ -1,6 +1,9 @@
+import { addDaysToDateISO } from './dates';
+
 export const PR_LABELS: Record<string, string> = {
   longest_sleep: 'Longest Sleep',
   shortest_sleep: 'Shortest Sleep',
+  most_wakes: 'Most Wakes',
   most_deep_sleep: 'Most Deep',
   most_rem: 'Most REM',
   most_core_sleep: 'Most Core',
@@ -21,9 +24,15 @@ export const PERCENT_PR_TYPES = new Set([
   'lowest_core_pct',
 ]);
 
-/** "Anti-records" — shortest night / lowest stage share. Styled distinctly from achievement PRs. */
+/** Count-based PRs (not minutes / %). */
+export const COUNT_PR_TYPES = new Set([
+  'most_wakes',
+]);
+
+/** "Anti-records" — shortest night / most wakes / lowest stage share. Styled distinctly from achievement PRs. */
 export const NEGATIVE_PR_TYPES = new Set([
   'shortest_sleep',
+  'most_wakes',
   'lowest_deep_pct',
   'lowest_rem_pct',
   'lowest_core_pct',
@@ -33,6 +42,10 @@ export function isPercentPrType(type: string): boolean {
   return PERCENT_PR_TYPES.has(type);
 }
 
+export function isCountPrType(type: string): boolean {
+  return COUNT_PR_TYPES.has(type);
+}
+
 export function isNegativePrType(type: string): boolean {
   return NEGATIVE_PR_TYPES.has(type);
 }
@@ -40,54 +53,65 @@ export function isNegativePrType(type: string): boolean {
 // Maps record_type → diff vs #2 in the user's own lifetime top-3
 export type PRDiffs = Record<string, number>;
 
-type PrBadgePost = {
-  prTypes?: string[];
-  monthlyPrTypes?: string[];
-  /** Wearable (non-custom) posts by this author in the post's calendar month. */
-  monthPostCount?: number;
-};
+/** Inclusive trailing window for feed/detail PR badges (not calendar month). */
+export const RECENT_PR_WINDOW_DAYS = 30;
 
-/** Wearable nights needed in a calendar month before monthly PR chips show. */
-export const MONTHLY_PR_MIN_POSTS = 5;
+/** Wearable nights needed in the trailing window before recent PR chips show. */
+export const RECENT_PR_MIN_POSTS = 5;
 
-/**
- * Hide monthly PR chips until the author has enough wearable posts in that
- * calendar month — a "monthly best" among a handful of nights is not meaningful.
- *
- * Missing `monthPostCount` is treated as 1 so badges stay hidden until enrichment
- * provides a real count.
- */
-export function isMonthlyPrBadgeHidden(post: Pick<PrBadgePost, 'monthPostCount'>): boolean {
-  return (post.monthPostCount ?? 1) < MONTHLY_PR_MIN_POSTS;
+/** First sleep_date (inclusive) in the trailing window ending on `sleepDate`. */
+export function recentPrWindowStart(sleepDate: string): string {
+  return addDaysToDateISO(sleepDate, -(RECENT_PR_WINDOW_DAYS - 1));
 }
 
-export function getVisibleMonthlyPrTypes(post: PrBadgePost): string[] {
-  const types = post.monthlyPrTypes ?? [];
-  if (!types.length || isMonthlyPrBadgeHidden(post)) return [];
+export function isInRecentPrWindow(nightDate: string, anchorSleepDate: string): boolean {
+  return nightDate >= recentPrWindowStart(anchorSleepDate) && nightDate <= anchorSleepDate;
+}
+
+type PrBadgePost = {
+  prTypes?: string[];
+  recentPrTypes?: string[];
+  recentWindowPostCount?: number;
+};
+
+/**
+ * Hide recent PR chips until the author has enough wearable posts in that
+ * trailing window — a "30-day best" among a handful of nights is not meaningful.
+ *
+ * Missing count is treated as 1 so badges stay hidden until enrichment
+ * provides a real count.
+ */
+export function isRecentPrBadgeHidden(post: Pick<PrBadgePost, 'recentWindowPostCount'>): boolean {
+  return (post.recentWindowPostCount ?? 1) < RECENT_PR_MIN_POSTS;
+}
+
+export function getVisibleRecentPrTypes(post: PrBadgePost): string[] {
+  const types = post.recentPrTypes ?? [];
+  if (!types.length || isRecentPrBadgeHidden(post)) return [];
   return types;
 }
 
 export type PrBadgeChip = {
   type: string;
-  scope: 'all-time' | 'monthly';
+  scope: 'all-time' | 'recent';
 };
 
 /**
- * Display order: lifetime best → monthly best → lifetime worst → monthly worst.
+ * Display order: lifetime best → 30-day best → lifetime worst → 30-day worst.
  * Preserves relative order within each group. Does not apply visibility prefs.
  */
 export function orderPrBadgeChips(post: PrBadgePost): PrBadgeChip[] {
   const lifetimeBest: PrBadgeChip[] = [];
   const lifetimeWorst: PrBadgeChip[] = [];
-  const monthlyBest: PrBadgeChip[] = [];
-  const monthlyWorst: PrBadgeChip[] = [];
+  const recentBest: PrBadgeChip[] = [];
+  const recentWorst: PrBadgeChip[] = [];
   for (const type of post.prTypes ?? []) {
     (isNegativePrType(type) ? lifetimeWorst : lifetimeBest).push({ type, scope: 'all-time' });
   }
-  for (const type of getVisibleMonthlyPrTypes(post)) {
-    (isNegativePrType(type) ? monthlyWorst : monthlyBest).push({ type, scope: 'monthly' });
+  for (const type of getVisibleRecentPrTypes(post)) {
+    (isNegativePrType(type) ? recentWorst : recentBest).push({ type, scope: 'recent' });
   }
-  return [...lifetimeBest, ...monthlyBest, ...lifetimeWorst, ...monthlyWorst];
+  return [...lifetimeBest, ...recentBest, ...lifetimeWorst, ...recentWorst];
 }
 
 /** Strip best and/or worst PR types for feed visibility (author prefs). */
@@ -100,7 +124,7 @@ export function filterPrTypesByVisibility(
   return next.length > 0 ? next : undefined;
 }
 
-/** Format margin vs #2 — bests as +time/+%, worsts as -time/-%. */
+/** Format margin vs #2 — bests as +time/+%, worsts as -time/-%, counts as ±N. */
 export function formatPrDiffLabel(
   type: string,
   value: number,
@@ -108,10 +132,14 @@ export function formatPrDiffLabel(
   formatPct: (n: number) => string,
 ): string {
   if (value <= 0) return '';
-  const mag = isPercentPrType(type) ? formatPct(value) : formatMins(value);
+  const mag = isPercentPrType(type)
+    ? formatPct(value)
+    : isCountPrType(type)
+      ? String(Math.round(value))
+      : formatMins(value);
   return isNegativePrType(type) ? `-${mag}` : `+${mag}`;
 }
 
 export function hasVisiblePrBadges(post: PrBadgePost): boolean {
-  return (post.prTypes?.length ?? 0) > 0 || getVisibleMonthlyPrTypes(post).length > 0;
+  return (post.prTypes?.length ?? 0) > 0 || getVisibleRecentPrTypes(post).length > 0;
 }

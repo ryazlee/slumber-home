@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Avatar from './Avatar';
 import CommentContextMenu from './CommentContextMenu';
 import { timeAgo } from '../lib/format';
+import { useAutosizeCommentTextarea } from '../lib/commentInputGrow';
 import type { Comment } from '../lib/types';
 import MentionText from './MentionText';
 import ReactionHeart from './ReactionHeart';
@@ -52,7 +53,9 @@ export default function CommentRow({
 
   const menuBtnRef = useRef<HTMLButtonElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
+  const editInputRef = useRef<HTMLTextAreaElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  useAutosizeCommentTextarea(editInputRef, isEditing ? editText : '');
 
   const openMenu = () => {
     if (!showMenu) return;
@@ -129,11 +132,12 @@ export default function CommentRow({
         {isEditing ? (
           <form className="comment-edit" onSubmit={handleSave}>
             <textarea
+              ref={editInputRef}
               className="comment-edit-input"
               value={editText}
               onChange={(e) => onEditTextChange?.(e.target.value)}
               maxLength={300}
-              rows={2}
+              rows={1}
               disabled={editSaving}
               autoFocus
             />

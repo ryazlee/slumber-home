@@ -1,5 +1,5 @@
 import { diff } from './diff';
-import type { PRDiffs } from './pr';
+import { recentPrWindowStart, type PRDiffs } from './pr';
 
 export type PrDiffNight = {
   sleepDate: string;
@@ -7,6 +7,7 @@ export type PrDiffNight = {
   deepMinutes: number;
   remMinutes: number;
   coreMinutes: number;
+  awakeEvents?: number;
 };
 
 function stagePct(stageMinutes: number, asleepMinutes: number): number {
@@ -43,6 +44,7 @@ export function computePrDiffs(nights: PrDiffNight[]): PRDiffs {
   return {
     longest_sleep: diff(topValues(nights, (n) => n.asleepMinutes)),
     shortest_sleep: shortest.length >= 2 ? shortest[1] - shortest[0] : 0,
+    most_wakes: diff(topValues(nights, (n) => n.awakeEvents ?? 0)),
     most_deep_sleep: diff(topValues(nights, (n) => n.deepMinutes)),
     most_rem: diff(topValues(nights, (n) => n.remMinutes)),
     most_core_sleep: diff(topValues(nights, (n) => n.coreMinutes)),
@@ -64,8 +66,13 @@ export function computePrDiffs(nights: PrDiffNight[]): PRDiffs {
   };
 }
 
-/** Diffs for nights in the same calendar month as `sleepDate` (YYYY-MM-DD). */
+/** Diffs for nights in the trailing 30-day window ending on `sleepDate`. */
+export function computeRecentPrDiffs(nights: PrDiffNight[], sleepDate: string): PRDiffs {
+  const start = recentPrWindowStart(sleepDate);
+  return computePrDiffs(nights.filter((n) => n.sleepDate >= start && n.sleepDate <= sleepDate));
+}
+
+/** @deprecated Use computeRecentPrDiffs. */
 export function computeMonthlyPrDiffs(nights: PrDiffNight[], sleepDate: string): PRDiffs {
-  const monthKey = sleepDate.slice(0, 7);
-  return computePrDiffs(nights.filter((n) => n.sleepDate.startsWith(monthKey)));
+  return computeRecentPrDiffs(nights, sleepDate);
 }

@@ -10,6 +10,7 @@ export type UserStats = {
   avgAsleepMinutes: number;
   prLongestSleep: PR;
   prShortestSleep: PR;
+  prMostWakes: PR;
   prMostDeep: PR;
   prMostRem: PR;
   prMostCore: PR;
@@ -28,6 +29,7 @@ export type TopNight = {
   deepMinutes: number;
   remMinutes: number;
   coreMinutes: number;
+  awakeEvents: number;
 };
 
 export type MonthBest = {
@@ -52,6 +54,7 @@ export type LifetimeStats = {
   avgWakeTime: string | null;
   bestNights: TopNight[];
   shortestNights: TopNight[];
+  mostWakesNights: TopNight[];
   mostDeepNights: TopNight[];
   mostRemNights: TopNight[];
   mostCoreNights: TopNight[];

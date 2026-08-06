@@ -7,6 +7,12 @@ import FeedPostsSkeleton from '../../components/FeedPostsSkeleton';
 import PostList from '../../components/PostList';
 import { useAuth } from '../../context/AuthContext';
 import { useProfile } from '../../hooks/useProfile';
+import {
+  useAcceptFriendRequest,
+  useCancelFriendRequest,
+  useDeclineFriendRequest,
+  useSendFriendRequest,
+} from '../../hooks/useSocial';
 import { useUserPosts } from '../../hooks/useUserPosts';
 import { formatChallengeRecord, formatMins } from '../../lib/format';
 import { formatRoleList } from '../../lib/userRoles';
@@ -18,6 +24,25 @@ export default function Profile() {
   const isOwnProfile = Boolean(authUser?.id && profileUserId === authUser.id);
 
   const profileQuery = useProfile(profileUserId);
+  const sendFriendMutation = useSendFriendRequest();
+  const cancelFriendMutation = useCancelFriendRequest();
+  const acceptFriendMutation = useAcceptFriendRequest();
+  const declineFriendMutation = useDeclineFriendRequest();
+  const friendActionBusy =
+    sendFriendMutation.isPending
+    || cancelFriendMutation.isPending
+    || acceptFriendMutation.isPending
+    || declineFriendMutation.isPending;
+  const friendActionError =
+    sendFriendMutation.error
+    ?? cancelFriendMutation.error
+    ?? acceptFriendMutation.error
+    ?? declineFriendMutation.error;
+  const friendActionErrorMessage = friendActionError instanceof Error
+    ? friendActionError.message
+    : friendActionError
+      ? 'Could not update friend request.'
+      : null;
   const canViewPosts = Boolean(
     profileQuery.data && (profileQuery.data.isOwnProfile || profileQuery.data.friendStatus === 'friends'),
   );
@@ -98,13 +123,59 @@ export default function Profile() {
           </p>
           {!isOwnProfile ? (
             <div className="profile-actions">
-              {profile.friendStatus === 'friends' ? (
-                <Link
-                  to={`/stats/compare?with=${profile.id}`}
-                  className="social-btn social-btn--ghost"
+              {profile.friendStatus === 'none' ? (
+                <button
+                  type="button"
+                  className="social-btn"
+                  disabled={friendActionBusy}
+                  onClick={() => sendFriendMutation.mutate(profile.id)}
                 >
-                  Compare
-                </Link>
+                  {sendFriendMutation.isPending ? 'Sending…' : 'Add friend'}
+                </button>
+              ) : null}
+              {profile.friendStatus === 'request_sent' ? (
+                <button
+                  type="button"
+                  className="social-btn social-btn--ghost"
+                  disabled={friendActionBusy}
+                  title="Cancel friend request"
+                  onClick={() => cancelFriendMutation.mutate(profile.id)}
+                >
+                  {cancelFriendMutation.isPending ? 'Canceling…' : 'Pending'}
+                </button>
+              ) : null}
+              {profile.friendStatus === 'request_received' ? (
+                <>
+                  <button
+                    type="button"
+                    className="social-btn social-btn--ghost"
+                    disabled={friendActionBusy}
+                    onClick={() => declineFriendMutation.mutate(profile.id)}
+                  >
+                    Decline
+                  </button>
+                  <button
+                    type="button"
+                    className="social-btn"
+                    disabled={friendActionBusy}
+                    onClick={() => acceptFriendMutation.mutate(profile.id)}
+                  >
+                    {acceptFriendMutation.isPending ? 'Accepting…' : 'Accept'}
+                  </button>
+                </>
+              ) : null}
+              {profile.friendStatus === 'friends' ? (
+                <>
+                  <button type="button" className="social-btn social-btn--ghost" disabled>
+                    Friends
+                  </button>
+                  <Link
+                    to={`/stats/compare?with=${profile.id}`}
+                    className="social-btn social-btn--ghost"
+                  >
+                    Compare
+                  </Link>
+                </>
               ) : (
                 <button
                   type="button"
@@ -116,6 +187,9 @@ export default function Profile() {
                 </button>
               )}
             </div>
+          ) : null}
+          {friendActionErrorMessage ? (
+            <p className="admin-error" style={{ marginTop: 8 }}>{friendActionErrorMessage}</p>
           ) : null}
         </div>
       </header>

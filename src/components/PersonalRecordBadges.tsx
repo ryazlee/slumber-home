@@ -7,7 +7,7 @@ import {
   orderPrBadgeChips,
   type PRDiffs,
 } from '../lib/pr';
-import { computeMonthlyPrDiffs } from '../lib/prDiffs';
+import { computeRecentPrDiffs } from '../lib/prDiffs';
 import { diff } from '../lib/diff';
 import { useLifetimeStats } from '../hooks/useStats';
 import type { SleepPost } from '../lib/types';
@@ -15,7 +15,7 @@ import type { SleepPost } from '../lib/types';
 type Props = {
   post: Pick<
     SleepPost,
-    'userId' | 'sleepDate' | 'prTypes' | 'monthlyPrTypes' | 'monthPostCount' | 'isPR'
+    'userId' | 'sleepDate' | 'prTypes' | 'recentPrTypes' | 'recentWindowPostCount' | 'isPR'
   >;
 };
 
@@ -28,14 +28,14 @@ function stagePct(stageMinutes: number, asleepMinutes: number): number {
   return (stageMinutes / asleepMinutes) * 100;
 }
 
-function prEmoji(type: string, scope: 'all-time' | 'monthly'): string {
+function prEmoji(type: string, scope: 'all-time' | 'recent'): string {
   if (isNegativePrType(type)) return '🧊';
-  return scope === 'monthly' ? '🥇' : '🏆';
+  return scope === 'recent' ? '🥇' : '🏆';
 }
 
-function prLabel(type: string, scope: 'all-time' | 'monthly'): string {
+function prLabel(type: string, scope: 'all-time' | 'recent'): string {
   const base = PR_LABELS[type] ?? type;
-  return scope === 'monthly' ? `Monthly ${base}` : base;
+  return scope === 'recent' ? `30-day ${base}` : base;
 }
 
 export default function PersonalRecordBadges({ post }: Props) {
@@ -48,6 +48,7 @@ export default function PersonalRecordBadges({ post }: Props) {
     return {
       longest_sleep: diff(lifetime.bestNights.map((n) => n.asleepMinutes)),
       shortest_sleep: shortest.length >= 2 ? shortest[1] - shortest[0] : 0,
+      most_wakes: diff(lifetime.mostWakesNights.map((n) => n.awakeEvents)),
       most_deep_sleep: diff(lifetime.mostDeepNights.map((n) => n.deepMinutes)),
       most_rem: diff(lifetime.mostRemNights.map((n) => n.remMinutes)),
       most_core_sleep: diff(lifetime.mostCoreNights.map((n) => n.coreMinutes)),
@@ -84,9 +85,9 @@ export default function PersonalRecordBadges({ post }: Props) {
     };
   }, [lifetime]);
 
-  const monthlyPrDiffs = useMemo<PRDiffs>(() => {
+  const recentPrDiffs = useMemo<PRDiffs>(() => {
     if (!lifetime) return {} as PRDiffs;
-    return computeMonthlyPrDiffs(lifetime.stageNights, post.sleepDate);
+    return computeRecentPrDiffs(lifetime.stageNights, post.sleepDate);
   }, [lifetime, post.sleepDate]);
 
   if (chips.length === 0) return null;
@@ -95,9 +96,9 @@ export default function PersonalRecordBadges({ post }: Props) {
     <div className="post-pr-badges">
       {chips.map(({ type, scope }) => {
         const negative = isNegativePrType(type);
-        const diffs = scope === 'monthly' ? monthlyPrDiffs : allTimePrDiffs;
+        const diffs = scope === 'recent' ? recentPrDiffs : allTimePrDiffs;
         const diffLabel = formatPrDiff(type, diffs[type] ?? 0);
-        const tone = negative ? 'negative' : scope === 'monthly' ? 'monthly' : 'alltime';
+        const tone = negative ? 'negative' : scope === 'recent' ? 'monthly' : 'alltime';
         return (
           <span
             key={`${scope}-${type}`}

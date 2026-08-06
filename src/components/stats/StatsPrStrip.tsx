@@ -2,55 +2,79 @@ import { Link } from 'react-router-dom';
 import type { PR } from '../../lib/statsTypes';
 import { formatSleepDate } from '../../lib/format';
 
+export type StatsPrTone = 'best' | 'rough' | 'deep' | 'rem' | 'core' | 'awake';
+
 export type StatsPrItem = {
   emoji: string;
   label: string;
   pr: PR;
   format: (v: number) => string;
+  tone?: StatsPrTone;
+};
+
+export type StatsPrSection = {
+  title: string;
+  kind: 'best' | 'rough';
+  items: StatsPrItem[];
 };
 
 type Props = {
-  /** Each row is a pair (e.g. longest | shortest, most deep | deep %). */
-  rows: StatsPrItem[][];
+  sections: StatsPrSection[];
 };
 
-export default function StatsPrStrip({ rows }: Props) {
-  const visibleRows = rows
-    .map((row) => row.filter((i) => i.pr?.value != null && i.pr.value > 0))
-    .filter((row) => row.length > 0);
-  if (!visibleRows.length) return null;
+export default function StatsPrStrip({ sections }: Props) {
+  const visibleSections = sections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((i) => i.pr?.value != null && i.pr.value > 0),
+    }))
+    .filter((section) => section.items.length > 0);
+  if (!visibleSections.length) return null;
 
   return (
-    <div className="stats-card stats-pr-strip">
-      {visibleRows.map((row, rowIndex) => (
-        <div key={`pr-row-${rowIndex}`} className="stats-pr-row">
-          {row.map((item) => {
-            const content = (
-              <>
-                <span className="stats-pr-emoji" aria-hidden>{item.emoji}</span>
-                <span className="stats-pr-value">{item.format(item.pr!.value)}</span>
-                <span className="stats-pr-label">{item.label}</span>
-                {item.pr?.date ? (
-                  <span className="stats-pr-date">{formatSleepDate(item.pr.date.split('T')[0])}</span>
-                ) : null}
-              </>
-            );
+    <div className="stats-pr-sections">
+      {visibleSections.map((section) => (
+        <div key={section.title} className="stats-pr-section">
+          <div className={`stats-pr-section-title stats-pr-section-title--${section.kind}`}>
+            {section.title}
+          </div>
+          <div className="stats-pr-grid">
+            {section.items.map((item) => {
+              const className = [
+                'stats-pr-tile',
+                section.kind === 'best' ? 'stats-pr-tile--best' : 'stats-pr-tile--rough',
+                item.tone ? `stats-pr-tile--${item.tone}` : '',
+                item.pr?.postId ? 'stats-pr-tile--link' : '',
+              ].filter(Boolean).join(' ');
 
-            if (item.pr?.postId) {
-              return (
-                <Link key={item.label} to={`/post/${item.pr.postId}`} className="stats-pr-tile stats-pr-tile--link">
-                  {content}
-                </Link>
+              const content = (
+                <>
+                  <div className="stats-pr-tile-top">
+                    <span className="stats-pr-emoji" aria-hidden>{item.emoji}</span>
+                    <span className="stats-pr-value">{item.format(item.pr!.value)}</span>
+                  </div>
+                  <span className="stats-pr-label">{item.label}</span>
+                  {item.pr?.date ? (
+                    <span className="stats-pr-date">{formatSleepDate(item.pr.date.split('T')[0])}</span>
+                  ) : null}
+                </>
               );
-            }
 
-            return (
-              <div key={item.label} className="stats-pr-tile">
-                {content}
-              </div>
-            );
-          })}
-          {row.length === 1 ? <div className="stats-pr-tile stats-pr-tile--spacer" aria-hidden /> : null}
+              if (item.pr?.postId) {
+                return (
+                  <Link key={`${section.title}-${item.label}`} to={`/post/${item.pr.postId}`} className={className}>
+                    {content}
+                  </Link>
+                );
+              }
+
+              return (
+                <div key={`${section.title}-${item.label}`} className={className}>
+                  {content}
+                </div>
+              );
+            })}
+          </div>
         </div>
       ))}
     </div>

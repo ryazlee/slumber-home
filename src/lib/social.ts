@@ -126,6 +126,44 @@ export async function fetchInboundFriendRequests(): Promise<WebFriendRequest[]> 
   });
 }
 
+/** Send a pending friend request (viewer = user_a, target = user_b). */
+export async function sendFriendRequest(targetUserId: string): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not signed in');
+  if (user.id === targetUserId) throw new Error('Cannot friend yourself');
+
+  // Clear any historical mirrored pending rows so only one direction exists.
+  await supabase
+    .from('friends')
+    .delete()
+    .eq('status', 'pending')
+    .or(
+      `and(user_a.eq.${user.id},user_b.eq.${targetUserId}),and(user_a.eq.${targetUserId},user_b.eq.${user.id})`,
+    );
+
+  const { error } = await supabase
+    .from('friends')
+    .insert({ user_a: user.id, user_b: targetUserId, status: 'pending' });
+
+  if (error) throw error;
+}
+
+/** Cancel an outgoing pending request (viewer = user_a). */
+export async function cancelFriendRequest(targetUserId: string): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not signed in');
+
+  const { error } = await supabase
+    .from('friends')
+    .delete()
+    .eq('status', 'pending')
+    .or(
+      `and(user_a.eq.${user.id},user_b.eq.${targetUserId}),and(user_a.eq.${targetUserId},user_b.eq.${user.id})`,
+    );
+
+  if (error) throw error;
+}
+
 export async function acceptFriendRequest(requesterId: string): Promise<void> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not signed in');

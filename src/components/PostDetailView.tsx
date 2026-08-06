@@ -75,7 +75,6 @@ export default function PostDetailView({
           />
           {isLatestPost ? <span className="post-badge post-badge-latest">🕒 Latest</span> : null}
           {post.isPrivate ? <span className="post-badge">Private</span> : null}
-          {isManual ? <span className="post-badge post-badge-manual">Manual</span> : null}
         </div>
         <p className="post-meta-strip post-detail-author-sub">
           {formatSleepDate(post.sleepDate)} · {timeAgo(post.createdAt)}

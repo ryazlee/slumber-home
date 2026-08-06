@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Avatar from '../../components/Avatar';
 import ChallengePlaceBadge from '../../components/ChallengePlaceBadge';
+import UserLink from '../../components/UserLink';
 import UserListRowsSkeleton from '../../components/UserListRowsSkeleton';
+import { useAuth } from '../../context/AuthContext';
 import { useGlobalSleepLeaderboard } from '../../hooks/useGlobalSleepLeaderboard';
 import { formatPct } from '../../lib/format';
 import type {
@@ -36,6 +36,11 @@ const METRICS: {
     label: 'Avg hours',
     subtitle: 'Average nightly asleep time',
   },
+  {
+    key: 'dreamRate',
+    label: 'Dream rate',
+    subtitle: 'Share of nights with a dream journal entry',
+  },
 ];
 
 function formatMetric(key: GlobalLeaderboardMetric, value: number): string {
@@ -52,6 +57,7 @@ function accentForMetric(key: GlobalLeaderboardMetric): string {
   if (key === 'deepPct') return stageColor('deep');
   if (key === 'remPct') return stageColor('rem');
   if (key === 'corePct') return stageColor('core');
+  if (key === 'dreamRate') return 'var(--dream-good)';
   return 'var(--accent)';
 }
 
@@ -59,40 +65,47 @@ function LeaderboardRow({
   rank,
   entry,
   metric,
+  isMe,
 }: {
   rank: number;
   entry: GlobalLeaderboardEntry;
   metric: GlobalLeaderboardMetric;
+  isMe: boolean;
 }) {
   const accent = accentForMetric(metric);
+  const valueColor = isMe ? 'var(--accent)' : accent;
 
   return (
-    <Link
-      to={`/profile/${entry.userId}`}
-      className="social-row social-row--link social-row--compact social-row--leaderboard"
-    >
-      <Avatar
-        userId={entry.userId}
-        username={entry.username}
-        avatarUrl={entry.avatarUrl ?? undefined}
-      />
-      <span className="social-row-main">
-        <span className="social-row-title-row">
-          <ChallengePlaceBadge place={rank} compact />
-          <span className="social-row-title">@{entry.username}</span>
+    <div className={`challenge-progress-row${isMe ? ' challenge-progress-row--me' : ''}`}>
+      <div className="challenge-progress-top global-lb-row-top">
+        <ChallengePlaceBadge
+          place={rank}
+          compact
+          fallbackColor={isMe ? 'var(--accent)' : 'var(--text-dim)'}
+        />
+        <UserLink
+          userId={entry.userId}
+          username={entry.username}
+          avatarUrl={entry.avatarUrl ?? undefined}
+          userRoles={entry.userRoles}
+          showAvatar
+          avatarSize="sm"
+          showStreak={false}
+          className="challenge-progress-name"
+        />
+        <span className="challenge-progress-stats global-lb-stats">
+          <span style={{ color: valueColor }}>{formatMetric(metric, entry.value)}</span>
+          <span className="global-lb-nights">
+            {entry.nights} night{entry.nights === 1 ? '' : 's'}
+          </span>
         </span>
-        <span className="social-row-meta">
-          {entry.nights} night{entry.nights === 1 ? '' : 's'}
-        </span>
-      </span>
-      <span className="global-lb-value" style={{ color: accent }}>
-        {formatMetric(metric, entry.value)}
-      </span>
-    </Link>
+      </div>
+    </div>
   );
 }
 
 export default function SocialGlobal() {
+  const { user } = useAuth();
   const [metric, setMetric] = useState<GlobalLeaderboardMetric>('deepPct');
   const { data, isLoading, isError, refetch, isFetching } = useGlobalSleepLeaderboard(true);
 
@@ -141,18 +154,16 @@ export default function SocialGlobal() {
   return (
     <section className="app-section social-section global-lb">
       <div className="global-lb-header">
-        <div className="global-lb-chips" role="tablist" aria-label="Leaderboard metrics">
+        <div className="app-tab-bar global-lb-metrics" role="tablist" aria-label="Leaderboard metrics">
           {METRICS.map((m) => {
             const active = m.key === metric;
-            const accent = accentForMetric(m.key);
             return (
               <button
                 key={m.key}
                 type="button"
                 role="tab"
                 aria-selected={active}
-                className={`global-lb-chip${active ? ' global-lb-chip--active' : ''}`}
-                style={active ? { borderColor: accent, color: accent } : undefined}
+                className={`app-tab-bar-link${active ? ' active' : ''}`}
                 onClick={() => setMetric(m.key)}
               >
                 {m.label}
@@ -171,13 +182,14 @@ export default function SocialGlobal() {
           No {activeMeta.label} rankings yet for this metric.
         </p>
       ) : (
-        <div className="social-list social-list--leaderboard">
+        <div className="challenge-progress-list">
           {entries.map((entry, index) => (
             <LeaderboardRow
               key={`${metric}-${entry.userId}`}
               rank={index + 1}
               entry={entry}
               metric={metric}
+              isMe={entry.userId === user?.id}
             />
           ))}
         </div>

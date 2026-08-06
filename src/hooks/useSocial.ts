@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   acceptFriendRequest,
+  cancelFriendRequest,
   declineFriendRequest,
   fetchClubMembers,
   fetchClubs,
   fetchFriends,
   fetchInboundFriendRequests,
   respondToClubInvite,
+  sendFriendRequest,
 } from '../lib/social';
 import { queryKeys } from './queryKeys';
 
@@ -39,16 +41,39 @@ export function useClubMembers(clubId: string | null, enabled: boolean) {
   });
 }
 
-function invalidateSocial(qc: ReturnType<typeof useQueryClient>) {
+function invalidateSocial(
+  qc: ReturnType<typeof useQueryClient>,
+  counterpartUserId?: string,
+) {
   void qc.invalidateQueries({ queryKey: queryKeys.friends });
   void qc.invalidateQueries({ queryKey: queryKeys.friendRequests });
+  if (counterpartUserId) {
+    void qc.invalidateQueries({ queryKey: queryKeys.profile(counterpartUserId) });
+    void qc.invalidateQueries({ queryKey: queryKeys.userPosts(counterpartUserId) });
+  }
+}
+
+export function useSendFriendRequest() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: sendFriendRequest,
+    onSuccess: (_data, targetUserId) => invalidateSocial(qc, targetUserId),
+  });
+}
+
+export function useCancelFriendRequest() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: cancelFriendRequest,
+    onSuccess: (_data, targetUserId) => invalidateSocial(qc, targetUserId),
+  });
 }
 
 export function useAcceptFriendRequest() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: acceptFriendRequest,
-    onSuccess: () => invalidateSocial(qc),
+    onSuccess: (_data, requesterId) => invalidateSocial(qc, requesterId),
   });
 }
 
@@ -56,7 +81,7 @@ export function useDeclineFriendRequest() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: declineFriendRequest,
-    onSuccess: () => invalidateSocial(qc),
+    onSuccess: (_data, requesterId) => invalidateSocial(qc, requesterId),
   });
 }
 

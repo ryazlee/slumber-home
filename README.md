@@ -31,7 +31,7 @@ npm install && npm run dev
 | `/profile` | Yes | Your profile and recent posts (header avatar; not a tab) |
 | `/social` | Yes | Friends list + inbound requests |
 | `/social/clubs` | Yes | Clubs you’re in |
-| `/social/global` | Yes | Global sleep leaderboard (Deep / REM / Core / Avg hours) |
+| `/social/global` | Yes | Global sleep leaderboard (Deep / REM / Core / Avg hours / Dream rate) |
 | `/stats` | Yes | My Stats (30-day averages, charts, PRs) |
 | `/stats/compare` | Yes | Friend compare table (wearable-only; bedtime/wake not rankable) |
 | `/challenges` | Yes | Active and completed challenges |

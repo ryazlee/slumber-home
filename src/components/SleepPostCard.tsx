@@ -85,7 +85,6 @@ export default function SleepPostCard({
         <div className="post-card-meta">
           {!showAuthor && isLatestPost && <span className="post-badge post-badge-latest">🕒 Latest</span>}
           {post.isPrivate && <span className="post-badge">Private</span>}
-          {isManual && <span className="post-badge post-badge-manual">Manual</span>}
         </div>
       </header>
 

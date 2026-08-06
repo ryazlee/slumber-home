@@ -3,7 +3,8 @@ import type { SleepBuddyProfile, SleepBuddyStatus, SleepPost, SleepSessionData, 
 import { avatarColorFromName } from './format';
 import { countWakes } from './wakes';
 import { SLEEP_POST_FEED_SELECT } from './sleepPostSelect';
-import { filterPrTypesByVisibility } from './pr';
+import { filterPrTypesByVisibility, recentPrWindowStart } from './pr';
+import { filterWearableSleepRows } from './sleepPostCustom';
 
 export const PAGE_SIZE = 20;
 
@@ -58,42 +59,50 @@ async function getBlockedUserIds(): Promise<Set<string>> {
   return new Set((data as string[] | null) ?? []);
 }
 
-function monthPostCountKey(userId: string, sleepDate: string): string {
-  return `${userId}:${sleepDate.slice(0, 7)}`;
+function recentWindowCountKey(userId: string, sleepDate: string): string {
+  return `${userId}:${sleepDate}`;
 }
 
-function monthRangeBounds(sleepDates: string[]): { start: string; end: string } | null {
+function recentWindowFetchBounds(sleepDates: string[]): { start: string; end: string } | null {
   if (sleepDates.length === 0) return null;
-  const months = [...new Set(sleepDates.map((d) => d.slice(0, 7)))].sort();
-  const minMonth = months[0];
-  const maxMonth = months[months.length - 1];
-  const [y, m] = maxMonth.split('-').map(Number);
-  const lastDay = new Date(y, m, 0).getDate();
+  const sorted = [...sleepDates].sort();
   return {
-    start: `${minMonth}-01`,
-    end: `${maxMonth}-${String(lastDay).padStart(2, '0')}`,
+    start: recentPrWindowStart(sorted[0]),
+    end: sorted[sorted.length - 1],
   };
 }
 
-async function fetchMonthPostCounts(rows: PostRow[]): Promise<Map<string, number>> {
+async function fetchRecentWindowPostCounts(rows: PostRow[]): Promise<Map<string, number>> {
   const counts = new Map<string, number>();
   const authorUserIds = [...new Set(rows.map((r) => r.user_id))];
-  const bounds = monthRangeBounds(rows.map((r) => r.sleep_date));
+  const bounds = recentWindowFetchBounds(rows.map((r) => r.sleep_date));
   if (authorUserIds.length === 0 || !bounds) return counts;
 
   const { data, error } = await supabase
     .from('sleep_posts')
-    .select('user_id, sleep_date')
+    .select('user_id, sleep_date, is_custom, source_device')
     .in('user_id', authorUserIds)
     .gte('sleep_date', bounds.start)
     .lte('sleep_date', bounds.end)
-    .is('deleted_at', null)
-    .eq('is_custom', false);
+    .is('deleted_at', null);
   if (error) return counts;
 
-  for (const row of data ?? []) {
-    const key = monthPostCountKey(row.user_id, row.sleep_date);
-    counts.set(key, (counts.get(key) ?? 0) + 1);
+  const wearable = filterWearableSleepRows(data ?? []);
+  const nightsByUser = new Map<string, string[]>();
+  for (const row of wearable) {
+    const list = nightsByUser.get(row.user_id) ?? [];
+    list.push(row.sleep_date);
+    nightsByUser.set(row.user_id, list);
+  }
+
+  for (const row of rows) {
+    const nights = nightsByUser.get(row.user_id) ?? [];
+    const start = recentPrWindowStart(row.sleep_date);
+    let n = 0;
+    for (const d of nights) {
+      if (d >= start && d <= row.sleep_date) n += 1;
+    }
+    counts.set(recentWindowCountKey(row.user_id, row.sleep_date), n);
   }
   return counts;
 }
@@ -105,12 +114,12 @@ function mapPostRow(
   myKudoPostIds: Set<string>,
   commentCountMap: Record<string, number>,
   prAllTimeMap: Map<string, string[]>,
-  prMonthlyMap: Map<string, string[]>,
-  monthPostCountMap: Map<string, number>,
+  prRecentMap: Map<string, string[]>,
+  recentWindowPostCountMap: Map<string, number>,
 ): SleepPost {
   const username = authorProfile?.username ?? 'unknown';
   const prTypes = prAllTimeMap.get(row.id);
-  const monthlyPrTypes = prMonthlyMap.get(row.id);
+  const recentPrTypes = prRecentMap.get(row.id);
   return {
     id: row.id,
     userId: row.user_id,
@@ -143,10 +152,10 @@ function mapPostRow(
     kudosCount: kudosCountMap[row.id] ?? 0,
     hasKudoed: myKudoPostIds.has(row.id),
     commentCount: commentCountMap[row.id] ?? 0,
-    isPR: prAllTimeMap.has(row.id) || prMonthlyMap.has(row.id),
+    isPR: prAllTimeMap.has(row.id) || prRecentMap.has(row.id),
     prTypes,
-    monthlyPrTypes,
-    monthPostCount: monthPostCountMap.get(monthPostCountKey(row.user_id, row.sleep_date)),
+    recentPrTypes,
+    recentWindowPostCount: recentWindowPostCountMap.get(recentWindowCountKey(row.user_id, row.sleep_date)),
     createdAt: row.created_at,
     sourceDevice: row.source_device ?? 'Unknown',
     isCustom: row.is_custom === true,
@@ -160,7 +169,7 @@ export async function enrichSleepPostRows(rows: PostRow[]): Promise<SleepPost[]>
   const { data: { user } } = await supabase.auth.getUser();
   const currentUserId = user?.id ?? null;
 
-  const [kudosRes, commentsRes, prRes, authorProfilesRes, monthPostCountMap] = await Promise.all([
+  const [kudosRes, commentsRes, prRes, authorProfilesRes, recentWindowPostCountMap] = await Promise.all([
     supabase.from('kudos').select('post_id, user_id').in('post_id', postIds),
     supabase.from('comments').select('post_id').in('post_id', postIds),
     supabase
@@ -169,7 +178,7 @@ export async function enrichSleepPostRows(rows: PostRow[]): Promise<SleepPost[]>
       .in('post_id', postIds)
       .not('post_id', 'is', null),
     supabase.from('profiles').select('id, username, avatar_url, user_roles, show_best_prs, show_worst_prs').in('id', authorUserIds),
-    fetchMonthPostCounts(rows),
+    fetchRecentWindowPostCounts(rows),
   ]);
 
   const authorProfileMap = new Map<string, AuthorProfile>();
@@ -189,9 +198,10 @@ export async function enrichSleepPostRows(rows: PostRow[]): Promise<SleepPost[]>
   }
 
   const prAllTimeMap = new Map<string, string[]>();
-  const prMonthlyMap = new Map<string, string[]>();
+  const prRecentMap = new Map<string, string[]>();
   for (const r of prRes.data ?? []) {
-    const map = r.scope === 'monthly' ? prMonthlyMap : prAllTimeMap;
+    if (r.scope !== 'all_time' && r.scope !== 'rolling_30') continue;
+    const map = r.scope === 'rolling_30' ? prRecentMap : prAllTimeMap;
     const arr = map.get(r.post_id) ?? [];
     arr.push(r.record_type as string);
     map.set(r.post_id, arr);
@@ -251,8 +261,8 @@ export async function enrichSleepPostRows(rows: PostRow[]): Promise<SleepPost[]>
       myKudoPostIds,
       commentCountMap,
       prAllTimeMap,
-      prMonthlyMap,
-      monthPostCountMap,
+      prRecentMap,
+      recentWindowPostCountMap,
     );
     const postBuddyRows = buddiesByPost.get(row.id) ?? [];
     const isAuthor = currentUserId === row.user_id;
@@ -264,9 +274,9 @@ export async function enrichSleepPostRows(rows: PostRow[]): Promise<SleepPost[]>
         showWorst: author?.show_worst_prs ?? true,
       };
       post.prTypes = filterPrTypesByVisibility(post.prTypes, visibility);
-      post.monthlyPrTypes = filterPrTypesByVisibility(post.monthlyPrTypes, visibility);
+      post.recentPrTypes = filterPrTypesByVisibility(post.recentPrTypes, visibility);
       post.isPR =
-        (post.prTypes?.length ?? 0) > 0 || (post.monthlyPrTypes?.length ?? 0) > 0;
+        (post.prTypes?.length ?? 0) > 0 || (post.recentPrTypes?.length ?? 0) > 0;
     }
 
     const accepted = postBuddyRows

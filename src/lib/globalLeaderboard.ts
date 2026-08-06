@@ -4,11 +4,12 @@ export type GlobalLeaderboardEntry = {
   userId: string;
   username: string;
   avatarUrl: string | null;
+  userRoles: string[] | null;
   nights: number;
   value: number;
 };
 
-export type GlobalLeaderboardMetric = 'deepPct' | 'remPct' | 'corePct' | 'avgHours';
+export type GlobalLeaderboardMetric = 'deepPct' | 'remPct' | 'corePct' | 'avgHours' | 'dreamRate';
 
 export type GlobalSleepLeaderboard = {
   days: number;
@@ -17,6 +18,7 @@ export type GlobalSleepLeaderboard = {
   remPct: GlobalLeaderboardEntry[];
   corePct: GlobalLeaderboardEntry[];
   avgHours: GlobalLeaderboardEntry[];
+  dreamRate: GlobalLeaderboardEntry[];
 };
 
 function mapEntry(raw: unknown): GlobalLeaderboardEntry | null {
@@ -28,10 +30,15 @@ function mapEntry(raw: unknown): GlobalLeaderboardEntry | null {
   const nights = typeof r.nights === 'number' ? r.nights : Number(r.nights);
   const value = typeof r.value === 'number' ? r.value : Number(r.value);
   if (!Number.isFinite(nights) || !Number.isFinite(value)) return null;
+  const rawRoles = r.userRoles;
+  const userRoles = Array.isArray(rawRoles)
+    ? rawRoles.filter((role): role is string => typeof role === 'string')
+    : null;
   return {
     userId,
     username,
     avatarUrl: typeof r.avatarUrl === 'string' ? r.avatarUrl : null,
+    userRoles: userRoles && userRoles.length > 0 ? userRoles : null,
     nights,
     value,
   };
@@ -62,5 +69,6 @@ export async function fetchGlobalSleepLeaderboard(opts?: {
     remPct: mapList(payload.remPct),
     corePct: mapList(payload.corePct),
     avgHours: mapList(payload.avgHours),
+    dreamRate: mapList(payload.dreamRate),
   };
 }

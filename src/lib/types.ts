@@ -67,9 +67,10 @@ export type SleepPost = {
   commentCount: number;
   isPR: boolean;
   prTypes?: string[];
-  monthlyPrTypes?: string[];
-  /** Wearable (non-custom) posts by this author in `sleepDate`'s calendar month. */
-  monthPostCount?: number;
+  /** Rolling 30-day record types (window ends on sleepDate). */
+  recentPrTypes?: string[];
+  /** Wearable nights by this author in the trailing 30 days ending on sleepDate. */
+  recentWindowPostCount?: number;
   createdAt: string;
   sourceDevice: string;
   isCustom?: boolean;

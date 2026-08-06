@@ -48,6 +48,7 @@ function buildTopNight(r: SleepPostRow): TopNight {
     deepMinutes: r.deep_minutes ?? 0,
     remMinutes: r.rem_minutes ?? 0,
     coreMinutes: r.core_minutes ?? 0,
+    awakeEvents: r.awake_events ?? 0,
   };
 }
 
@@ -113,6 +114,7 @@ export async function fetchUserStats(userId: string): Promise<UserStats> {
     avgAsleepMinutes: avg(weeklyPosts.map((p) => p.asleepMinutes)),
     prLongestSleep: findPR(prs, 'longest_sleep'),
     prShortestSleep: findPR(prs, 'shortest_sleep'),
+    prMostWakes: findPR(prs, 'most_wakes'),
     prMostDeep: findPR(prs, 'most_deep_sleep'),
     prMostRem: findPR(prs, 'most_rem'),
     prMostCore: findPR(prs, 'most_core_sleep'),
@@ -132,9 +134,10 @@ async function fetchLifetimeData(userId: string) {
     .is('deleted_at', null)
     .not('asleep_minutes', 'is', null);
 
-  const [bestRes, shortestRes, deepRes, remRes, coreRes, allRes, monthlyRes] = await Promise.all([
+  const [bestRes, shortestRes, wakesRes, deepRes, remRes, coreRes, allRes, monthlyRes] = await Promise.all([
     baseFilter().order('asleep_minutes', { ascending: false }).limit(3),
     baseFilter().gt('asleep_minutes', 0).order('asleep_minutes', { ascending: true }).limit(3),
+    baseFilter().gt('awake_events', 0).order('awake_events', { ascending: false }).limit(3),
     baseFilter().gt('deep_minutes', 0).order('deep_minutes', { ascending: false }).limit(3),
     baseFilter().gt('rem_minutes', 0).order('rem_minutes', { ascending: false }).limit(3),
     baseFilter().gt('core_minutes', 0).order('core_minutes', { ascending: false }).limit(3),
@@ -156,6 +159,7 @@ async function fetchLifetimeData(userId: string) {
   return {
     bestNights: filterWearableSleepRows((bestRes.data ?? []) as SleepPostRow[]).map(buildTopNight),
     shortestNights: filterWearableSleepRows((shortestRes.data ?? []) as SleepPostRow[]).map(buildTopNight),
+    mostWakesNights: filterWearableSleepRows((wakesRes.data ?? []) as SleepPostRow[]).map(buildTopNight),
     mostDeepNights: filterWearableSleepRows((deepRes.data ?? []) as SleepPostRow[]).map(buildTopNight),
     mostRemNights: filterWearableSleepRows((remRes.data ?? []) as SleepPostRow[]).map(buildTopNight),
     mostCoreNights: filterWearableSleepRows((coreRes.data ?? []) as SleepPostRow[]).map(buildTopNight),
@@ -295,6 +299,7 @@ export async function fetchLifetimeStats(userId: string): Promise<LifetimeStats>
     ...computeAggregateMetrics(data.allRows),
     bestNights: data.bestNights,
     shortestNights: data.shortestNights,
+    mostWakesNights: data.mostWakesNights,
     mostDeepNights: data.mostDeepNights,
     mostRemNights: data.mostRemNights,
     mostCoreNights: data.mostCoreNights,
