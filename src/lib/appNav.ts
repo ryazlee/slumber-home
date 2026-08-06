@@ -7,9 +7,9 @@ export type PrimaryNavItem = {
 
 export const MAIN_NAV_ITEMS: PrimaryNavItem[] = [
   { to: '/feed', label: 'Feed', end: true },
-  { to: '/stats', label: 'Stats', matchPrefix: '/stats' },
-  { to: '/social', label: 'Social', matchPrefix: '/social' },
   { to: '/challenges', label: 'Challenges', matchPrefix: '/challenge' },
+  { to: '/social', label: 'Social', matchPrefix: '/social' },
+  { to: '/stats', label: 'Stats', matchPrefix: '/stats' },
 ];
 
 export const STATS_SUBNAV: { to: string; label: string; end?: boolean }[] = [
@@ -20,15 +20,8 @@ export const STATS_SUBNAV: { to: string; label: string; end?: boolean }[] = [
 export const SOCIAL_SUBNAV: { to: string; label: string; end?: boolean }[] = [
   { to: '/social', label: 'Friends', end: true },
   { to: '/social/clubs', label: 'Clubs' },
+  { to: '/social/global', label: 'Global' },
 ];
-
-export function profileNavItem(userId: string | undefined): PrimaryNavItem {
-  return {
-    to: userId ? `/profile/${userId}` : '/profile',
-    label: 'You',
-    matchPrefix: '/profile',
-  };
-}
 
 export const ADMIN_NAV_ITEM: PrimaryNavItem = {
   to: '/admin',

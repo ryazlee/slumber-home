@@ -28,7 +28,10 @@ npm install && npm run dev
 | `/login` | Login | Web sign-in — email OTP, Google, magic link; redirects to `/feed` when signed in |
 | `/login-callback` | — | Supabase auth return (magic link + Google OAuth) |
 | `/feed` | Yes | Friends feed — kudos + comments; stage metrics on one line (dynamic sizing) |
-| `/profile` | Yes | Your profile and recent posts |
+| `/profile` | Yes | Your profile and recent posts (header avatar; not a tab) |
+| `/social` | Yes | Friends list + inbound requests |
+| `/social/clubs` | Yes | Clubs you’re in |
+| `/social/global` | Yes | Global sleep leaderboard (Deep / REM / Core / Avg hours) |
 | `/stats` | Yes | My Stats (30-day averages, charts, PRs) |
 | `/stats/compare` | Yes | Friend compare table (wearable-only; bedtime/wake not rankable) |
 | `/challenges` | Yes | Active and completed challenges |
@@ -44,7 +47,7 @@ npm install && npm run dev
 | `/club/:clubId/invite/:token` | Partial | Club invite landing |
 | `/admin` | OTP / Google + admin role | Moderation dashboard |
 
-**Partial auth:** deep-link landings show preview when logged out; signed-in users get full in-app views where applicable. Friend invite links are generated in the iOS app (**People → Share invite link**); URL shape matches `buildFriendInviteUrl()` in the main repo.
+**Partial auth:** deep-link landings show preview when logged out; signed-in users get full in-app views where applicable. Friend invite links are generated in the iOS app (**Profile → Invite**); URL shape matches `buildFriendInviteUrl()` in the main repo.
 
 ## Local setup
 

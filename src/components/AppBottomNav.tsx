@@ -5,7 +5,6 @@ import {
   ADMIN_NAV_ITEM,
   isNavActive,
   MAIN_NAV_ITEMS,
-  profileNavItem,
   type PrimaryNavItem,
 } from '../lib/appNav';
 
@@ -14,9 +13,9 @@ function bottomTabClass(active: boolean) {
 }
 
 export function useBottomNavItems(): PrimaryNavItem[] {
-  const { user, session } = useAuth();
+  const { session } = useAuth();
   const moderatorQuery = useIsModerator(Boolean(session));
-  const items = [...MAIN_NAV_ITEMS, profileNavItem(user?.id)];
+  const items = [...MAIN_NAV_ITEMS];
   if (moderatorQuery.data === true) {
     items.push(ADMIN_NAV_ITEM);
   }

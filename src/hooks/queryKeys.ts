@@ -20,6 +20,7 @@ export const queryKeys = {
   friendRequests: ['friend-requests'] as const,
   clubs: ['clubs'] as const,
   clubMembers: (clubId: string) => ['club-members', clubId] as const,
+  globalSleepLeaderboard: ['global-sleep-leaderboard'] as const,
   search: (query: string) => ['search', query] as const,
   comparePeriods: (userId: string) => ['compare-periods', userId] as const,
   userStats: (userId: string) => ['user-stats', userId] as const,

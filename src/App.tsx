@@ -27,6 +27,7 @@ import PostDetail from './pages/app/PostDetail';
 import Profile from './pages/app/Profile';
 import SocialClubs from './pages/app/SocialClubs';
 import SocialFriends from './pages/app/SocialFriends';
+import SocialGlobal from './pages/app/SocialGlobal';
 import SocialLayout from './pages/app/SocialLayout';
 import StatsLayout from './pages/app/StatsLayout';
 import DeleteAccount from './pages/DeleteAccount';
@@ -100,6 +101,7 @@ export default function App() {
           <Route path="social" element={<SocialLayout />}>
             <Route index element={<SocialFriends />} />
             <Route path="clubs" element={<SocialClubs />} />
+            <Route path="global" element={<SocialGlobal />} />
           </Route>
           <Route path="compare" element={<Navigate to="/stats/compare" replace />} />
           <Route path="social/compare" element={<Navigate to="/stats/compare" replace />} />
