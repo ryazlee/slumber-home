@@ -481,7 +481,7 @@ export function useRepairDoubledSleepPostStagesBulk() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['admin', 'posts'] });
       void qc.invalidateQueries({ queryKey: ['admin', 'data-issues'] });
-      void qc.invalidateQueries({ queryKey: queryKeys.admin.healthMetrics(7) });
+      void qc.invalidateQueries({ queryKey: ['admin', 'health'] });
     },
   });
 }

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { patchPostInCache } from '../../lib/patchPostCache';
 import { getOptionalQueryErrorMessage } from '../../lib/queryError';
@@ -9,6 +9,8 @@ import { usePost } from '../../hooks/usePost';
 
 export default function PostDetail() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const fromAdmin = searchParams.get('from') === 'admin';
   const qc = useQueryClient();
   const { data: post, isLoading, error } = usePost(id);
 
@@ -31,7 +33,9 @@ export default function PostDetail() {
     return (
       <div className="app-page app-page--feed post-detail-page">
         <p className="admin-error">{errorMessage ?? 'Post not found.'}</p>
-        <Link to="/feed" className="app-back-link">← Back to feed</Link>
+        <Link to={fromAdmin ? '/admin/posts' : '/feed'} className="app-back-link">
+          {fromAdmin ? '← Back to admin posts' : '← Back to feed'}
+        </Link>
       </div>
     );
   }
@@ -39,7 +43,12 @@ export default function PostDetail() {
   return (
     <div className="app-page app-page--feed post-detail-page">
       <header className="post-detail-page-header">
-        <Link to="/feed" className="app-back-link">← Feed</Link>
+        <Link to={fromAdmin ? '/admin/posts' : '/feed'} className="app-back-link">
+          {fromAdmin ? '← Admin posts' : '← Feed'}
+        </Link>
+        {fromAdmin ? (
+          <p className="admin-muted post-detail-admin-note">Admin lookup — not shown in the friends feed.</p>
+        ) : null}
       </header>
 
       <PostDetailView post={post} onSocialPatch={handleSocialPatch} />

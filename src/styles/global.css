@@ -2853,6 +2853,23 @@ a.admin-metric-card--link:focus-visible {
   align-self: center;
 }
 
+.admin-post-id-lookup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.admin-post-id-lookup .admin-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.admin-filter-field .admin-error.admin-filter-note {
+  margin: 6px 0 0;
+  align-self: flex-start;
+}
+
 .admin-filter-actions {
   margin-bottom: 12px;
 }

@@ -205,7 +205,7 @@ export default function AdminUserDetailPanel({ user, onClose }: Props) {
           <ul className="admin-user-post-list">
             {posts.map((post) => (
               <li key={post.id}>
-                <Link to={`/post/${post.id}`} className="admin-user-post-link">
+                <Link to={`/post/${post.id}?from=admin`} className="admin-user-post-link">
                   <span className="admin-user-post-title">{post.title || 'Untitled'}</span>
                   <span className="admin-user-post-meta">
                     {post.sleep_date} · {formatWhen(post.created_at)}

@@ -334,10 +334,19 @@ export async function fetchPost(postId: string): Promise<SleepPost | null> {
     .maybeSingle();
 
   if (error) throw error;
-  if (!data) return null;
+  if (data) {
+    const [post] = await enrichSleepPostRows(toPostRows([data]));
+    return post ?? null;
+  }
 
-  const [post] = await enrichSleepPostRows(toPostRows([data]));
-  return post ?? null;
+  // Moderators can open any post by ID for investigation (not via the friends feed).
+  const { data: adminData, error: adminError } = await supabase.rpc('admin_get_post', {
+    p_post_id: postId,
+  });
+  if (adminError || !adminData) return null;
+
+  const [adminPost] = await enrichSleepPostRows(toPostRows([adminData]));
+  return adminPost ?? null;
 }
 
 export async function fetchUserPosts(userId: string, cursor?: string): Promise<SleepPost[]> {

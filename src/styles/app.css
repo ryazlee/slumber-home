@@ -1130,6 +1130,11 @@
   margin-bottom: 16px;
 }
 
+.post-detail-admin-note {
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
 .post-detail-view {
   display: flex;
   flex-direction: column;

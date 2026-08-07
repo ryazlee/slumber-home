@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCallback, useMemo, useState } from 'react';
 import type { GridColDef } from '@mui/x-data-grid';
 import type { RecentPostRow } from '../../lib/admin';
@@ -20,6 +20,7 @@ import type { AdminAnalyticsScreenProps } from './adminAnalyticsTypes';
 import AdminActivityChart from './AdminActivityChart';
 import AdminAnalyticsFilters from './AdminAnalyticsFilters';
 import AdminDataGrid from './AdminDataGrid';
+import AdminFilterBar, { AdminFilterField } from './AdminFilterBar';
 import AdminGridActions from './AdminGridActions';
 import AdminGridClientFilterHint from './AdminGridClientFilterHint';
 import AdminListToolbar from './AdminListToolbar';
@@ -27,6 +28,8 @@ import AdminMetricCard from './AdminMetricCard';
 import AdminSection, { AdminTableSummary } from './AdminSection';
 import { gridActionsColumn } from './gridColumnHelpers';
 import { buildRecentPostColumns } from './postGridColumns';
+
+const POST_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 type Props = AdminAnalyticsScreenProps & {
   userId?: string | null;
@@ -41,9 +44,12 @@ export default function AdminPosts({
   onAppVersionChange,
   userId = null,
 }: Props) {
+  const navigate = useNavigate();
   const { refreshing } = useAdmin();
   const [stageMessage, setStageMessage] = useState<string | null>(null);
   const [actingPostId, setActingPostId] = useState<string | null>(null);
+  const [postIdLookup, setPostIdLookup] = useState('');
+  const [lookupError, setLookupError] = useState<string | null>(null);
 
   const baseFilters = useMemo(() => ({
     start: range.start,
@@ -141,6 +147,16 @@ export default function AdminPosts({
     }
   }, [softDeleteMutation]);
 
+  const openPostById = useCallback((rawId: string) => {
+    const id = rawId.trim();
+    if (!POST_ID_RE.test(id)) {
+      setLookupError('Enter a valid post UUID.');
+      return;
+    }
+    setLookupError(null);
+    navigate(`/post/${id}?from=admin`);
+  }, [navigate]);
+
   const recalculateLoadedWearable = async () => {
     const ids = wearablePosts.map((post) => post.id);
     if (!ids.length) {
@@ -221,7 +237,7 @@ export default function AdminPosts({
       renderCell: ({ row }) => (
         <AdminGridActions>
           <Link
-            to={`/post/${row.id}`}
+            to={`/post/${row.id}?from=admin`}
             className="admin-action-btn admin-action-btn--link"
             onClick={(e) => e.stopPropagation()}
           >
@@ -237,7 +253,7 @@ export default function AdminPosts({
       className="admin-posts"
       lead={userId
         ? 'Posts for one user in the selected date range.'
-        : 'Browse sleep posts in the selected date range (paginated). Repair inflated stage minutes, recalculate from raw_samples, soft-delete, or open a post. Bulk actions apply to the current page.'}
+        : 'Browse sleep posts in the selected date range (paginated). Repair inflated stage minutes, recalculate from raw_samples, soft-delete, or open a post. Lookup any post by ID (not shown in the friends feed). Bulk actions apply to the current page.'}
       error={error}
     >
       <AdminAnalyticsFilters
@@ -252,6 +268,40 @@ export default function AdminPosts({
         onAppVersionChange={onAppVersionChange}
       />
 
+      <AdminFilterBar nested>
+        <AdminFilterField label="Open post by ID" htmlFor="admin-post-id-lookup" className="admin-filter-field--wide">
+          <div className="admin-post-id-lookup">
+            <input
+              id="admin-post-id-lookup"
+              className="admin-input"
+              type="search"
+              inputMode="text"
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="Paste post UUID…"
+              value={postIdLookup}
+              onChange={(e) => {
+                setPostIdLookup(e.target.value);
+                if (lookupError) setLookupError(null);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  openPostById(postIdLookup);
+                }
+              }}
+            />
+            <button
+              type="button"
+              className="admin-button admin-button-ghost"
+              onClick={() => openPostById(postIdLookup)}
+            >
+              Open
+            </button>
+          </div>
+          {lookupError ? <p className="admin-error admin-filter-note">{lookupError}</p> : null}
+        </AdminFilterField>
+      </AdminFilterBar>
       {!loading && metrics ? (
         <>
           <AdminTableSummary>

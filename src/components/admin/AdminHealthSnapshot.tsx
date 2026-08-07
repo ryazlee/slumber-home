@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAdmin } from '../../context/AdminContext';
 import {
@@ -12,14 +13,28 @@ import AdminSubsection from './AdminSubsection';
 import AdminVersionChart from './AdminVersionChart';
 import { formatNumber } from './format';
 
+type HealthWindow = 1 | 7 | 30;
+
+const HEALTH_WINDOW_CHIPS: { days: HealthWindow; label: string }[] = [
+  { days: 1, label: 'Day' },
+  { days: 7, label: 'Week' },
+  { days: 30, label: 'Month' },
+];
+
 function pct(part: number, whole: number): string {
   if (!whole) return '0%';
   return `${Math.round((part / whole) * 1000) / 10}%`;
 }
 
+function healthWindowLabel(days: number): string {
+  if (days === 1) return '1 day';
+  return `${days} days`;
+}
+
 export default function AdminHealthSnapshot() {
   const { metrics } = useAdmin();
-  const healthQuery = useHealthMetrics(7);
+  const [windowDays, setWindowDays] = useState<HealthWindow>(7);
+  const healthQuery = useHealthMetrics(windowDays);
   const versionsQuery = useAppVersions();
   const cohortQuery = useCohortRetention(8);
   const repairMutation = useRepairInflatedStages();
@@ -28,6 +43,7 @@ export default function AdminHealthSnapshot() {
   const versions = versionsQuery.data ?? [];
   const cohort = cohortQuery.data ?? [];
   const pendingReports = (metrics?.pending_post_reports ?? 0) + (metrics?.pending_comment_reports ?? 0);
+  const windowLabel = healthWindowLabel(windowDays);
 
   const dreamRate = health && health.engagement.posts > 0
     ? pct(health.engagement.posts_with_dreams, health.engagement.posts)
@@ -42,9 +58,11 @@ export default function AdminHealthSnapshot() {
   const inflatedTotal = health?.data_quality.inflated_stage_posts_total ?? 0;
 
   const repairAllInflated = async () => {
-    if (!window.confirm(`Repair up to 50 inflated wearable posts${inflatedWindow ? ' from the last 7 days' : ''}?`)) return;
+    if (!window.confirm(
+      `Repair up to 50 inflated wearable posts${inflatedWindow ? ` from the last ${windowLabel}` : ''}?`,
+    )) return;
     try {
-      const result = await repairMutation.mutateAsync({ limit: 50, days: 7 });
+      const result = await repairMutation.mutateAsync({ limit: 50, days: windowDays });
       const failed = result.errors.length;
       window.alert(
         failed
@@ -67,10 +85,28 @@ export default function AdminHealthSnapshot() {
         </Link>
       ) : null}
 
+      <div
+        className={`admin-analytics-bar${healthQuery.isFetching ? ' admin-analytics-bar--loading' : ''}`}
+        aria-busy={healthQuery.isFetching || undefined}
+      >
+        <div className="admin-tabs admin-tabs-sub" role="group" aria-label="Health window">
+          {HEALTH_WINDOW_CHIPS.map((item) => (
+            <button
+              key={item.days}
+              type="button"
+              className={windowDays === item.days ? 'admin-tab active' : 'admin-tab'}
+              onClick={() => setWindowDays(item.days)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {inflatedWindow > 0 ? (
         <div className="admin-attention-banner admin-attention-banner--inline">
           <span className="admin-attention-banner-title">
-            {inflatedWindow} wearable post{inflatedWindow === 1 ? '' : 's'} in the last 7 days have inflated stage minutes
+            {inflatedWindow} wearable post{inflatedWindow === 1 ? '' : 's'} in the last {windowLabel} have inflated stage minutes
             {inflatedTotal > inflatedWindow ? ` (${inflatedTotal} total)` : ''}
           </span>
           <span className="admin-attention-banner-actions">
@@ -89,7 +125,7 @@ export default function AdminHealthSnapshot() {
 
       {health ? (
         <>
-          <AdminSubsection title="Activation (7 days)" className="admin-health-block">
+          <AdminSubsection title={`Activation (${windowLabel})`} className="admin-health-block">
             <div className="admin-metric-grid admin-metric-grid--dense">
               <AdminMetricCard
                 label="Signups"
@@ -118,7 +154,7 @@ export default function AdminHealthSnapshot() {
             </div>
           </AdminSubsection>
 
-          <AdminSubsection title="Engagement (7 days)" className="admin-health-block">
+          <AdminSubsection title={`Engagement (${windowLabel})`} className="admin-health-block">
             <div className="admin-metric-grid admin-metric-grid--dense">
               <AdminMetricCard
                 label="Sleep posts"
