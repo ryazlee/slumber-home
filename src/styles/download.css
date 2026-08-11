@@ -1,0 +1,85 @@
+/* Dedicated /download — same marketing vocabulary as home, centered composition. */
+
+.download-page {
+  --home-header-offset: 56px;
+}
+
+.download-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100svh - var(--home-header-offset));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: clamp(32px, 8vh, 72px) 0 clamp(48px, 10vh, 96px);
+  overflow: hidden;
+}
+
+.download-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 32rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0;
+}
+
+.download-hero-inner > * {
+  animation: home-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.download-hero-inner > *:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.download-hero-inner > *:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.download-hero-inner > *:nth-child(4) {
+  animation-delay: 0.15s;
+}
+
+.download-hero-inner > *:nth-child(5) {
+  animation-delay: 0.2s;
+}
+
+.download-brand {
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.download-hero h1 {
+  margin: 0 0 12px;
+  font-size: clamp(1.5rem, 5vw, 2.25rem);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.download-lead {
+  margin: 0 auto;
+  max-width: 28em;
+}
+
+.download-stores {
+  margin-top: clamp(22px, 4vh, 32px);
+  width: min(100%, 23rem);
+}
+
+.download-hero .home-login-prompt {
+  margin-top: 16px;
+  white-space: normal;
+}
+
+@media (max-width: 420px) {
+  .download-stores.store-badge-pair {
+    flex-direction: column;
+    width: 100%;
+  }
+}

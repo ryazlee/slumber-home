@@ -10,6 +10,7 @@ export default function Layout() {
       <footer className="site-footer">
         <div className="site-footer-inner content-wrap">
           <span>© {new Date().getFullYear()} Slumber</span>
+          <NavLink to="/download">Download</NavLink>
           <NavLink to="/privacy">Privacy Policy</NavLink>
           <NavLink to="/terms">Terms of Service</NavLink>
           <NavLink to="/delete-account">Delete account</NavLink>

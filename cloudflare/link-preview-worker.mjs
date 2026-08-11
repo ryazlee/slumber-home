@@ -33,6 +33,8 @@ const STATIC_PUBLIC_PATHS = new Set([
   '/delete-data/',
   '/home',
   '/home/',
+  '/download',
+  '/download/',
 ]);
 
 function isDeepLinkPath(pathname) {

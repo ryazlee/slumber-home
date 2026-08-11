@@ -59,6 +59,9 @@ export default function HeaderMenu({ showAdmin, adminActive }: Props) {
           <NavLink to="/home" role="menuitem" className="header-menu-item" onClick={() => setOpen(false)}>
             About
           </NavLink>
+          <NavLink to="/download" role="menuitem" className="header-menu-item" onClick={() => setOpen(false)}>
+            Download
+          </NavLink>
           <NavLink to="/privacy" role="menuitem" className="header-menu-item" onClick={() => setOpen(false)}>
             Privacy
           </NavLink>

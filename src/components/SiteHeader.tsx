@@ -65,6 +65,12 @@ export default function SiteHeader() {
                 >
                   Home
                 </NavLink>
+                <NavLink
+                  to="/download"
+                  className={({ isActive }) => (isActive ? 'site-header-link active' : 'site-header-link')}
+                >
+                  Download
+                </NavLink>
                 <NavLink to="/privacy" className={({ isActive }) => (isActive ? 'site-header-link active' : 'site-header-link')}>
                   Privacy
                 </NavLink>
