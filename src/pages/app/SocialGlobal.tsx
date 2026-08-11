@@ -78,11 +78,14 @@ function LeaderboardRow({
   return (
     <div className={`challenge-progress-row${isMe ? ' challenge-progress-row--me' : ''}`}>
       <div className="challenge-progress-top global-lb-row-top">
-        <ChallengePlaceBadge
-          place={rank}
-          compact
-          fallbackColor={isMe ? 'var(--accent)' : 'var(--text-dim)'}
-        />
+        <div className="global-lb-place">
+          <ChallengePlaceBadge
+            place={rank}
+            compact
+            fallbackColor={isMe ? 'var(--accent)' : 'var(--text-dim)'}
+          />
+          <RankDelta delta={entry.rankDelta} />
+        </div>
         <UserLink
           userId={entry.userId}
           username={entry.username}
@@ -101,6 +104,17 @@ function LeaderboardRow({
         </span>
       </div>
     </div>
+  );
+}
+
+function RankDelta({ delta }: { delta: number | null }) {
+  if (delta == null) return <span className="global-lb-delta global-lb-delta--new">NEW</span>;
+  if (delta === 0) return <span className="global-lb-delta global-lb-delta--flat">—</span>;
+  const up = delta > 0;
+  return (
+    <span className={`global-lb-delta${up ? ' global-lb-delta--up' : ' global-lb-delta--down'}`}>
+      {up ? `↑${delta}` : `↓${Math.abs(delta)}`}
+    </span>
   );
 }
 
@@ -175,7 +189,7 @@ export default function SocialGlobal() {
         </div>
         <p className="global-lb-subtitle">{activeMeta.subtitle}</p>
         <p className="global-lb-intro app-muted">
-          Top 10 over the last {data?.days ?? 60} days · wearable nights only
+          Top 10 over the last {data?.days ?? 60} days · vs yesterday · wearable nights only
         </p>
       </div>
 

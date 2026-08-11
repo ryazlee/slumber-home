@@ -107,6 +107,23 @@ async function fetchRecentWindowPostCounts(rows: PostRow[]): Promise<Map<string,
   return counts;
 }
 
+async function fetchAuthorWearablePostCounts(userIds: string[]): Promise<Map<string, number>> {
+  const counts = new Map<string, number>();
+  if (userIds.length === 0) return counts;
+
+  const { data, error } = await supabase
+    .from('sleep_posts')
+    .select('user_id, is_custom, source_device')
+    .in('user_id', userIds)
+    .is('deleted_at', null);
+  if (error) return counts;
+
+  for (const row of filterWearableSleepRows(data ?? [])) {
+    counts.set(row.user_id, (counts.get(row.user_id) ?? 0) + 1);
+  }
+  return counts;
+}
+
 function mapPostRow(
   row: PostRow,
   authorProfile: AuthorProfile | undefined,
@@ -116,6 +133,7 @@ function mapPostRow(
   prAllTimeMap: Map<string, string[]>,
   prRecentMap: Map<string, string[]>,
   recentWindowPostCountMap: Map<string, number>,
+  authorWearablePostCountMap: Map<string, number>,
 ): SleepPost {
   const username = authorProfile?.username ?? 'unknown';
   const prTypes = prAllTimeMap.get(row.id);
@@ -156,6 +174,7 @@ function mapPostRow(
     prTypes,
     recentPrTypes,
     recentWindowPostCount: recentWindowPostCountMap.get(recentWindowCountKey(row.user_id, row.sleep_date)),
+    authorWearablePostCount: authorWearablePostCountMap.get(row.user_id),
     createdAt: row.created_at,
     sourceDevice: row.source_device ?? 'Unknown',
     isCustom: row.is_custom === true,
@@ -169,7 +188,7 @@ export async function enrichSleepPostRows(rows: PostRow[]): Promise<SleepPost[]>
   const { data: { user } } = await supabase.auth.getUser();
   const currentUserId = user?.id ?? null;
 
-  const [kudosRes, commentsRes, prRes, authorProfilesRes, recentWindowPostCountMap] = await Promise.all([
+  const [kudosRes, commentsRes, prRes, authorProfilesRes, recentWindowPostCountMap, authorWearablePostCountMap] = await Promise.all([
     supabase.from('kudos').select('post_id, user_id').in('post_id', postIds),
     supabase.from('comments').select('post_id').in('post_id', postIds),
     supabase
@@ -179,6 +198,7 @@ export async function enrichSleepPostRows(rows: PostRow[]): Promise<SleepPost[]>
       .not('post_id', 'is', null),
     supabase.from('profiles').select('id, username, avatar_url, user_roles, show_best_prs, show_worst_prs').in('id', authorUserIds),
     fetchRecentWindowPostCounts(rows),
+    fetchAuthorWearablePostCounts(authorUserIds),
   ]);
 
   const authorProfileMap = new Map<string, AuthorProfile>();
@@ -263,6 +283,7 @@ export async function enrichSleepPostRows(rows: PostRow[]): Promise<SleepPost[]>
       prAllTimeMap,
       prRecentMap,
       recentWindowPostCountMap,
+      authorWearablePostCountMap,
     );
     const postBuddyRows = buddiesByPost.get(row.id) ?? [];
     const isAuthor = currentUserId === row.user_id;

@@ -59,6 +59,9 @@ export const RECENT_PR_WINDOW_DAYS = 30;
 /** Wearable nights needed in the trailing window before recent PR chips show. */
 export const RECENT_PR_MIN_POSTS = 5;
 
+/** Lifetime wearable nights needed before all-time PR chips show. */
+export const ALL_TIME_PR_MIN_POSTS = 5;
+
 /** First sleep_date (inclusive) in the trailing window ending on `sleepDate`. */
 export function recentPrWindowStart(sleepDate: string): string {
   return addDaysToDateISO(sleepDate, -(RECENT_PR_WINDOW_DAYS - 1));
@@ -72,6 +75,7 @@ type PrBadgePost = {
   prTypes?: string[];
   recentPrTypes?: string[];
   recentWindowPostCount?: number;
+  authorWearablePostCount?: number;
 };
 
 /**
@@ -85,9 +89,23 @@ export function isRecentPrBadgeHidden(post: Pick<PrBadgePost, 'recentWindowPostC
   return (post.recentWindowPostCount ?? 1) < RECENT_PR_MIN_POSTS;
 }
 
+/**
+ * Hide all-time PR chips until the author has enough wearable posts overall.
+ * Missing count is treated as 1 so badges stay hidden until enrichment provides a real count.
+ */
+export function isAllTimePrBadgeHidden(post: Pick<PrBadgePost, 'authorWearablePostCount'>): boolean {
+  return (post.authorWearablePostCount ?? 1) < ALL_TIME_PR_MIN_POSTS;
+}
+
 export function getVisibleRecentPrTypes(post: PrBadgePost): string[] {
   const types = post.recentPrTypes ?? [];
   if (!types.length || isRecentPrBadgeHidden(post)) return [];
+  return types;
+}
+
+export function getVisibleAllTimePrTypes(post: PrBadgePost): string[] {
+  const types = post.prTypes ?? [];
+  if (!types.length || isAllTimePrBadgeHidden(post)) return [];
   return types;
 }
 
@@ -105,7 +123,7 @@ export function orderPrBadgeChips(post: PrBadgePost): PrBadgeChip[] {
   const lifetimeWorst: PrBadgeChip[] = [];
   const recentBest: PrBadgeChip[] = [];
   const recentWorst: PrBadgeChip[] = [];
-  for (const type of post.prTypes ?? []) {
+  for (const type of getVisibleAllTimePrTypes(post)) {
     (isNegativePrType(type) ? lifetimeWorst : lifetimeBest).push({ type, scope: 'all-time' });
   }
   for (const type of getVisibleRecentPrTypes(post)) {
@@ -144,5 +162,5 @@ export function formatPrDiffLabel(
 }
 
 export function hasVisiblePrBadges(post: PrBadgePost): boolean {
-  return (post.prTypes?.length ?? 0) > 0 || getVisibleRecentPrTypes(post).length > 0;
+  return getVisibleAllTimePrTypes(post).length > 0 || getVisibleRecentPrTypes(post).length > 0;
 }

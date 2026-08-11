@@ -1,9 +1,24 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { build404Html, buildIndexRestoreScript, buildSocialMetaHead } from './lib/spaShellScripts';
 
 const DEFAULT_SITE_URL = 'https://useslumber.com';
 const IOS_APP_ID = 'L57M37HLYR.com.ryan.slumber';
+
+/**
+ * Public marketing / legal routes that store crawlers (Google Play, App Store) hit with a
+ * direct GET. GitHub Pages otherwise serves 404.html with HTTP 404 for these SPA paths,
+ * which Play rejects as an invalid privacy-policy URL.
+ */
+const STATIC_SPA_ROUTES = [
+  'privacy',
+  'terms',
+  'delete-account',
+  'delete-data',
+  'home',
+];
 
 function appLinkPath(basePath: string, route: string): string {
   const base = basePath.replace(/\/$/, '');
@@ -20,6 +35,9 @@ function pathSegmentsToKeep(basePath: string): number {
 /**
  * SPA fallback for GitHub Pages — https://github.com/rafgraph/spa-github-pages
  * 404.html redirects to index.html with a query param; index.html restores the path via replaceState.
+ *
+ * Also copies index.html into known public routes so GitHub Pages returns HTTP 200
+ * (required for Google Play privacy / deletion URLs).
  */
 function spaGithubPagesPlugin(basePath: string, siteUrl: string): Plugin {
   const segments = pathSegmentsToKeep(basePath);
@@ -40,6 +58,18 @@ function spaGithubPagesPlugin(basePath: string, siteUrl: string): Plugin {
         fileName: '404.html',
         source: build404Html(segments, siteUrl),
       });
+    },
+    closeBundle() {
+      const outDir = path.resolve(process.cwd(), 'dist');
+      const indexPath = path.join(outDir, 'index.html');
+      if (!fs.existsSync(indexPath)) return;
+
+      const html = fs.readFileSync(indexPath, 'utf8');
+      for (const route of STATIC_SPA_ROUTES) {
+        const dir = path.join(outDir, route);
+        fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(path.join(dir, 'index.html'), html);
+      }
     },
   };
 }

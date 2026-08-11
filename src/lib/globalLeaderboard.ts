@@ -7,6 +7,8 @@ export type GlobalLeaderboardEntry = {
   userRoles: string[] | null;
   nights: number;
   value: number;
+  /** prevRank − currentRank; positive = moved up. Null = new / not ranked yesterday. */
+  rankDelta: number | null;
 };
 
 export type GlobalLeaderboardMetric =
@@ -19,6 +21,7 @@ export type GlobalLeaderboardMetric =
 export type GlobalSleepLeaderboard = {
   days: number;
   minNights: number;
+  clubId: string | null;
   deepPct: GlobalLeaderboardEntry[];
   remPct: GlobalLeaderboardEntry[];
   corePct: GlobalLeaderboardEntry[];
@@ -39,6 +42,12 @@ function mapEntry(raw: unknown): GlobalLeaderboardEntry | null {
   const userRoles = Array.isArray(rawRoles)
     ? rawRoles.filter((role): role is string => typeof role === 'string')
     : null;
+  const rawDelta = r.rankDelta;
+  let rankDelta: number | null = null;
+  if (rawDelta != null) {
+    const n = typeof rawDelta === 'number' ? rawDelta : Number(rawDelta);
+    if (Number.isFinite(n)) rankDelta = n;
+  }
   return {
     userId,
     username,
@@ -46,6 +55,7 @@ function mapEntry(raw: unknown): GlobalLeaderboardEntry | null {
     userRoles: userRoles && userRoles.length > 0 ? userRoles : null,
     nights,
     value,
+    rankDelta,
   };
 }
 
@@ -58,11 +68,14 @@ export async function fetchGlobalSleepLeaderboard(opts?: {
   days?: number;
   limit?: number;
   minNights?: number;
+  clubId?: string | null;
 }): Promise<GlobalSleepLeaderboard> {
+  const clubId = opts?.clubId ?? null;
   const { data, error } = await supabase.rpc('get_global_sleep_leaderboard', {
     p_days: opts?.days ?? 60,
     p_limit: opts?.limit ?? 10,
     p_min_nights: opts?.minNights ?? 5,
+    p_club_id: clubId,
   });
   if (error) throw error;
 
@@ -70,6 +83,7 @@ export async function fetchGlobalSleepLeaderboard(opts?: {
   return {
     days: typeof payload.days === 'number' ? payload.days : 60,
     minNights: typeof payload.minNights === 'number' ? payload.minNights : 5,
+    clubId: typeof payload.clubId === 'string' ? payload.clubId : clubId,
     deepPct: mapList(payload.deepPct),
     remPct: mapList(payload.remPct),
     corePct: mapList(payload.corePct),

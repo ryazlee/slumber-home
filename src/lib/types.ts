@@ -71,6 +71,8 @@ export type SleepPost = {
   recentPrTypes?: string[];
   /** Wearable nights by this author in the trailing 30 days ending on sleepDate. */
   recentWindowPostCount?: number;
+  /** Lifetime wearable (non-custom) nights by this author — gates all-time PR chips. */
+  authorWearablePostCount?: number;
   createdAt: string;
   sourceDevice: string;
   isCustom?: boolean;

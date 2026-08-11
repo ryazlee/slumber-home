@@ -15,7 +15,7 @@ import type { SleepPost } from '../lib/types';
 type Props = {
   post: Pick<
     SleepPost,
-    'userId' | 'sleepDate' | 'prTypes' | 'recentPrTypes' | 'recentWindowPostCount' | 'isPR'
+    'userId' | 'sleepDate' | 'prTypes' | 'recentPrTypes' | 'recentWindowPostCount' | 'authorWearablePostCount' | 'isPR'
   >;
 };
 
@@ -98,7 +98,7 @@ export default function PersonalRecordBadges({ post }: Props) {
         const negative = isNegativePrType(type);
         const diffs = scope === 'recent' ? recentPrDiffs : allTimePrDiffs;
         const diffLabel = formatPrDiff(type, diffs[type] ?? 0);
-        const tone = negative ? 'negative' : scope === 'recent' ? 'monthly' : 'alltime';
+        const tone = negative ? 'negative' : scope === 'recent' ? 'recent' : 'alltime';
         return (
           <span
             key={`${scope}-${type}`}

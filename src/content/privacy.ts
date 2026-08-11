@@ -1,6 +1,6 @@
 export const privacyMeta = {
   title: 'Privacy Policy',
-  updated: 'August 3, 2026',
+  updated: 'August 10, 2026',
 };
 
 export const privacySections = [
@@ -17,6 +17,7 @@ export const privacySections = [
       'Account information: email address (for email one-time-code / magic-link sign-in), username, profile photo, sleep goal, and optional profile settings. On iOS you can also sign in with Google or Sign in with Apple.',
       'Sleep data you create: sleep duration, bed and wake times, sleep stages (when available from a wearable), hypnogram samples, titles, location labels, vibes, tags, morning notes, dream journal entries, optional dream mood, and photos you attach to posts.',
       'Manual sleep logs: when you log a night without wearable data, we store the times and duration you enter. Manual logs appear in your social feed but are excluded from competitive stats, personal records, and challenge scoring.',
+      'Offline drafts (on device): if you save a sleep post while offline, the draft (including any photos you attach) is stored temporarily in the app’s on-device storage until it syncs to our servers when you reconnect. Offline drafts are not visible to friends until sync succeeds.',
       'Apple Health data (with your permission): sleep duration and stage data read via HealthKit to populate wearable sleep logs. Slumber only reads Health data you authorize; we do not write to HealthKit on your behalf.',
       'Health Connect data (Android, with your permission): sleep duration and stage data read via Health Connect to populate wearable sleep logs. Slumber only reads Health Connect data you authorize; we do not write sleep data back to Health Connect on your behalf.',
       'Google Health data (optional, with your permission): if you connect Google Health in Settings, we read sleep duration and stage data from your Google Health account via Google\'s API using the restricted scope googlehealth.sleep.readonly. OAuth refresh tokens are stored on our servers (never on your device) so we can fetch sleep on your behalf. Slumber only reads sleep data you authorize; we do not write sleep data to Google Health. See "Data protection" below for how we safeguard this data.',
@@ -67,6 +68,7 @@ export const privacySections = [
       'We protect personal information and Google user data (including Google Health sleep data and OAuth credentials) with the following mechanisms:',
       'Encryption in transit: All client–server and server–Google API traffic uses HTTPS / TLS.',
       'Encryption at rest: Account data, sleep posts, and OAuth credentials are stored in our hosted database (Supabase / PostgreSQL), which encrypts data at rest.',
+      'On-device offline drafts: Queued posts saved while offline live in app-protected storage on your device until sync; they are uploaded over HTTPS when connectivity returns.',
       'Credential isolation: Google Health OAuth refresh tokens are never stored on your device or exposed to the mobile/web client. Tokens are stored server-side and usable only by authenticated backend services (Edge Functions with a service role). Database row-level security and revoked client grants prevent anonymous or signed-in users from reading other users\' tokens or Google Health credentials.',
       'Least privilege: We request only the Google Health sleep read-only scope needed to sync sleep. We do not request write access to Google Health.',
       'Access control: Sleep and account data are scoped to your authenticated account. Friend-visible content is limited by mutual friendship and per-post privacy settings. Administrative access to production systems is limited to authorized operators and used for security, reliability, and abuse investigation.',
@@ -79,7 +81,7 @@ export const privacySections = [
     body: [
       'We do not sell your personal information.',
       'Friends: Slumber uses mutual friend requests. Both people must accept before either can see the other\'s posts. Your feed shows posts from accepted friends and your own posts.',
-      'Post visibility: posts default to visible to friends. You can mark an individual post private (hidden from the feed; tagged sleep buddies can still see it).',
+      'Post visibility: posts default to visible to friends. You can mark an individual post private (hidden from the feed; tagged sleep buddies can still see it). Offline drafts stay on your device only until they sync.',
       'Dream privacy: you can blur a dream entry so friends see that you logged a dream without reading the text. Mentioned friends may see a minimal indicator when they are @mentioned in a private dream.',
       'Sleep buddies: when you tag a friend on a post, they must accept before the tag appears to other viewers.',
       'Challenges: participants in a challenge you join can see challenge-related sleep contributions according to challenge rules.',
@@ -93,7 +95,7 @@ export const privacySections = [
     body: [
       'Control post privacy per night (public to friends or private to you).',
       'Blur dream journal entries on individual posts.',
-      'Edit or delete your own posts.',
+      'Edit or delete your own posts (including deleting an offline draft before it syncs).',
       'Block users. They are removed from your feed, search, and challenge interactions.',
       'Report posts for moderation review.',
       'Delete your account in Settings, or request deletion on the web at useslumber.com/delete-account — removes your login, personal sleep posts, photos, health connections, and social connections; comments and likes you left on others\' posts may remain under an anonymized account name.',
@@ -105,7 +107,7 @@ export const privacySections = [
   {
     heading: 'Retention',
     body: [
-      'We retain your data while your account is active. When you delete your account, we remove your authentication record and personal sleep data. Comments and likes you left on other people\'s posts may be retained under an anonymized username so those conversations stay intact.',
+      'We retain your data while your account is active. Offline drafts remain on your device until they sync or you delete them. When you delete your account, we remove your authentication record and personal sleep data. Comments and likes you left on other people\'s posts may be retained under an anonymized username so those conversations stay intact.',
     ],
   },
   {

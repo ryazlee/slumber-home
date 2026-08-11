@@ -1432,7 +1432,7 @@
   color: #ffd60a;
 }
 
-.post-pr-badge--monthly {
+.post-pr-badge--recent {
   background: rgba(94, 156, 245, 0.12);
   border: 1px solid rgba(94, 156, 245, 0.35);
   color: #7eb6ff;
@@ -3900,6 +3900,39 @@ button.app-back-link {
 
 .global-lb-row-top {
   margin-bottom: 0;
+}
+
+.global-lb-place {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 2.25rem;
+}
+
+.global-lb-delta {
+  font-size: 0.625rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.global-lb-delta--up {
+  color: var(--success, #2d7a4f);
+}
+
+.global-lb-delta--down {
+  color: var(--error, #ff453a);
+}
+
+.global-lb-delta--flat {
+  color: var(--text-dim);
+}
+
+.global-lb-delta--new {
+  color: var(--accent);
+  font-size: 0.5625rem;
+  letter-spacing: 0.02em;
 }
 
 .global-lb-stats {

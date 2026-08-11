@@ -21,7 +21,22 @@ const DEEP_LINK_PREFIXES = [
   '/health-callback',
 ];
 
+/** Exact public routes store crawlers fetch (Play privacy / deletion URLs, etc.). */
+const STATIC_PUBLIC_PATHS = new Set([
+  '/privacy',
+  '/privacy/',
+  '/terms',
+  '/terms/',
+  '/delete-account',
+  '/delete-account/',
+  '/delete-data',
+  '/delete-data/',
+  '/home',
+  '/home/',
+]);
+
 function isDeepLinkPath(pathname) {
+  if (STATIC_PUBLIC_PATHS.has(pathname)) return true;
   if (pathname === '/login-callback' || pathname === '/health-callback') return true;
   return DEEP_LINK_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }

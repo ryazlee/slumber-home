@@ -81,10 +81,11 @@ Defaults derive from `EXPO_PUBLIC_WEB_BASE_URL` when omitted (`lib/legal.ts`).
 
 Crawlers do not run React. Open Graph tags are injected at build time into `index.html` and `404.html` via `lib/spaShellScripts.ts` (`og-image.png`, `apple-touch-icon.png`, etc. in `public/`).
 
-**GitHub Pages quirk:** paths like `/invite/:token` are served from `404.html` with **HTTP 404**. Some apps (especially iMessage) skip rich previews on non-200 responses even when meta tags are present.
+**GitHub Pages quirk:** unknown SPA paths are served from `404.html` with **HTTP 404**. Google Play rejects privacy/deletion URLs that return 404. iMessage often skips rich previews on non-200 responses even when meta tags are present.
 
-**Fix (pick one):**
+**Mitigations in this repo:**
 
-1. **Cloudflare Pages** (recommended) — deploy `dist/` with `public/_redirects` (`/* /index.html 200`). Previews use `index.html` meta + logo.
-2. **Cloudflare Worker** (keep GitHub Pages) — deploy `cloudflare/link-preview-worker.mjs` on `useslumber.com/*` to re-serve `404.html` with status **200** for deep-link paths. See `cloudflare/README.md`.
-3. **Verify after deploy** — `curl -sI https://useslumber.com/invite/TOKEN` should be `200` for reliable previews; `og-image.png` must return `200`.
+1. **Build-time static shells** — `vite` copies `index.html` into `privacy/`, `terms/`, `delete-account/`, `delete-data/`, and `home/` so those URLs return **HTTP 200** on GitHub Pages (required for Play Console).
+2. **Cloudflare Pages** (optional) — deploy `dist/` with `public/_redirects` (`/* /index.html 200`). Previews use `index.html` meta + logo.
+3. **Cloudflare Worker** (optional, keep GitHub Pages) — deploy `cloudflare/link-preview-worker.mjs` on `useslumber.com/*` to re-serve `404.html` with status **200** for deep-link + legal paths. See `cloudflare/README.md`.
+4. **Verify after deploy** — `curl -sI https://useslumber.com/privacy` and `curl -sI https://useslumber.com/invite/TOKEN` should be `200`; `og-image.png` must return `200`.

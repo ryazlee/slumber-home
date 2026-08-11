@@ -93,7 +93,8 @@ export default function Home() {
                 <h3>Add a little context</h3>
                 <p>
                   How you felt, a note, a dream, or who you slept near. Or turn on
-                  auto-publish and skip it.
+                  auto-publish and skip it. Spotty signal? Save offline and sync when
+                  you&apos;re back.
                 </p>
               </div>
             </li>
@@ -119,8 +120,8 @@ export default function Home() {
             <li>
               <strong>Feed</strong>
               See friends&apos; nights as they land: hypnograms, bed and wake times,
-              optional vibes, dream logs, PR badges with margins, wearables, and comments
-              in one place.
+              optional vibes, dream logs, PR badges with margins (after enough wearable
+              nights), wearables, and comments in one place.
             </li>
             <li>
               <strong>Compare</strong>
