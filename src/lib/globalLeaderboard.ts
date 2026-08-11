@@ -7,7 +7,7 @@ export type GlobalLeaderboardEntry = {
   userRoles: string[] | null;
   nights: number;
   value: number;
-  /** prevRank − currentRank; positive = moved up. Null = new / not ranked yesterday. */
+  /** prevRank − currentRank; positive = moved up. Null = not ranked on the board 7 days ago. */
   rankDelta: number | null;
 };
 
@@ -18,8 +18,15 @@ export type GlobalLeaderboardMetric =
   | 'avgHours'
   | 'dreamRate';
 
+/** Weekly = rolling last 7 days ending today (not calendar week); all-time = every qualifying wearable night. */
+export type GlobalLeaderboardPeriod = 'weekly' | 'all_time';
+
 export type GlobalSleepLeaderboard = {
-  days: number;
+  /** Rolling window length; null for all-time. */
+  days: number | null;
+  period: GlobalLeaderboardPeriod;
+  /** Lookback for rankDelta — compare to same board as of this many days ago (always 7). */
+  deltaDays: number;
   minNights: number;
   clubId: string | null;
   deepPct: GlobalLeaderboardEntry[];
@@ -28,6 +35,21 @@ export type GlobalSleepLeaderboard = {
   avgHours: GlobalLeaderboardEntry[];
   dreamRate: GlobalLeaderboardEntry[];
 };
+
+export const LEADERBOARD_PERIODS: {
+  key: GlobalLeaderboardPeriod;
+  label: string;
+  /** null → all-time (RPC p_days NULL). */
+  days: number | null;
+  minNights: number;
+}[] = [
+  { key: 'all_time', label: 'All-time', days: null, minNights: 5 },
+  { key: 'weekly', label: 'Weekly', days: 7, minNights: 3 },
+];
+
+export function leaderboardPeriodConfig(period: GlobalLeaderboardPeriod) {
+  return LEADERBOARD_PERIODS.find((p) => p.key === period) ?? LEADERBOARD_PERIODS[0];
+}
 
 function mapEntry(raw: unknown): GlobalLeaderboardEntry | null {
   if (!raw || typeof raw !== 'object') return null;
@@ -64,25 +86,52 @@ function mapList(raw: unknown): GlobalLeaderboardEntry[] {
   return raw.map(mapEntry).filter((e): e is GlobalLeaderboardEntry => e != null);
 }
 
+function mapPeriod(raw: unknown, days: number | null): GlobalLeaderboardPeriod {
+  if (raw === 'all_time' || raw === 'weekly') return raw;
+  return days == null ? 'all_time' : 'weekly';
+}
+
 export async function fetchGlobalSleepLeaderboard(opts?: {
-  days?: number;
+  period?: GlobalLeaderboardPeriod;
+  days?: number | null;
   limit?: number;
   minNights?: number;
   clubId?: string | null;
 }): Promise<GlobalSleepLeaderboard> {
   const clubId = opts?.clubId ?? null;
+  const period = opts?.period ?? 'all_time';
+  const config = leaderboardPeriodConfig(period);
+  const days = opts?.days !== undefined ? opts.days : config.days;
+  const minNights = opts?.minNights ?? config.minNights;
+
   const { data, error } = await supabase.rpc('get_global_sleep_leaderboard', {
-    p_days: opts?.days ?? 60,
+    p_days: days,
     p_limit: opts?.limit ?? 10,
-    p_min_nights: opts?.minNights ?? 5,
+    p_min_nights: minNights,
     p_club_id: clubId,
   });
   if (error) throw error;
 
   const payload = (data ?? {}) as Record<string, unknown>;
+  const payloadDays =
+    payload.days == null
+      ? null
+      : typeof payload.days === 'number'
+        ? payload.days
+        : Number(payload.days);
+  const resolvedDays =
+    payloadDays != null && Number.isFinite(payloadDays) ? payloadDays : days ?? null;
+  const deltaDaysRaw = payload.deltaDays;
+  const deltaDays =
+    typeof deltaDaysRaw === 'number' && Number.isFinite(deltaDaysRaw)
+      ? deltaDaysRaw
+      : 7;
+
   return {
-    days: typeof payload.days === 'number' ? payload.days : 60,
-    minNights: typeof payload.minNights === 'number' ? payload.minNights : 5,
+    days: resolvedDays,
+    period: mapPeriod(payload.period, resolvedDays),
+    deltaDays,
+    minNights: typeof payload.minNights === 'number' ? payload.minNights : minNights,
     clubId: typeof payload.clubId === 'string' ? payload.clubId : clubId,
     deepPct: mapList(payload.deepPct),
     remPct: mapList(payload.remPct),

@@ -3829,6 +3829,39 @@ button.app-back-link {
   min-width: 0;
 }
 
+.global-lb-periods {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.global-lb-period {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--text-muted) 14%, var(--bg));
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.global-lb-period:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text-muted) 20%, var(--bg));
+}
+
+.global-lb-period--active {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 .global-lb-chip-scroll {
   min-width: 0;
   max-width: 100%;
@@ -3887,15 +3920,10 @@ button.app-back-link {
 
 .global-lb-subtitle {
   margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.global-lb-intro {
-  margin: 0;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
   line-height: 1.35;
+  color: var(--text-muted);
 }
 
 .global-lb-row-top {

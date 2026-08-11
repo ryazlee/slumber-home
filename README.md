@@ -30,7 +30,7 @@ npm install && npm run dev
 | `/feed` | Yes | Friends feed — kudos + comments; stage metrics on one line (dynamic sizing) |
 | `/profile` | Yes | Your profile and recent posts (header avatar; not a tab) |
 | `/social` | Yes | Redirects to Global |
-| `/social/global` | Yes | Global sleep leaderboard (Average hours / Deep / REM / Core / Dream rate) |
+| `/social/global` | Yes | Global sleep leaderboard — All-time (default) / Weekly (rolling last 7 days); Avg hours / Deep / REM / Core / Dream rate; place Δ vs board 7 days ago |
 | `/social/clubs` | Yes | Clubs you’re in |
 | `/social/friends` | Yes | Friends list + inbound requests |
 | `/stats` | Yes | My Stats (30-day averages, charts, PRs) |
