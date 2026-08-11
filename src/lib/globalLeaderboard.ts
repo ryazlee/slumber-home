@@ -25,7 +25,8 @@ export type GlobalSleepLeaderboard = {
   /** Rolling window length; null for all-time. */
   days: number | null;
   period: GlobalLeaderboardPeriod;
-  /** Lookback for rankDelta — compare to same board as of this many days ago (always 7). */
+  /** Lookback for rankDelta — compare to same board as of this many days ago (always 7).
+   * Newcomers (not on prior board) receive prevBoardSize - rank (positive ↑). */
   deltaDays: number;
   minNights: number;
   clubId: string | null;

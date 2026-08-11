@@ -122,7 +122,7 @@ function LeaderboardRow({
 }
 
 function RankDelta({ delta }: { delta: number | null }) {
-  // Only surface real place movement; hide flat (—) and first-time NEW.
+  // Hide flat (0). Newcomers get a positive delta from the RPC (migration 150).
   if (delta == null || delta === 0) return null;
   const up = delta > 0;
   return (
