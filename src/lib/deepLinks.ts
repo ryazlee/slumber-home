@@ -9,6 +9,9 @@ export { isRestrictedInAppBrowser } from './inAppBrowserEscape';
 
 export const APP_STORE_URL = 'https://apps.apple.com/app/id6772449516';
 
+/** Cross-platform download page (App Store + Play). Prefer for general “get the app” links. */
+export const DOWNLOAD_URL = 'https://useslumber.com/download';
+
 /** Play internal testing invite until public listing has enough testers. */
 export const PLAY_STORE_URL =
   'https://play.google.com/apps/internaltest/4700340789434908709';

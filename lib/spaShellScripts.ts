@@ -141,14 +141,117 @@ export function build404RedirectScript(pathSegmentsToKeep: number): string {
 }
 
 export function build404Html(pathSegmentsToKeep: number, siteUrl: string): string {
+  const base = siteUrl.replace(/\/$/, '');
+  const iconUrl = `${base}/icon-512.png`;
+  const homeUrl = `${base}/`;
+  const downloadUrl = `${base}/download`;
+
   return `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     ${buildSocialMetaHead(siteUrl, 'deeplink')}
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        background: #0c0c0e;
+        color: #f4f4f5;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      body {
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 20px;
+        background:
+          radial-gradient(ellipse 70% 55% at 12% 18%, rgba(94, 156, 245, 0.18), transparent 58%),
+          radial-gradient(ellipse 50% 45% at 88% 12%, rgba(236, 72, 153, 0.12), transparent 52%),
+          radial-gradient(ellipse 60% 50% at 70% 90%, rgba(139, 92, 246, 0.16), transparent 55%),
+          #0c0c0e;
+      }
+      .shell {
+        width: 100%;
+        max-width: 24rem;
+        text-align: center;
+      }
+      .icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        margin: 0 auto 14px;
+        box-shadow:
+          0 4px 18px rgba(0, 0, 0, 0.4),
+          0 0 0 1px rgba(255, 255, 255, 0.08);
+        display: block;
+      }
+      .brand {
+        margin: 0 0 18px;
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+      .title {
+        margin: 0 0 8px;
+        font-size: 1.15rem;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+      }
+      .lead {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.45;
+        color: #a1a1aa;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 22px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        min-width: 9.5rem;
+        padding: 11px 18px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 15px;
+        text-decoration: none;
+        color: #f4f4f5;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .btn--primary {
+        background: #f4f4f5;
+        color: #0c0c0e;
+        border-color: transparent;
+      }
+      noscript .lead { color: #a1a1aa; }
+    </style>
     <script type="text/javascript">${build404RedirectScript(pathSegmentsToKeep)}</script>
   </head>
-  <body></body>
+  <body>
+    <div class="shell">
+      <img class="icon" src="${iconUrl}" width="64" height="64" alt="" />
+      <p class="brand">Slumber</p>
+      <h1 class="title">Opening Slumber…</h1>
+      <p class="lead">If nothing happens, use one of the links below.</p>
+      <div class="actions">
+        <a class="btn btn--primary" href="${homeUrl}">Go home</a>
+        <a class="btn" href="${downloadUrl}">Download</a>
+      </div>
+    </div>
+  </body>
 </html>`;
 }

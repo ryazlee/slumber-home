@@ -175,40 +175,29 @@ export default function DeepLinkLanding({
 }
 
 export function DeepLinkNotFound({ message }: { message: string }) {
-  const stores = storeLinks();
-
   return (
     <main className="deeplink-page">
       <header className="deeplink-brand">
-        <img className="deeplink-app-icon" src={`${base}moon.png`} alt="" width={64} height={64} />
+        <img className="deeplink-app-icon" src={`${base}icon-512.png`} alt="" width={64} height={64} />
         <span className="deeplink-app-name">Slumber</span>
       </header>
       <section className="deeplink-preview">
-        <div className="deeplink-preview-icon" aria-hidden>🔗</div>
-        <p className="deeplink-preview-kind">Link</p>
+        <p className="deeplink-preview-kind">404</p>
         <h1 className="deeplink-preview-title">Link not found</h1>
         <p className="deeplink-preview-subtitle">{message}</p>
       </section>
       <div className="deeplink-cta">
-        <a
-          href={stores.primaryHref}
-          className="deeplink-cta-primary deeplink-cta-primary--link"
-          rel="noreferrer"
-          target="_blank"
-        >
-          {stores.primaryLabel}
-        </a>
-        <a
-          href={stores.secondaryHref}
-          className="deeplink-cta-store"
-          rel="noreferrer"
-          target="_blank"
-        >
-          {stores.secondaryLabel}
-        </a>
+        <Link to="/" className="deeplink-cta-primary deeplink-cta-primary--link">
+          Go home
+        </Link>
+        <Link to="/download" className="deeplink-cta-store">
+          Download the app
+        </Link>
       </div>
       <footer className="deeplink-footer">
         <Link to="/home">About Slumber</Link>
+        <span aria-hidden>·</span>
+        <Link to="/privacy">Privacy</Link>
       </footer>
     </main>
   );

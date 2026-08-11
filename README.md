@@ -38,6 +38,7 @@ npm install && npm run dev
 | `/challenges` | Yes | Active and completed challenges |
 | `/home` | No | Same marketing home as `/` (About / legacy links) |
 | `/download` | No | Dedicated App Store + Google Play download page |
+| `*` (unknown) | No | Not-found page (Home / Download CTAs) |
 | `/privacy` | No | Privacy policy (App Store / Play link) |
 | `/terms` | No | Terms of service |
 | `/delete-account` | No | Account deletion (Play Console account deletion URL) |

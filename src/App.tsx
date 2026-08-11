@@ -36,6 +36,7 @@ import Download from './pages/Download';
 import HealthCallback from './pages/HealthCallback';
 import InviteLandingPage from './pages/InviteLandingPage';
 import LoginCallback from './pages/LoginCallback';
+import NotFound from './pages/NotFound';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 
@@ -118,6 +119,7 @@ export default function App() {
           <Route path="terms" element={<Terms />} />
           <Route path="delete-account" element={<DeleteAccount />} />
           <Route path="delete-data" element={<DeleteData />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Route>
       </Routes>

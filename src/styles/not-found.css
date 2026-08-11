@@ -1,0 +1,24 @@
+/* /404 catch-all — shares download hero layout. */
+
+.not-found-code {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: clamp(22px, 4vh, 32px);
+  width: 100%;
+}
+
+.not-found-actions .home-cta {
+  min-width: 9.5rem;
+}
