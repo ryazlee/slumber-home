@@ -17,8 +17,8 @@ export default function HomeScreenshots() {
                 alt={shot.alt}
                 loading="lazy"
                 decoding="async"
-                width={428}
-                height={926}
+                width={432}
+                height={914}
               />
             </div>
             <figcaption className="home-screenshot-caption">

@@ -62,8 +62,8 @@ export default function Home() {
               <img
                 src={`${base}screenshots/feed.png`}
                 alt="Slumber feed with friends' sleep posts and hypnograms"
-                width={428}
-                height={926}
+                width={432}
+                height={914}
                 decoding="async"
                 fetchPriority="high"
                 sizes="(min-width: 960px) 360px, (min-width: 560px) 260px, 220px"
