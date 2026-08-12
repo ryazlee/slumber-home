@@ -29,8 +29,8 @@ npm install && npm run dev
 | `/login-callback` | — | Supabase auth return (magic link + Google OAuth) |
 | `/feed` | Yes | Friends feed — kudos + comments; stage metrics on one line (dynamic sizing) |
 | `/profile` | Yes | Your profile and recent posts (header avatar; not a tab) |
-| `/social` | Yes | Redirects to Global |
-| `/social/global` | Yes | Global sleep leaderboard — All-time (default) / Weekly (rolling last 7 days); Avg hours / Deep / REM / Core / Dream rate; place Δ vs board 7 days ago |
+| `/social` | Yes | Redirects to Leaderboards (`/social/global`) |
+| `/social/global` | Yes | Leaderboards (sleep rankings) — All-time (default) / Weekly (rolling last 7 days); Avg hours / Deep / REM / Core / Dream rate; place Δ vs board 7 days ago |
 | `/social/clubs` | Yes | Clubs you’re in |
 | `/social/friends` | Yes | Friends list + inbound requests |
 | `/stats` | Yes | My Stats (30-day averages, charts, PRs) |

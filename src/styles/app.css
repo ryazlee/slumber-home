@@ -746,9 +746,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.28);
 }
 
-.post-card--latest {
-  border-color: rgba(52, 199, 89, 0.4);
-}
 
 .post-card-author {
   display: flex;
@@ -968,15 +965,6 @@
   color: #86efac;
 }
 
-.post-badge-latest {
-  background: rgba(52, 199, 89, 0.12);
-  border: 1px solid rgba(52, 199, 89, 0.35);
-  color: #86efac;
-  text-transform: uppercase;
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  padding: 2px 7px;
-}
 
 .manual-sleep-block {
   background: #1a1a1e;
@@ -1125,6 +1113,11 @@
 .post-detail-page .post-card {
   margin-top: 4px;
 }
+
+.post-card--latest {
+  border-color: var(--success-mid, #3d9a6a);
+}
+
 
 .post-detail-page-header {
   margin-bottom: 16px;
@@ -1896,6 +1889,9 @@
 }
 
 .post-dream {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin-top: 16px;
   padding: 14px 16px;
   border-radius: 10px;
@@ -1906,7 +1902,7 @@
 
 .post-dream-badge {
   display: inline-block;
-  margin-bottom: 8px;
+  margin: 0;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -1914,8 +1910,20 @@
   color: #c4b5fd;
 }
 
+.post-dream-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.post-dream-header .post-dream-mood {
+  margin: 0;
+}
+
 .post-dream-mood {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 13px;
   font-weight: 600;
 }
@@ -1924,6 +1932,7 @@
   margin: 0;
   font-size: 15px;
   line-height: 1.5;
+  font-style: italic;
   color: #e9d5ff;
   white-space: pre-wrap;
   word-break: break-word;
@@ -1931,12 +1940,6 @@
 
 .post-dream-icon {
   margin-right: 6px;
-}
-
-.post-dream-private {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
 }
 
 .post-dream-hint {

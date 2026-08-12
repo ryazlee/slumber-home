@@ -40,7 +40,6 @@ export default function SleepPostCard({
   const handleMentionPress = useMentionProfilePress();
   const {
     isManual,
-    isOwnPost,
     canReadDream,
     isNapDay,
     napChipLabel,
@@ -79,13 +78,14 @@ export default function SleepPostCard({
               avatarSize="md"
               className="post-author-link"
             />
-            {isLatestPost && <span className="post-badge post-badge-latest">🕒 Latest</span>}
+            {post.isPrivate ? <span className="post-badge">Private</span> : null}
           </div>
         )}
-        <div className="post-card-meta">
-          {!showAuthor && isLatestPost && <span className="post-badge post-badge-latest">🕒 Latest</span>}
-          {post.isPrivate && <span className="post-badge">Private</span>}
-        </div>
+        {!showAuthor && post.isPrivate ? (
+          <div className="post-card-meta">
+            <span className="post-badge">Private</span>
+          </div>
+        ) : null}
       </header>
 
       <p className="post-meta-strip">{metaParts.join(' · ')}</p>
@@ -133,7 +133,6 @@ export default function SleepPostCard({
         dreamMood={post.dreamMood}
         canReadDream={canReadDream}
         blurDream={post.blurDream}
-        isOwnPost={isOwnPost}
         variant="feed"
         onMentionPress={handleMentionPress}
       />

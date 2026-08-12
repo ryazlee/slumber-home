@@ -1,13 +1,9 @@
-import { useMemo } from 'react';
 import { formatMins, formatSleepDate, timeAgo } from '../lib/format';
-import { buildLatestPostIdsByUser, isLatestSleepPost } from '../lib/latestSleepPost';
 import { hasVisiblePrBadges } from '../lib/pr';
 import { hasVisibleSleepBuddies, sleepBuddiesForViewer } from '../lib/sleepBuddiesDisplay';
 import { useAuth } from '../context/AuthContext';
 import { useMentionProfilePress } from '../hooks/useMentionProfilePress';
 import { usePostSocialPatch, useSleepPostDisplay } from '../hooks/useSleepPostDisplay';
-import { useLocalMidnightInvalidation } from '../hooks/useLocalMidnightInvalidation';
-import { useUserPosts } from '../hooks/useUserPosts';
 import type { SleepPost } from '../lib/types';
 import ManualLogSleepBlock from './ManualLogSleepBlock';
 import PersonalRecordBadges from './PersonalRecordBadges';
@@ -40,7 +36,6 @@ export default function PostDetailView({
   const handleMentionPress = useMentionProfilePress();
   const {
     isManual,
-    isOwnPost,
     canReadDream,
     isNapDay,
     napChipLabel,
@@ -50,12 +45,6 @@ export default function PostDetailView({
     footerDeviceLabel,
   } = useSleepPostDisplay(post);
 
-  const todayISO = useLocalMidnightInvalidation();
-  const { posts: authorPosts } = useUserPosts(post.userId);
-  const isLatestPost = useMemo(() => {
-    if (authorPosts.length === 0) return false;
-    return isLatestSleepPost(post, buildLatestPostIdsByUser(authorPosts), todayISO);
-  }, [post, authorPosts, todayISO]);
 
   const handleSocialPatch = usePostSocialPatch(post.id, onSocialPatch);
   const visibleBuddies = sleepBuddiesForViewer(post, user?.id);
@@ -73,7 +62,6 @@ export default function PostDetailView({
             avatarSize="md"
             className="post-author-link"
           />
-          {isLatestPost ? <span className="post-badge post-badge-latest">🕒 Latest</span> : null}
           {post.isPrivate ? <span className="post-badge">Private</span> : null}
         </div>
         <p className="post-meta-strip post-detail-author-sub">
@@ -88,6 +76,17 @@ export default function PostDetailView({
         <div className="post-detail-pr">
           <PersonalRecordBadges post={post} />
         </div>
+      ) : null}
+
+      {post.notes ? (
+        <>
+          <PostDetailSectionHeader title="Notes" />
+          <div className="post-detail-panel post-detail-text">
+            <p className="post-notes">
+              <MentionText onMentionPress={handleMentionPress}>{post.notes}</MentionText>
+            </p>
+          </div>
+        </>
       ) : null}
 
       {isManual ? (
@@ -166,17 +165,6 @@ export default function PostDetailView({
         </>
       ) : null}
 
-      {post.notes ? (
-        <>
-          <PostDetailSectionHeader title="Notes" />
-          <div className="post-detail-panel post-detail-text">
-            <p className="post-notes">
-              <MentionText onMentionPress={handleMentionPress}>{post.notes}</MentionText>
-            </p>
-          </div>
-        </>
-      ) : null}
-
       {post.dreamLog ? (
         <>
           <PostDetailSectionHeader title="Dream" />
@@ -186,7 +174,6 @@ export default function PostDetailView({
               dreamMood={post.dreamMood}
               canReadDream={canReadDream}
               blurDream={post.blurDream}
-              isOwnPost={isOwnPost}
               variant="detail"
               onMentionPress={handleMentionPress}
             />

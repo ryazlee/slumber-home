@@ -4157,9 +4157,6 @@ a.admin-metric-card--link:focus-visible {
     gap: 12px;
   }
 
-  .site-header-btn--store {
-    display: none;
-  }
 
   .header-search-panel {
     top: calc(var(--nav-height) + env(safe-area-inset-top, 0px) + 4px);

@@ -18,7 +18,7 @@ export const STATS_SUBNAV: { to: string; label: string; end?: boolean }[] = [
 ];
 
 export const SOCIAL_SUBNAV: { to: string; label: string; end?: boolean }[] = [
-  { to: '/social/global', label: 'Global' },
+  { to: '/social/global', label: 'Leaderboards' },
   { to: '/social/clubs', label: 'Clubs' },
   { to: '/social/friends', label: 'Friends' },
 ];

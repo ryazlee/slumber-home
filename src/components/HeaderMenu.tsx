@@ -1,7 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { APP_STORE_URL, PLAY_STORE_URL } from '../lib/deepLinks';
 
 type Props = {
   showAdmin: boolean;
@@ -74,30 +73,6 @@ export default function HeaderMenu({ showAdmin, adminActive }: Props) {
           <NavLink to="/delete-data" role="menuitem" className="header-menu-item" onClick={() => setOpen(false)}>
             Delete data
           </NavLink>
-          {!isLoggedIn ? (
-            <>
-              <a
-                href={APP_STORE_URL}
-                role="menuitem"
-                className="header-menu-item header-menu-item--store"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setOpen(false)}
-              >
-                App Store
-              </a>
-              <a
-                href={PLAY_STORE_URL}
-                role="menuitem"
-                className="header-menu-item header-menu-item--store"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setOpen(false)}
-              >
-                Google Play
-              </a>
-            </>
-          ) : null}
           {isLoggedIn ? (
             <button
               type="button"
