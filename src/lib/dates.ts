@@ -16,6 +16,15 @@ export function addDaysToDateISO(dateISO: string, days: number): string {
   return toLocalDateISO(date);
 }
 
+/** Whole local calendar days from dateISO to referenceISO (0 = same day, 1 = yesterday). */
+export function daysAgoForDateISO(dateISO: string, referenceISO = getLocalDateISO()): number {
+  const [y, m, d] = dateISO.split('-').map(Number);
+  const [ry, rm, rd] = referenceISO.split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  const ref = new Date(ry, rm - 1, rd);
+  return Math.floor((ref.getTime() - date.getTime()) / 86_400_000);
+}
+
 /** Last night's sleep_date (sleep_date is the night, not wake morning). */
 export function getLastNightSleepDateISO(): string {
   return addDaysToDateISO(getLocalDateISO(), -1);

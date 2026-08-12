@@ -1,5 +1,5 @@
 import type { SleepPost } from './types';
-import { daysAgoForDateISO, getLocalDateISO } from './format';
+import { daysAgoForDateISO, getLocalDateISO } from './dates';
 
 /** Max age (viewer-local calendar days) for latest-night card highlighting. */
 export const LATEST_POST_MAX_AGE_DAYS = 2;
