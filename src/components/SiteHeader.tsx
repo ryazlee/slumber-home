@@ -55,30 +55,6 @@ export default function SiteHeader() {
           </div>
 
           <div className="site-header-end">
-            {!isLoggedIn ? (
-              <nav className="site-header-links" aria-label="Site">
-                <NavLink
-                  to="/"
-                  end
-                  className={({ isActive }) => (isActive ? 'site-header-link active' : 'site-header-link')}
-                >
-                  Home
-                </NavLink>
-                <NavLink
-                  to="/download"
-                  className={({ isActive }) => (isActive ? 'site-header-link active' : 'site-header-link')}
-                >
-                  Download
-                </NavLink>
-                <NavLink to="/privacy" className={({ isActive }) => (isActive ? 'site-header-link active' : 'site-header-link')}>
-                  Privacy
-                </NavLink>
-                <NavLink to="/terms" className={({ isActive }) => (isActive ? 'site-header-link active' : 'site-header-link')}>
-                  Terms
-                </NavLink>
-              </nav>
-            ) : null}
-
             <div className="site-header-actions">
               {isLoggedIn ? (
                 <>
@@ -88,12 +64,13 @@ export default function SiteHeader() {
                 </>
               ) : (
                 <>
+                  <NavLink to="/download" className="site-header-btn site-header-btn--ghost">
+                    Download
+                  </NavLink>
                   <NavLink to="/login" end className="site-header-btn site-header-btn--primary">
                     Log in
                   </NavLink>
-                  <div className="site-header-mobile-menu">
-                    <HeaderMenu showAdmin={false} adminActive={false} />
-                  </div>
+                  <HeaderMenu showAdmin={false} adminActive={false} variant="hamburger" />
                 </>
               )}
             </div>

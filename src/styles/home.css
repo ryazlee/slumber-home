@@ -58,17 +58,6 @@
   }
 }
 
-@keyframes home-strip-rise {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .home-marketing * {
     animation: none !important;
@@ -80,14 +69,11 @@
 .home-hero {
   position: relative;
   isolation: isolate;
-  /* Fit the full first content block into the screen under the sticky header. */
   min-height: calc(100svh - var(--home-header-offset));
-  height: calc(100svh - var(--home-header-offset));
-  max-height: calc(100svh - var(--home-header-offset));
   display: flex;
   align-items: stretch;
   box-sizing: border-box;
-  padding: clamp(16px, 3.5vh, 40px) 0 clamp(18px, 3.5vh, 36px);
+  padding: clamp(16px, 3.5vh, 40px) 0 clamp(24px, 4vh, 48px);
   overflow: hidden;
 }
 
@@ -109,7 +95,7 @@
 .home-hero-inner {
   width: 100%;
   max-width: var(--home-wide);
-  height: 100%;
+  flex: 1;
   min-height: 0;
   display: grid;
   gap: clamp(16px, 3vh, 40px);
@@ -130,6 +116,7 @@
 .home-hero-copy > *:nth-child(3) { animation-delay: 0.1s; }
 .home-hero-copy > *:nth-child(4) { animation-delay: 0.15s; }
 .home-hero-copy > *:nth-child(5) { animation-delay: 0.2s; }
+.home-hero-copy > *:nth-child(6) { animation-delay: 0.28s; }
 
 .home-brand-lockup {
   display: flex;
@@ -161,13 +148,14 @@
   margin: 0 0 12px;
   font-size: clamp(1.15rem, 5vw, 1.85rem);
   line-height: 1.2;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   white-space: nowrap;
 }
 
 .home-hero h1 strong {
   font-weight: 800;
+  color: var(--accent-bright);
 }
 
 .home-lead {
@@ -342,22 +330,11 @@
   white-space: nowrap;
 }
 
-/* ── Product strip (hypnogram under the fold) ─────────────────────── */
-
-.home-product-strip {
-  position: relative;
-  padding: clamp(36px, 6vw, 64px) 0;
-  border-block: 1px solid var(--border);
-  background: var(--bg);
-}
-
-.home-product-strip-inner {
-  max-width: 560px;
-  animation: home-strip-rise 0.8s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
 .home-night-card {
-  padding: 18px 18px 16px;
+  margin: 14px 0 16px;
+  width: 100%;
+  max-width: 28rem;
+  padding: 16px 16px 14px;
   border-radius: 16px;
   background: var(--surface);
   box-shadow: var(--shadow-card);
@@ -655,6 +632,36 @@
   display: flex;
   flex-direction: column;
   gap: clamp(52px, 9vw, 104px);
+}
+
+.home-devices h2 {
+  margin-bottom: 16px;
+}
+
+.home-devices-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.home-devices-list li {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.home-devices-note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--text-dim);
 }
 
 .home-marketing h2 {

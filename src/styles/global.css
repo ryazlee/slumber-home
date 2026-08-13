@@ -449,6 +449,26 @@ textarea {
   background: var(--surface);
 }
 
+.header-menu-trigger--hamburger {
+  font-size: 0;
+}
+
+.header-menu-bars {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 18px;
+}
+
+.header-menu-bars span {
+  display: block;
+  height: 1.5px;
+  width: 100%;
+  border-radius: 999px;
+  background: currentColor;
+}
+
 .header-menu-panel {
   position: absolute;
   top: calc(100% + 8px);

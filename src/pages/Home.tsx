@@ -30,6 +30,7 @@ export default function Home() {
               <p className="home-brand">Slumber</p>
             </div>
             <h1 id="home-headline">Sleep socially, <strong>together</strong>.</h1>
+            <HomeHypnogram />
             <p className="home-lead">
               Your sleep score isn&apos;t enough. Post last night from your wearable
               and see how friends actually slept.
@@ -62,13 +63,20 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="home-product-strip" aria-label="Sample sleep night">
-        <div className="home-product-strip-inner content-wrap">
-          <HomeHypnogram />
-        </div>
-      </section>
-
       <div className="home-body content-wrap">
+        <section className="home-devices" aria-labelledby="home-devices-title">
+          <h2 id="home-devices-title">Works with</h2>
+          <ul className="home-devices-list">
+            <li>Watch</li>
+            <li>Oura</li>
+            <li>Garmin</li>
+            <li>Whoop</li>
+            <li>Fitbit</li>
+            <li>Pixel</li>
+          </ul>
+          <p className="home-devices-note">via Apple Health, Health Connect, or Google Health</p>
+        </section>
+
         <section className="home-steps" aria-labelledby="home-steps-title">
           <h2 id="home-steps-title">Mornings</h2>
           <ol className="home-steps-list">

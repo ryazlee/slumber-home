@@ -33,11 +33,6 @@ export default function AppShell({ children }: Props) {
               </NavLink>
             ) : null}
             <span className="app-footer-note">Browse on web · log sleep in the iOS app</span>
-            <NavLink to="/home">About</NavLink>
-            <NavLink to="/privacy">Privacy</NavLink>
-            <NavLink to="/terms">Terms</NavLink>
-            <NavLink to="/delete-account">Delete account</NavLink>
-            <NavLink to="/delete-data">Delete data</NavLink>
           </div>
         </footer>
       </div>

@@ -5,9 +5,10 @@ import { useAuth } from '../context/AuthContext';
 type Props = {
   showAdmin: boolean;
   adminActive: boolean;
+  variant?: 'dots' | 'hamburger';
 };
 
-export default function HeaderMenu({ showAdmin, adminActive }: Props) {
+export default function HeaderMenu({ showAdmin, adminActive, variant = 'dots' }: Props) {
   const { session, signOut } = useAuth();
   const isLoggedIn = Boolean(session);
   const [open, setOpen] = useState(false);
@@ -34,14 +35,24 @@ export default function HeaderMenu({ showAdmin, adminActive }: Props) {
     <div className="header-menu" ref={rootRef}>
       <button
         type="button"
-        className={`header-menu-trigger${open ? ' header-menu-trigger--open' : ''}`}
+        className={`header-menu-trigger${open ? ' header-menu-trigger--open' : ''}${
+          variant === 'hamburger' ? ' header-menu-trigger--hamburger' : ''
+        }`}
         aria-expanded={open}
         aria-haspopup="menu"
         aria-controls={menuId}
         aria-label="Menu"
         onClick={() => setOpen((v) => !v)}
       >
-        ···
+        {variant === 'hamburger' ? (
+          <span className="header-menu-bars" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
+        ) : (
+          '···'
+        )}
       </button>
       {open ? (
         <div id={menuId} className="header-menu-panel" role="menu">
@@ -58,9 +69,11 @@ export default function HeaderMenu({ showAdmin, adminActive }: Props) {
           <NavLink to="/home" role="menuitem" className="header-menu-item" onClick={() => setOpen(false)}>
             About
           </NavLink>
-          <NavLink to="/download" role="menuitem" className="header-menu-item" onClick={() => setOpen(false)}>
-            Download
-          </NavLink>
+          {isLoggedIn ? (
+            <NavLink to="/download" role="menuitem" className="header-menu-item" onClick={() => setOpen(false)}>
+              Download
+            </NavLink>
+          ) : null}
           <NavLink to="/privacy" role="menuitem" className="header-menu-item" onClick={() => setOpen(false)}>
             Privacy
           </NavLink>
@@ -73,6 +86,14 @@ export default function HeaderMenu({ showAdmin, adminActive }: Props) {
           <NavLink to="/delete-data" role="menuitem" className="header-menu-item" onClick={() => setOpen(false)}>
             Delete data
           </NavLink>
+          <a
+            href="mailto:useslumber@gmail.com"
+            role="menuitem"
+            className="header-menu-item"
+            onClick={() => setOpen(false)}
+          >
+            Contact
+          </a>
           {isLoggedIn ? (
             <button
               type="button"
@@ -85,17 +106,7 @@ export default function HeaderMenu({ showAdmin, adminActive }: Props) {
             >
               Log out
             </button>
-          ) : (
-            <NavLink
-              to="/login"
-              end
-              role="menuitem"
-              className="header-menu-item"
-              onClick={() => setOpen(false)}
-            >
-              Log in
-            </NavLink>
-          )}
+          ) : null}
         </div>
       ) : null}
     </div>
