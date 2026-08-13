@@ -122,8 +122,11 @@ textarea {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--surface-raised);
-  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, rgba(12, 12, 14, 0.72) 100%, transparent);
+  background: rgba(12, 12, 14, 0.62);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   padding-top: env(safe-area-inset-top, 0px);
 }
 
@@ -542,27 +545,30 @@ main {
 .site-footer {
   border-top: 1px solid var(--border);
   margin-top: 0;
+  background: transparent;
 }
 
 .site-footer-inner {
-  padding-block: 28px 40px;
+  padding-block: 18px 28px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 12px 24px;
-  font-size: 14px;
+  gap: 8px 18px;
+  font-size: 12px;
+  letter-spacing: 0.01em;
   color: var(--text-dim);
   text-align: center;
 }
 
 .site-footer a {
-  color: var(--text-muted);
+  color: var(--text-dim);
   text-decoration: none;
+  transition: color 0.15s ease;
 }
 
 .site-footer a:hover {
-  color: var(--text);
+  color: var(--text-muted);
 }
 
 .page {

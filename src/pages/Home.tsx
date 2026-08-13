@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import HomeHeroPhone from '../components/HomeHeroPhone';
 import HomeHypnogram from '../components/HomeHypnogram';
 import HomeScreenshots from '../components/HomeScreenshots';
 import { StoreBadgePair } from '../components/StoreBadges';
@@ -53,23 +54,18 @@ export default function Home() {
                 </p>
               )}
             </div>
-
-            <HomeHypnogram />
           </div>
 
           <div className="home-hero-visual">
-            <div className="home-phone">
-              <img
-                src={`${base}screenshots/feed.png`}
-                alt="Slumber feed with friends' sleep posts and hypnograms"
-                width={432}
-                height={914}
-                decoding="async"
-                fetchPriority="high"
-                sizes="(min-width: 960px) 360px, (min-width: 560px) 260px, 220px"
-              />
-            </div>
+            <HomeHeroPhone />
           </div>
+        </div>
+      </section>
+
+      <section className="home-product-strip" aria-label="Sample sleep night">
+        <div className="home-product-strip-inner content-wrap">
+          <p className="home-product-strip-label">What a night looks like</p>
+          <HomeHypnogram />
         </div>
       </section>
 
@@ -78,7 +74,7 @@ export default function Home() {
           <h2 id="home-steps-title">How mornings go</h2>
           <ol className="home-steps-list">
             <li>
-              <span className="home-step-num">1</span>
+              <span className="home-step-mark home-step-mark--core" aria-hidden="true" />
               <div>
                 <h3>Last night shows up</h3>
                 <p>
@@ -88,7 +84,7 @@ export default function Home() {
               </div>
             </li>
             <li>
-              <span className="home-step-num">2</span>
+              <span className="home-step-mark home-step-mark--rem" aria-hidden="true" />
               <div>
                 <h3>Add a little context</h3>
                 <p>
@@ -99,7 +95,7 @@ export default function Home() {
               </div>
             </li>
             <li>
-              <span className="home-step-num">3</span>
+              <span className="home-step-mark home-step-mark--deep" aria-hidden="true" />
               <div>
                 <h3>Friends see the real night</h3>
                 <p>
