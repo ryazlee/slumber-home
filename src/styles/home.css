@@ -346,29 +346,65 @@
 
 .home-product-strip {
   position: relative;
-  padding: clamp(28px, 5vw, 48px) 0;
+  padding: clamp(36px, 6vw, 64px) 0;
   border-block: 1px solid var(--border);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 40%),
-    var(--bg);
+  background: var(--bg);
 }
 
 .home-product-strip-inner {
-  max-width: 800px;
+  max-width: 560px;
   animation: home-strip-rise 0.8s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.home-product-strip-label {
-  margin: 0 0 14px;
+.home-night-card {
+  padding: 18px 18px 16px;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.home-night-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.home-night-kicker {
+  margin: 0 0 4px;
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-dim);
 }
 
+.home-night-duration {
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 2.1rem);
+  font-weight: 750;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text);
+}
+
+.home-night-times {
+  margin: 0 0 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.home-night-arrow {
+  color: var(--text-dim);
+}
+
 .home-hypnogram {
-  max-width: 36rem;
   width: 100%;
 }
 
@@ -383,26 +419,11 @@
 }
 
 .home-hypnogram .hypno-labels {
-  margin-bottom: 6px;
-  font-size: 11px;
-  letter-spacing: 0.02em;
+  display: none;
 }
 
 .home-hypno-breakdown {
   margin-top: 12px;
-  display: grid;
-  gap: 8px;
-}
-
-.home-hypno-asleep {
-  margin: 0;
-  font-size: 13px;
-  color: var(--text-dim);
-}
-
-.home-hypno-asleep strong {
-  color: var(--text);
-  font-weight: 700;
 }
 
 .home-hypnogram .post-stage-metrics--scrollable {
@@ -649,25 +670,24 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 28px;
+  gap: 22px;
 }
 
 .home-steps-list li {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 16px;
+  gap: 14px;
   align-items: start;
   min-width: 0;
-  padding-left: 2px;
 }
 
 .home-step-mark {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   margin-top: 8px;
   border-radius: 999px;
   flex-shrink: 0;
-  box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 18%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 16%, transparent);
 }
 
 .home-step-mark--core {
@@ -686,8 +706,8 @@
 }
 
 .home-steps-list h3 {
-  margin: 0 0 6px;
-  font-size: clamp(1.05rem, 3.8vw, 1.15rem);
+  margin: 0 0 4px;
+  font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.025em;
 }
@@ -695,8 +715,9 @@
 .home-steps-list p {
   margin: 0;
   color: var(--text-muted);
-  line-height: 1.55;
+  line-height: 1.45;
   font-size: 15px;
+  max-width: 36em;
 }
 
 .home-screenshot-scroll {
@@ -757,19 +778,20 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0;
+  gap: 12px;
 }
 
 .home-essentials-list li {
   display: grid;
   gap: 6px;
-  padding: 18px 0 18px 14px;
-  border-bottom: 1px solid var(--border);
+  padding: 16px 16px 16px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
   border-left: 2px solid transparent;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
   color: var(--text-muted);
-  line-height: 1.5;
-  font-size: 15px;
-  transition: border-left-color 0.18s ease;
+  line-height: 1.45;
+  font-size: 14px;
 }
 
 .home-essentials-list li:first-child {
@@ -788,16 +810,16 @@
   border-left-color: var(--accent);
 }
 
-.home-essentials-list li:last-child {
-  border-bottom: 0;
-}
-
 .home-essentials-list strong {
   color: var(--text);
   font-family: var(--font);
   font-size: 15px;
   font-weight: 650;
   letter-spacing: -0.015em;
+}
+
+.home-essentials-list span {
+  color: var(--text-muted);
 }
 
 .home-closing {
@@ -849,6 +871,25 @@
 
   .home-closing-stores {
     max-width: none;
+  }
+
+  .home-essentials-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .home-steps-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .home-steps-list li {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .home-step-mark {
+    margin-top: 0;
   }
 
   .home-steps-list p,

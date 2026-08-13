@@ -30,16 +30,32 @@ const HOME_DEMO_STAGES = {
 
 export default function HomeHypnogram() {
   return (
-    <div className="home-hypnogram">
-      <SleepTimelineBar
-        segments={HOME_DEMO_SEGMENTS}
-        bedtime="10:42 PM"
-        wakeTime="6:31 AM"
-        variant="card"
-      />
-      <div className="home-hypno-breakdown">
-        <p className="home-hypno-asleep"><strong>7h 12m</strong> asleep</p>
-        <PostStageMetrics data={HOME_DEMO_STAGES} scrollable />
+    <div className="home-night-card">
+      <div className="home-night-top">
+        <div>
+          <p className="home-night-kicker">Last night</p>
+          <p className="home-night-duration">7h 12m</p>
+        </div>
+        <p className="home-night-times">
+          <span>10:42 PM</span>
+          <span className="home-night-arrow" aria-hidden="true">
+            →
+          </span>
+          <span>6:31 AM</span>
+        </p>
+      </div>
+
+      <div className="home-hypnogram">
+        <SleepTimelineBar
+          segments={HOME_DEMO_SEGMENTS}
+          bedtime="10:42 PM"
+          wakeTime="6:31 AM"
+          variant="card"
+          showClockLabels={false}
+        />
+        <div className="home-hypno-breakdown">
+          <PostStageMetrics data={HOME_DEMO_STAGES} scrollable />
+        </div>
       </div>
     </div>
   );
