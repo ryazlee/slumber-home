@@ -28,7 +28,7 @@ export default function Home() {
               />
               <p className="home-brand">Slumber</p>
             </div>
-            <h1 id="home-headline">Sleep socially, together.</h1>
+            <h1 id="home-headline">Sleep socially, <strong>together</strong>.</h1>
             <p className="home-lead">
               Your sleep score isn&apos;t enough. Post last night from your wearable
               and see how friends actually slept.

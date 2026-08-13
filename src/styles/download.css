@@ -69,7 +69,9 @@
 
 .download-stores {
   margin-top: clamp(22px, 4vh, 32px);
-  width: min(100%, 23rem);
+  width: 100%;
+  max-width: 23rem;
+  flex-direction: row;
 }
 
 .download-hero .home-login-prompt {
@@ -78,8 +80,17 @@
 }
 
 @media (max-width: 420px) {
-  .download-stores.store-badge-pair {
-    flex-direction: column;
-    width: 100%;
+  .download-stores .store-badge {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .download-stores .store-badge-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .download-stores .store-badge-title {
+    font-size: 13px;
   }
 }
