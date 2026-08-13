@@ -524,7 +524,8 @@
 
 /* Mobile: stack copy inside the viewport; hide the phone to keep the fold clean */
 @media (max-width: 959px) {
-  .home-hero-visual {
+  .home-hero-visual,
+  .home-night-card {
     display: none;
   }
 
