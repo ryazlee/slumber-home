@@ -129,7 +129,7 @@ export function countNaps(sessions?: SleepSessionData[]): number {
 }
 
 export function getSessionLabel(
-  session: SleepSessionData,
+  _session: SleepSessionData,
   index: number,
   sessions: SleepSessionData[],
 ): string {
