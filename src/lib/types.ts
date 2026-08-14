@@ -76,6 +76,10 @@ export type SleepPost = {
   createdAt: string;
   sourceDevice: string;
   isCustom?: boolean;
+  sessionKind?: 'overnight' | 'nap' | 'manual';
+  sessionStartedAt?: string;
+  sessionEndedAt?: string;
+  splitFromPostId?: string;
   /** Accepted sleep buddies — visible on feed/detail for viewers. */
   sleepBuddies?: SleepBuddyProfile[];
   /** Author-only: all non-declined tags including pending. */

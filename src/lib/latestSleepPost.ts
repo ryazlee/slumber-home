@@ -1,5 +1,6 @@
 import type { SleepPost } from './types';
 import { daysAgoForDateISO, getLocalDateISO } from './dates';
+import { isNightJournalPost } from './sessionPost';
 
 /** Max age (viewer-local calendar days) for latest-night card highlighting. */
 export const LATEST_POST_MAX_AGE_DAYS = 2;
@@ -8,6 +9,9 @@ export function compareSleepPostsByRecency(a: SleepPost, b: SleepPost): number {
   if (a.sleepDate !== b.sleepDate) {
     return a.sleepDate > b.sleepDate ? -1 : 1;
   }
+  const aJournal = isNightJournalPost(a) ? 0 : 1;
+  const bJournal = isNightJournalPost(b) ? 0 : 1;
+  if (aJournal !== bJournal) return aJournal - bJournal;
   return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 }
 

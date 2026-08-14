@@ -49,7 +49,7 @@ export async function fetchProfileSummary(userId: string): Promise<WebProfile | 
     supabase.rpc('get_user_friends_count', { target_user: userId }),
     supabase
       .from('sleep_posts')
-      .select('id', { count: 'exact', head: true })
+      .select('sleep_date')
       .eq('user_id', userId)
       .is('deleted_at', null),
     supabase.rpc('get_challenge_record', { p_user_id: userId }),
@@ -70,7 +70,9 @@ export async function fetchProfileSummary(userId: string): Promise<WebProfile | 
     avatarUrl: row.avatar_url ?? undefined,
     userRoles: row.user_roles ?? undefined,
     friendsCount: typeof friendsCountRes.data === 'number' ? friendsCountRes.data : 0,
-    postsCount: postsCountRes.count ?? 0,
+    postsCount: new Set(
+      ((postsCountRes.data ?? []) as { sleep_date: string }[]).map((r) => r.sleep_date),
+    ).size,
     streak: streakRes.data?.current_streak ?? 0,
     longestStreak: streakRes.data?.longest_streak ?? 0,
     avgAsleepMinutes,

@@ -1,5 +1,5 @@
 import { formatMins } from '../lib/format';
-import { getSessionLabel, hasNapDay, isNapSession } from '../lib/napDay';
+import { getSessionLabel, hasMultipleSessions, isNapSession } from '../lib/napDay';
 import { segmentsForPost } from '../lib/timeline';
 import type { SleepPost, SleepSessionData } from '../lib/types';
 import PostStageMetrics from './post/PostStageMetrics';
@@ -87,10 +87,9 @@ function SessionBlock({
 
 export default function SessionTimelines({ post, variant = 'card' }: Props) {
   const sessions = post.sessionBreakdown ?? [];
-  const isNapDay = hasNapDay(post);
   const segments = segmentsForPost(post);
 
-  if (isNapDay && sessions.length > 0) {
+  if (hasMultipleSessions(post)) {
     return (
       <div className="session-timelines">
         {sessions.map((session, idx) => (

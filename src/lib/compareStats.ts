@@ -99,8 +99,11 @@ export async function fetchComparePeriods(userId: string): Promise<ComparePeriod
   const stagePct = (subset: SleepRow[], stage: 'deep_minutes' | 'rem_minutes' | 'core_minutes') =>
     pctOf(subset, stage, 'asleep_minutes');
 
-  const dreamRatePct = (subset: SleepRow[]) =>
-    subset.length ? Math.round((countDreams(subset) / subset.length) * 100) : null;
+  const nightCount = (subset: SleepRow[]) => new Set(subset.map((r) => r.sleep_date)).size;
+  const dreamRatePct = (subset: SleepRow[]) => {
+    const nights = nightCount(subset);
+    return nights ? Math.round((countDreams(subset) / nights) * 100) : null;
+  };
 
   const bestNightMins = (subset: SleepRow[]) => {
     const values = subset.map((r) => r.asleep_minutes).filter((v) => v > 0);
@@ -136,7 +139,7 @@ export async function fetchComparePeriods(userId: string): Promise<ComparePeriod
       inBed: col(subset, 'in_bed_minutes'),
       avgBedtime: btAvg != null ? formatSleepClockMinutes(btAvg) : null,
       avgWakeTime: wtAvg != null ? formatSleepClockMinutes(wtAvg) : null,
-      postsCount: subset.length,
+      postsCount: new Set(subset.map((r) => r.sleep_date)).size,
       dreamsCount: countDreams(subset),
       dreamRate: dreamRatePct(subset),
       deepPct: stagePct(subset, 'deep_minutes'),

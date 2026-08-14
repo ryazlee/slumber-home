@@ -41,8 +41,8 @@ export default function SleepPostCard({
   const {
     isManual,
     canReadDream,
-    isNapDay,
     napChipLabel,
+    isSplitSessions,
     showWearableSleep,
     displayTitle,
     footerDeviceLabel,
@@ -58,7 +58,7 @@ export default function SleepPostCard({
   ].filter(Boolean);
 
   const scheduleParts = [
-    !isNapDay && post.bedtime !== '—' ? `${post.bedtime} → ${post.wakeTime}` : null,
+    !isSplitSessions && post.bedtime !== '—' ? `${post.bedtime} → ${post.wakeTime}` : null,
     post.inBedMinutes > 0 ? `${formatMins(post.inBedMinutes)} in bed` : null,
   ].filter(Boolean);
 

@@ -28,4 +28,8 @@ export const SLEEP_POST_FEED_SELECT = [
   'created_at',
   'location_label',
   'is_custom',
+  'session_kind',
+  'session_started_at',
+  'session_ended_at',
+  'split_from_post_id',
 ].join(', ');

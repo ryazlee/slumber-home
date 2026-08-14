@@ -119,7 +119,7 @@ export default function Profile() {
           ) : null}
           <p className="app-muted">
             {profile.friendsCount} friends
-            {canViewPosts ? ` · ${profile.postsCount} posts` : ''}
+            {canViewPosts ? ` · ${profile.postsCount} nights` : ''}
           </p>
           {!isOwnProfile ? (
             <div className="profile-actions">

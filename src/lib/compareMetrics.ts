@@ -31,7 +31,7 @@ export const COMPARE_METRIC_CATEGORIES: { key: CompareMetricCategory; label: str
 ];
 
 export const ALL_COMPARE_METRICS: CompareMetricDef[] = [
-  { id: 'postsCount', kind: 'count', key: 'postsCount', label: 'Posts', category: 'activity', defaultSelected: true },
+  { id: 'postsCount', kind: 'count', key: 'postsCount', label: 'Nights', category: 'activity', defaultSelected: true },
   { id: 'dreamsCount', kind: 'count', key: 'dreamsCount', label: 'Dreams', category: 'activity', defaultSelected: true },
   { id: 'dreamRate', kind: 'pct', key: 'dreamRate', label: 'Dream rate', category: 'activity', defaultSelected: false },
   { id: 'avgBedtime', kind: 'time', key: 'avgBedtime', label: 'Bedtime', category: 'schedule', defaultSelected: true, lessIsBetter: true, rankable: false },

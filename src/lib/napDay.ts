@@ -37,13 +37,21 @@ export function inferSplitGapMinutes(
   return gap > 0 ? gap : 0;
 }
 
+export function hasMultipleSessions(input: {
+  sessionBreakdown?: SleepSessionData[];
+}): boolean {
+  return (input.sessionBreakdown?.length ?? 0) > 1;
+}
+
 export function hasNapDay(input: {
   bedtime: string;
   wakeTime: string;
   inBedMinutes: number;
   sessionBreakdown?: SleepSessionData[];
 }): boolean {
-  if (input.sessionBreakdown && input.sessionBreakdown.length > 1) return true;
+  if (input.sessionBreakdown && input.sessionBreakdown.length > 0) {
+    return countNaps(input.sessionBreakdown) > 0;
+  }
   const gap = inferSplitGapMinutes(input.bedtime, input.wakeTime, input.inBedMinutes);
   return gap !== null && gap >= SPLIT_GAP_THRESHOLD_MINUTES;
 }
@@ -60,6 +68,12 @@ function isNighttimeBedtime(bedtime: string): boolean {
   return mins >= 21 * 60 || mins < 6 * 60;
 }
 
+function isLateMorningBedtime(bedtime: string): boolean {
+  const mins = parseClockToMinutes(bedtime);
+  if (mins === null) return false;
+  return mins >= 6 * 60 && mins < MORNING_WAKE_END_MINUTES;
+}
+
 function isMorningWake(wakeTime: string): boolean {
   const mins = parseClockToMinutes(wakeTime);
   if (mins === null) return false;
@@ -73,41 +87,25 @@ export function matchesMainSleepPattern(session: SleepSessionData): boolean {
   if (session.asleepMinutes >= MAIN_SLEEP_MIN_MINUTES && isMorningWake(session.wakeTime)) {
     return true;
   }
+  if (
+    isLateMorningBedtime(session.bedtime)
+    && isMorningWake(session.wakeTime)
+    && session.asleepMinutes > NAP_SESSION_MAX_MINUTES
+  ) {
+    return true;
+  }
   return false;
 }
 
 function classifyStandaloneIsNap(session: SleepSessionData): boolean {
+  if (session.asleepMinutes >= MAIN_SLEEP_MIN_MINUTES) return false;
   if (matchesMainSleepPattern(session)) return false;
   if (isDaytimeWake(session.wakeTime)) return true;
   return session.asleepMinutes <= NAP_SESSION_MAX_MINUTES;
 }
 
 export function classifySessionNaps(sessions: SleepSessionData[]): boolean[] {
-  if (sessions.length === 0) return [];
-  if (sessions.length === 1) return [classifyStandaloneIsNap(sessions[0])];
-
-  const mainCandidates = sessions
-    .map((s, i) => ({ i, s }))
-    .filter(({ s }) => matchesMainSleepPattern(s));
-
-  let mainIndex: number;
-  if (mainCandidates.length >= 1) {
-    mainIndex = mainCandidates.reduce((best, curr) =>
-      (curr.s.asleepMinutes > best.s.asleepMinutes ? curr : best),
-    ).i;
-  } else {
-    const nonDaytime = sessions
-      .map((s, i) => ({ i, s }))
-      .filter(({ s }) => !isDaytimeWake(s.wakeTime));
-    if (nonDaytime.length === 0) {
-      return sessions.map(() => true);
-    }
-    mainIndex = nonDaytime.reduce((best, curr) =>
-      (curr.s.asleepMinutes > best.s.asleepMinutes ? curr : best),
-    ).i;
-  }
-
-  return sessions.map((_, i) => i !== mainIndex);
+  return sessions.map((session) => classifyStandaloneIsNap(session));
 }
 
 export function isOvernightSession(session: SleepSessionData): boolean {
@@ -135,14 +133,17 @@ export function getSessionLabel(
   index: number,
   sessions: SleepSessionData[],
 ): string {
-  if (sessions.length === 1) return 'Sleep';
-  if (isNapSession(session, index, sessions)) {
-    const napFlags = classifySessionNaps(sessions);
+  const napFlags = classifySessionNaps(sessions);
+  if (napFlags[index]) {
+    if (sessions.length === 1) return 'Nap';
     const napIndex = napFlags.slice(0, index + 1).filter(Boolean).length;
     const totalNaps = napFlags.filter(Boolean).length;
     return totalNaps === 1 ? 'Nap' : `Nap ${napIndex}`;
   }
-  return 'Overnight';
+  if (sessions.length === 1) return 'Sleep';
+  const overnightIndex = napFlags.slice(0, index + 1).filter((isNap) => !isNap).length;
+  const totalOvernight = napFlags.filter((isNap) => !isNap).length;
+  return totalOvernight === 1 ? 'Overnight' : `Overnight ${overnightIndex}`;
 }
 
 export type LabeledSession = {

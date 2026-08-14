@@ -5,6 +5,7 @@ import { countWakes } from './wakes';
 import { SLEEP_POST_FEED_SELECT } from './sleepPostSelect';
 import { filterPrTypesByVisibility, recentPrWindowStart } from './pr';
 import { filterWearableSleepRows } from './sleepPostCustom';
+import { countDistinctDatesInWindow } from './sessionPost';
 
 export const PAGE_SIZE = 20;
 
@@ -45,6 +46,10 @@ export type PostRow = {
   created_at: string;
   source_device: string | null;
   is_custom?: boolean | null;
+  session_kind?: 'overnight' | 'nap' | 'manual' | null;
+  session_started_at?: string | null;
+  session_ended_at?: string | null;
+  split_from_post_id?: string | null;
 };
 
 /** Supabase infers `GenericStringError[]` for dynamic `.select()` strings — narrow at the boundary. */
@@ -98,11 +103,10 @@ async function fetchRecentWindowPostCounts(rows: PostRow[]): Promise<Map<string,
   for (const row of rows) {
     const nights = nightsByUser.get(row.user_id) ?? [];
     const start = recentPrWindowStart(row.sleep_date);
-    let n = 0;
-    for (const d of nights) {
-      if (d >= start && d <= row.sleep_date) n += 1;
-    }
-    counts.set(recentWindowCountKey(row.user_id, row.sleep_date), n);
+    counts.set(
+      recentWindowCountKey(row.user_id, row.sleep_date),
+      countDistinctDatesInWindow(nights, start, row.sleep_date),
+    );
   }
   return counts;
 }
@@ -113,13 +117,19 @@ async function fetchAuthorWearablePostCounts(userIds: string[]): Promise<Map<str
 
   const { data, error } = await supabase
     .from('sleep_posts')
-    .select('user_id, is_custom, source_device')
+    .select('user_id, sleep_date, is_custom, source_device')
     .in('user_id', userIds)
     .is('deleted_at', null);
   if (error) return counts;
 
+  const datesByUser = new Map<string, Set<string>>();
   for (const row of filterWearableSleepRows(data ?? [])) {
-    counts.set(row.user_id, (counts.get(row.user_id) ?? 0) + 1);
+    const set = datesByUser.get(row.user_id) ?? new Set<string>();
+    set.add(row.sleep_date);
+    datesByUser.set(row.user_id, set);
+  }
+  for (const [id, dates] of datesByUser) {
+    counts.set(id, dates.size);
   }
   return counts;
 }
@@ -178,6 +188,10 @@ function mapPostRow(
     createdAt: row.created_at,
     sourceDevice: row.source_device ?? 'Unknown',
     isCustom: row.is_custom === true,
+    sessionKind: row.session_kind ?? undefined,
+    sessionStartedAt: row.session_started_at ?? undefined,
+    sessionEndedAt: row.session_ended_at ?? undefined,
+    splitFromPostId: row.split_from_post_id ?? undefined,
   };
 }
 

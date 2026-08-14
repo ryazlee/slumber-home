@@ -40,6 +40,7 @@ export default function PostDetailView({
     isNapDay,
     napChipLabel,
     sessions,
+    isSplitSessions,
     showWearableSleep,
     displayTitle,
     footerDeviceLabel,
@@ -111,9 +112,9 @@ export default function PostDetailView({
               {post.vibe ? <PostVibe vibe={post.vibe} showLabel /> : null}
             </div>
 
-            {isNapDay ? (
+            {isSplitSessions || isNapDay ? (
               <p className="post-nap-callout">
-                Split sleep · {post.bedtime !== '—' ? `${post.bedtime} → ${post.wakeTime}` : '—'}
+                {isNapDay ? 'Nap day' : 'Split sleep'} · {post.bedtime !== '—' ? `${post.bedtime} → ${post.wakeTime}` : '—'}
                 {post.inBedMinutes > 0 ? ` · ${formatMins(post.inBedMinutes)} in bed` : ''}
               </p>
             ) : post.bedtime !== '—' ? (
@@ -132,9 +133,9 @@ export default function PostDetailView({
 
             <div className="post-detail-timeline-header">
               <h3 className="post-detail-timeline-title">
-                {isNapDay && sessions.length > 0 ? 'Sleep by session' : 'Sleep stages over time'}
+                {isSplitSessions && sessions.length > 0 ? 'Sleep by session' : 'Sleep stages over time'}
               </h3>
-              {!isNapDay && post.stageSegments.length > 1 ? (
+              {!isSplitSessions && post.stageSegments.length > 1 ? (
                 <span className="post-detail-timeline-meta">
                   {Math.max(post.stageSegments.length - 1, 0)} transitions
                 </span>
@@ -143,7 +144,7 @@ export default function PostDetailView({
 
             <SessionTimelines post={post} variant="detail" />
 
-            {!isNapDay || sessions.length === 0 ? (
+            {!isSplitSessions || sessions.length === 0 ? (
               <PostStageMetrics data={post} className="post-detail-stage-chips" />
             ) : null}
           </div>

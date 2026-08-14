@@ -18,6 +18,7 @@ export function useSleepPostDisplay(post: SleepPost) {
     ? `☀️ ${napCount === 1 ? 'nap' : `${napCount} naps`}`
     : null;
   const sessions = post.sessionBreakdown ?? [];
+  const isSplitSessions = sessions.length > 1;
   const showWearableSleep = !isManual && post.asleepMinutes > 0;
   const timelineSegments = segmentsForPost(post);
   const displayTitle = sleepPostDisplayTitle(post.title, post.sleepDate);
@@ -37,6 +38,7 @@ export function useSleepPostDisplay(post: SleepPost) {
     napCount,
     napChipLabel,
     sessions,
+    isSplitSessions,
     showWearableSleep,
     timelineSegments,
     displayTitle,

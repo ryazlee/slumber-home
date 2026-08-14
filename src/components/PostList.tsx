@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
 import SleepPostCard from './SleepPostCard';
 import { buildLatestPostIdsByUser, isLatestSleepPost } from '../lib/latestSleepPost';
+import { groupSleepPostsByNight } from '../lib/sessionPost';
 import { useLocalMidnightInvalidation } from '../hooks/useLocalMidnightInvalidation';
 import FeedPostsSkeleton from './FeedPostsSkeleton';
 import type { PostSocialPatch } from './PostSocial';
@@ -31,6 +32,7 @@ export default function PostList({
 }: PostListProps) {
   const todayISO = useLocalMidnightInvalidation();
   const latestPostIds = useMemo(() => buildLatestPostIdsByUser(posts), [posts]);
+  const nightGroups = useMemo(() => groupSleepPostsByNight(posts), [posts]);
 
   return (
     <>
@@ -42,14 +44,24 @@ export default function PostList({
       )}
 
       <div className="post-list">
-        {!loading && posts.map((post) => (
-          <SleepPostCard
-            key={post.id}
-            post={post}
-            showAuthor={showAuthor}
-            isLatestPost={isLatestSleepPost(post, latestPostIds, todayISO)}
-            onSocialPatch={onPatchPost}
-          />
+        {!loading && nightGroups.map((group) => (
+          <Fragment key={group.key}>
+            <SleepPostCard
+              post={group.primary}
+              showAuthor={showAuthor}
+              isLatestPost={isLatestSleepPost(group.primary, latestPostIds, todayISO)}
+              onSocialPatch={onPatchPost}
+            />
+            {group.naps.map((nap) => (
+              <SleepPostCard
+                key={nap.id}
+                post={nap}
+                showAuthor={showAuthor}
+                isLatestPost={false}
+                onSocialPatch={onPatchPost}
+              />
+            ))}
+          </Fragment>
         ))}
       </div>
 
