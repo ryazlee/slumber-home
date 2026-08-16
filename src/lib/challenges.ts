@@ -139,7 +139,7 @@ export async function fetchChallengeContributions(challengeId: string): Promise<
 
   const { data, error } = await supabase
     .from('sleep_posts')
-    .select('id, user_id, sleep_date, asleep_minutes, title, bedtime, wake_time, created_at, is_private, source_device, is_custom')
+    .select('id, user_id, sleep_date, asleep_minutes, title, bedtime, wake_time, created_at, is_private, source_device, is_custom, session_kind')
     .in('user_id', participantIds)
     .is('deleted_at', null)
     .gte('sleep_date', startDate)
@@ -163,6 +163,7 @@ export async function fetchChallengeContributions(challengeId: string): Promise<
       wakeTime: row.wake_time ?? null,
       createdAt: row.created_at,
       isPrivate: row.is_private === true,
+      sessionKind: row.session_kind ?? undefined,
     };
   });
 }

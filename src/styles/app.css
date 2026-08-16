@@ -723,6 +723,12 @@
   max-width: 100%;
 }
 
+.post-night-group {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
 .post-card,
 .challenge-card {
   background: var(--surface);
@@ -1206,7 +1212,7 @@
 
 .post-detail-asleep-label {
   display: block;
-  margin-top: 4px;
+  margin-top: 0;
   font-size: 13px;
   font-weight: 600;
   color: var(--text-muted);
@@ -1293,17 +1299,48 @@
 .post-sleep-hero-main {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
 }
 
-.post-nap-chip {
-  font-size: 12px;
+.post-sleep-hero-main--detail {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.post-sleep-duration-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.session-kind-chip {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 10px;
   font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(245, 158, 11, 0.12);
-  color: #fbbf24;
+  letter-spacing: 0.2px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 149, 0, 0.33);
+  background: rgba(255, 149, 0, 0.12);
+  color: #FF9500;
+}
+
+.session-kind-chip--overnight {
+  border-color: rgba(139, 92, 246, 0.45);
+  background: rgba(139, 92, 246, 0.12);
+  color: #8B5CF6;
+}
+
+.session-kind-chip--md {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 8px;
 }
 
 .post-vibe {
@@ -1727,13 +1764,12 @@
 
 .session-timeline-detail-header {
   margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
   font-size: 13px;
   line-height: 1.45;
-}
-
-.session-timeline-detail-label {
-  font-weight: 700;
-  color: var(--text);
 }
 
 .session-timeline-detail-meta {
@@ -1749,7 +1785,13 @@
 }
 
 .session-timeline-card--nap {
-  border-color: rgba(245, 158, 11, 0.25);
+  background: rgba(255, 149, 0, 0.08);
+  border-color: rgba(255, 149, 0, 0.33);
+}
+
+.session-timeline-card--overnight {
+  background: rgba(139, 92, 246, 0.08);
+  border-color: rgba(139, 92, 246, 0.33);
 }
 
 .session-timeline-card-header {
@@ -1759,23 +1801,6 @@
   gap: 3px;
   margin-bottom: 8px;
   font-size: 11px;
-}
-
-.session-timeline-badge {
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.session-timeline-badge--nap {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-}
-
-.session-timeline-badge--overnight {
-  background: rgba(139, 92, 246, 0.15);
-  color: #c4b5fd;
 }
 
 .session-timeline-card-times {

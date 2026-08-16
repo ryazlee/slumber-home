@@ -25,12 +25,15 @@ export function daysAgoForDateISO(dateISO: string, referenceISO = getLocalDateIS
   return Math.floor((ref.getTime() - date.getTime()) / 86_400_000);
 }
 
-/** Last night's sleep_date (sleep_date is the night, not wake morning). */
+/** Last completed sleep's wake date: today after 5am, yesterday before. */
 export function getLastNightSleepDateISO(): string {
-  return addDaysToDateISO(getLocalDateISO(), -1);
+  const now = new Date();
+  const today = getLocalDateISO();
+  if (now.getHours() < 5) return addDaysToDateISO(today, -1);
+  return today;
 }
 
-/** Recent sleep-night YYYY-MM-DDs, oldest first (default: 7 nights ending at last night). */
+/** Recent wake-morning YYYY-MM-DDs, oldest first (default: 7 days ending at last completed sleep). */
 export function getRecentSleepNightISOs(count = 7): string[] {
   const lastNight = getLastNightSleepDateISO();
   return Array.from({ length: count }, (_, i) => addDaysToDateISO(lastNight, -(count - 1 - i)));

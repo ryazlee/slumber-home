@@ -1,8 +1,9 @@
 import { formatMins } from '../lib/format';
-import { getSessionLabel, hasMultipleSessions, isNapSession } from '../lib/napDay';
+import { hasMultipleSessions, isNapSession } from '../lib/napDay';
 import { segmentsForPost } from '../lib/timeline';
 import type { SleepPost, SleepSessionData } from '../lib/types';
 import PostStageMetrics from './post/PostStageMetrics';
+import SessionKindChip from './SessionKindChip';
 import SleepTimelineBar from './SleepTimelineBar';
 
 type PostTimelineInput = Pick<
@@ -38,17 +39,15 @@ function SessionBlock({
   isLast: boolean;
 }) {
   const sessionIsNap = isNapSession(session, idx, sessions);
-  const sessionLabel = getSessionLabel(session, idx, sessions);
+  const sessionKind = sessionIsNap ? 'nap' : 'overnight';
 
   if (variant === 'detail') {
     return (
       <div className={`session-timeline-detail${!isLast ? ' session-timeline-detail--divided' : ''}`}>
         <p className="session-timeline-detail-header">
-          <span className="session-timeline-detail-label">
-            {sessionIsNap ? '☀️' : '🌙'} {sessionLabel}
-          </span>
+          <SessionKindChip kind={sessionKind} always size="sm" />
           <span className="session-timeline-detail-meta">
-            {' · '}{session.bedtime} to {session.wakeTime} · {formatMins(session.asleepMinutes)}
+            {session.bedtime} to {session.wakeTime} · {formatMins(session.asleepMinutes)}
           </span>
         </p>
         <SleepTimelineBar
@@ -65,10 +64,7 @@ function SessionBlock({
   return (
     <div className={`session-timeline-card${sessionIsNap ? ' session-timeline-card--nap' : ' session-timeline-card--overnight'}`}>
       <div className="session-timeline-card-header">
-        <span className={`session-timeline-badge${sessionIsNap ? ' session-timeline-badge--nap' : ' session-timeline-badge--overnight'}`}>
-          {sessionIsNap ? '☀️ NAP' : '🌙 OVERNIGHT'}
-        </span>
-        <span className="session-timeline-card-label">{sessionLabel}</span>
+        <SessionKindChip kind={sessionKind} always size="sm" />
       </div>
       <SleepTimelineBar
         segments={session.segments}

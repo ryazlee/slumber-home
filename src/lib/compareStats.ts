@@ -1,8 +1,6 @@
 import { addDaysToDateISO, getLastNightSleepDateISO, getLocalDateISO } from './dates';
-import {
-  filterWearableSleepRows,
-  isManualSleepRow,
-} from './sleepPostCustom';
+import { filterWearableSleepRows } from './sleepPostCustom';
+import { shouldReplaceNightClocks } from './sessionPost';
 import {
   averageBedtimeMinutes,
   averageWakeTimeMinutes,
@@ -52,12 +50,13 @@ type SleepRow = {
   bedtime: string | null;
   wake_time: string | null;
   dream_log: string | null;
+  session_kind?: string | null;
   session_breakdown?: SleepSessionData[] | null;
   is_custom?: boolean | null;
   source_device?: string | null;
 };
 
-const POST_COLS = 'sleep_date, asleep_minutes, deep_minutes, rem_minutes, core_minutes, awake_minutes, awake_events, in_bed_minutes, bedtime, wake_time, dream_log, session_breakdown, is_custom, source_device';
+const POST_COLS = 'sleep_date, asleep_minutes, deep_minutes, rem_minutes, core_minutes, awake_minutes, awake_events, in_bed_minutes, bedtime, wake_time, dream_log, session_kind, session_breakdown, is_custom, source_device';
 
 export async function fetchComparePeriods(userId: string): Promise<ComparePeriods> {
   const todayLocal = getLocalDateISO();
@@ -69,8 +68,7 @@ export async function fetchComparePeriods(userId: string): Promise<ComparePeriod
     supabase.from('sleep_posts').select(POST_COLS)
       .eq('user_id', userId)
       .eq('sleep_date', lastNightDate)
-      .is('deleted_at', null)
-      .maybeSingle(),
+      .is('deleted_at', null),
     supabase.from('sleep_posts').select(POST_COLS)
       .eq('user_id', userId)
       .is('deleted_at', null)
@@ -119,68 +117,99 @@ export async function fetchComparePeriods(userId: string): Promise<ComparePeriod
   const col = (subset: SleepRow[], key: keyof SleepRow) =>
     avgN(subset.map((r) => (r[key] as number | null) ?? 0).filter((v) => v > 0));
 
+  const nightTotals = (subset: SleepRow[]): SleepRow[] => {
+    const map = new Map<string, SleepRow & { longestSession: number }>();
+    for (const r of subset) {
+      const cur = map.get(r.sleep_date);
+      if (!cur) {
+        map.set(r.sleep_date, { ...r, longestSession: r.asleep_minutes });
+        continue;
+      }
+      if (shouldReplaceNightClocks(
+        { isNap: cur.session_kind === 'nap', asleep: cur.longestSession },
+        { isNap: r.session_kind === 'nap', asleep: r.asleep_minutes },
+      )) {
+        cur.bedtime = r.bedtime;
+        cur.wake_time = r.wake_time;
+        cur.session_breakdown = r.session_breakdown;
+        cur.longestSession = r.asleep_minutes;
+        cur.session_kind = r.session_kind;
+      }
+      cur.asleep_minutes += r.asleep_minutes;
+      cur.deep_minutes = (cur.deep_minutes ?? 0) + (r.deep_minutes ?? 0);
+      cur.rem_minutes = (cur.rem_minutes ?? 0) + (r.rem_minutes ?? 0);
+      cur.core_minutes = (cur.core_minutes ?? 0) + (r.core_minutes ?? 0);
+      cur.awake_minutes = (cur.awake_minutes ?? 0) + (r.awake_minutes ?? 0);
+      cur.awake_events = (cur.awake_events ?? 0) + (r.awake_events ?? 0);
+      cur.in_bed_minutes = (cur.in_bed_minutes ?? 0) + (r.in_bed_minutes ?? 0);
+      if (r.dream_log?.trim()) cur.dream_log = r.dream_log;
+    }
+    return [...map.values()];
+  };
+
   const build = (subset: SleepRow[]): PeriodStats => {
-    if (subset.length === 0) return null;
-    const bedtimeMins = subset
+    const nights = nightTotals(subset);
+    if (nights.length === 0) return null;
+    const bedtimeMins = nights
       .map((r) => extractBedtimeMinutes(r.bedtime, r.session_breakdown))
       .filter((v): v is number => v !== null);
-    const wakeTimeMins = subset
+    const wakeTimeMins = nights
       .map((r) => extractWakeTimeMinutes(r.wake_time, r.session_breakdown))
       .filter((v): v is number => v !== null);
     const btAvg = averageBedtimeMinutes(bedtimeMins);
     const wtAvg = averageWakeTimeMinutes(wakeTimeMins);
     return {
-      asleep: col(subset, 'asleep_minutes'),
-      deep: col(subset, 'deep_minutes'),
-      rem: col(subset, 'rem_minutes'),
-      core: col(subset, 'core_minutes'),
-      awake: col(subset, 'awake_minutes'),
-      awakeEvents: avgWakes(subset),
-      inBed: col(subset, 'in_bed_minutes'),
+      asleep: col(nights, 'asleep_minutes'),
+      deep: col(nights, 'deep_minutes'),
+      rem: col(nights, 'rem_minutes'),
+      core: col(nights, 'core_minutes'),
+      awake: col(nights, 'awake_minutes'),
+      awakeEvents: avgWakes(nights),
+      inBed: col(nights, 'in_bed_minutes'),
       avgBedtime: btAvg != null ? formatSleepClockMinutes(btAvg) : null,
       avgWakeTime: wtAvg != null ? formatSleepClockMinutes(wtAvg) : null,
-      postsCount: new Set(subset.map((r) => r.sleep_date)).size,
-      dreamsCount: countDreams(subset),
-      dreamRate: dreamRatePct(subset),
-      deepPct: stagePct(subset, 'deep_minutes'),
-      remPct: stagePct(subset, 'rem_minutes'),
-      corePct: stagePct(subset, 'core_minutes'),
-      awakePct: pctOf(subset, 'awake_minutes', 'in_bed_minutes'),
-      bestNight: bestNightMins(subset),
+      postsCount: nights.length,
+      dreamsCount: countDreams(nights),
+      dreamRate: dreamRatePct(nights),
+      deepPct: stagePct(nights, 'deep_minutes'),
+      remPct: stagePct(nights, 'rem_minutes'),
+      corePct: stagePct(nights, 'core_minutes'),
+      awakePct: pctOf(nights, 'awake_minutes', 'in_bed_minutes'),
+      bestNight: bestNightMins(nights),
     };
   };
 
   const week = rows.filter((r) => r.sleep_date >= d7);
   const month = rows.filter((r) => r.sleep_date >= d30);
-  const tRaw = todayRes.data as SleepRow | null;
-  const t = tRaw && !isManualSleepRow(tRaw) ? tRaw : null;
+  const todayRows = filterWearableSleepRows((todayRes.data ?? []) as SleepRow[]);
+  const todayNight = nightTotals(todayRows)[0] ?? null;
 
-  const todayBedtime = t
-    ? extractBedtimeMinutes(t.bedtime, t.session_breakdown)
+  const todayBedtime = todayNight
+    ? extractBedtimeMinutes(todayNight.bedtime, todayNight.session_breakdown)
     : null;
-  const todayWake = t
-    ? extractWakeTimeMinutes(t.wake_time, t.session_breakdown)
+  const todayWake = todayNight
+    ? extractWakeTimeMinutes(todayNight.wake_time, todayNight.session_breakdown)
     : null;
 
   return {
-    today: t ? {
-      asleep: t.asleep_minutes,
-      deep: t.deep_minutes,
-      rem: t.rem_minutes,
-      core: t.core_minutes,
-      awake: t.awake_minutes,
-      awakeEvents: t.awake_events ?? 0,
-      inBed: t.in_bed_minutes,
+    today: todayNight ? {
+      asleep: todayNight.asleep_minutes,
+      deep: todayNight.deep_minutes,
+      rem: todayNight.rem_minutes,
+      core: todayNight.core_minutes,
+      awake: todayNight.awake_minutes,
+      awakeEvents: todayNight.awake_events ?? 0,
+      inBed: todayNight.in_bed_minutes,
       avgBedtime: todayBedtime != null ? formatSleepClockMinutes(todayBedtime) : null,
       avgWakeTime: todayWake != null ? formatSleepClockMinutes(todayWake) : null,
       postsCount: 1,
-      dreamsCount: hasDream(t) ? 1 : 0,
-      dreamRate: hasDream(t) ? 100 : 0,
-      deepPct: stagePct([t], 'deep_minutes'),
-      remPct: stagePct([t], 'rem_minutes'),
-      corePct: stagePct([t], 'core_minutes'),
-      awakePct: pctOf([t], 'awake_minutes', 'in_bed_minutes'),
-      bestNight: t.asleep_minutes > 0 ? t.asleep_minutes : null,
+      dreamsCount: hasDream(todayNight) ? 1 : 0,
+      dreamRate: hasDream(todayNight) ? 100 : 0,
+      deepPct: stagePct([todayNight], 'deep_minutes'),
+      remPct: stagePct([todayNight], 'rem_minutes'),
+      corePct: stagePct([todayNight], 'core_minutes'),
+      awakePct: pctOf([todayNight], 'awake_minutes', 'in_bed_minutes'),
+      bestNight: todayNight.asleep_minutes > 0 ? todayNight.asleep_minutes : null,
     } : {
       asleep: null,
       deep: null,

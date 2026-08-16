@@ -15,6 +15,7 @@ import PostVibe from './post/PostVibe';
 import PostStageMetrics from './post/PostStageMetrics';
 import PostSocial, { type PostSocialPatch } from './PostSocial';
 import PostTagList from './PostTagList';
+import SessionKindChip from './SessionKindChip';
 import SessionTimelines from './SessionTimelines';
 import SleepBuddiesRow from './SleepBuddiesRow';
 import StageBreakdown from './StageBreakdown';
@@ -37,8 +38,6 @@ export default function PostDetailView({
   const {
     isManual,
     canReadDream,
-    isNapDay,
-    napChipLabel,
     sessions,
     isSplitSessions,
     showWearableSleep,
@@ -102,22 +101,17 @@ export default function PostDetailView({
           <PostDetailSectionHeader title="Sleep" />
           <div className="post-detail-panel post-detail-sleep">
             <div className="post-sleep-hero">
-              <div className="post-sleep-hero-main">
-                <span className="post-sleep-duration">{formatMins(post.asleepMinutes)}</span>
+              <div className="post-sleep-hero-main post-sleep-hero-main--detail">
+                <div className="post-sleep-duration-row">
+                  <span className="post-sleep-duration">{formatMins(post.asleepMinutes)}</span>
+                  <SessionKindChip kind={post.sessionKind} always size="md" />
+                </div>
                 <span className="post-detail-asleep-label">asleep</span>
-                {napChipLabel ? (
-                  <span className="post-nap-chip">{napChipLabel}</span>
-                ) : null}
               </div>
               {post.vibe ? <PostVibe vibe={post.vibe} showLabel /> : null}
             </div>
 
-            {isSplitSessions || isNapDay ? (
-              <p className="post-nap-callout">
-                {isNapDay ? 'Nap day' : 'Split sleep'} · {post.bedtime !== '—' ? `${post.bedtime} → ${post.wakeTime}` : '—'}
-                {post.inBedMinutes > 0 ? ` · ${formatMins(post.inBedMinutes)} in bed` : ''}
-              </p>
-            ) : post.bedtime !== '—' ? (
+            {post.bedtime !== '—' ? (
               <div className="post-times-row">
                 <div className="post-time-block">
                   <span className="post-time-label">Bedtime</span>

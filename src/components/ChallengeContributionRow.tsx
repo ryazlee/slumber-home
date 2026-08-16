@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { ChallengeContributionPost } from '../lib/types';
 import { formatMins } from '../lib/format';
+import { sessionKindTitleSuffix } from '../lib/sessionPost';
 import Avatar from './Avatar';
 
 type Props = {
@@ -22,7 +23,7 @@ export default function ChallengeContributionRow({ post, isPrivate, userRoles }:
       <div className="challenge-contribution-copy">
         <span className="challenge-contribution-user">@{post.username}</span>
         <span className={`challenge-contribution-title${isPrivate ? ' challenge-contribution-title--private' : ''}`}>
-          {isPrivate ? 'Private sleep entry' : post.title}
+          {isPrivate ? 'Private sleep entry' : `${post.title}${sessionKindTitleSuffix(post.sessionKind, post.title)}`}
         </span>
       </div>
       <span className="challenge-contribution-mins">{formatMins(post.asleepMinutes)}</span>

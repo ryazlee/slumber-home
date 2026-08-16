@@ -14,6 +14,7 @@ import PostDreamBlock from './post/PostDreamBlock';
 import PostVibe from './post/PostVibe';
 import PostStageMetrics from './post/PostStageMetrics';
 import PostSocial, { type PostSocialPatch } from './PostSocial';
+import SessionKindChip from './SessionKindChip';
 import SessionTimelines from './SessionTimelines';
 import PostTagList from './PostTagList';
 import SleepBuddiesRow from './SleepBuddiesRow';
@@ -24,6 +25,7 @@ type SleepPostCardProps = {
   showAuthor?: boolean;
   clickable?: boolean;
   isLatestPost?: boolean;
+  stacked?: boolean;
   defaultCommentsOpen?: boolean;
   onSocialPatch?: (postId: string, patch: PostSocialPatch) => void;
 };
@@ -33,6 +35,7 @@ export default function SleepPostCard({
   showAuthor = true,
   clickable = true,
   isLatestPost = false,
+  stacked = false,
   defaultCommentsOpen = false,
   onSocialPatch,
 }: SleepPostCardProps) {
@@ -41,7 +44,6 @@ export default function SleepPostCard({
   const {
     isManual,
     canReadDream,
-    napChipLabel,
     isSplitSessions,
     showWearableSleep,
     displayTitle,
@@ -103,9 +105,7 @@ export default function SleepPostCard({
           <div className="post-sleep-hero">
             <div className="post-sleep-hero-main">
               <span className="post-sleep-duration">{formatMins(post.asleepMinutes)}</span>
-              {napChipLabel ? (
-                <span className="post-nap-chip">{napChipLabel}</span>
-              ) : null}
+              <SessionKindChip kind={post.sessionKind} stacked={stacked} />
             </div>
             {post.vibe ? <PostVibe vibe={post.vibe} /> : null}
           </div>

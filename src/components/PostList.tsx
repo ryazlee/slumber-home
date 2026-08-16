@@ -1,4 +1,4 @@
-import { Fragment, useMemo } from 'react';
+import { useMemo } from 'react';
 import SleepPostCard from './SleepPostCard';
 import { buildLatestPostIdsByUser, isLatestSleepPost } from '../lib/latestSleepPost';
 import { groupSleepPostsByNight } from '../lib/sessionPost';
@@ -45,11 +45,15 @@ export default function PostList({
 
       <div className="post-list">
         {!loading && nightGroups.map((group) => (
-          <Fragment key={group.key}>
+          <div
+            key={group.key}
+            className={group.naps.length > 0 ? 'post-night-group' : undefined}
+          >
             <SleepPostCard
               post={group.primary}
               showAuthor={showAuthor}
               isLatestPost={isLatestSleepPost(group.primary, latestPostIds, todayISO)}
+              stacked={group.naps.length > 0}
               onSocialPatch={onPatchPost}
             />
             {group.naps.map((nap) => (
@@ -57,11 +61,12 @@ export default function PostList({
                 key={nap.id}
                 post={nap}
                 showAuthor={showAuthor}
-                isLatestPost={false}
+                isLatestPost={isLatestSleepPost(nap, latestPostIds, todayISO)}
+                stacked
                 onSocialPatch={onPatchPost}
               />
             ))}
-          </Fragment>
+          </div>
         ))}
       </div>
 

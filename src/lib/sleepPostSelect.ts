@@ -29,6 +29,7 @@ export const SLEEP_POST_FEED_SELECT = [
   'location_label',
   'is_custom',
   'session_kind',
+  'session_kind_overridden',
   'session_started_at',
   'session_ended_at',
   'split_from_post_id',

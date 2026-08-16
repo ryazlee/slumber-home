@@ -4,6 +4,7 @@ import {
   filterWearableSleepRows,
   type ManualSleepRowFlags,
 } from './sleepPostCustom';
+import { averageAsleepMinutesByNight, shouldReplaceNightClocks } from './sessionPost';
 import { supabase } from './supabase';
 import {
   averageBedtimeMinutes,
@@ -25,6 +26,7 @@ type SleepPostRow = ManualSleepRowFlags & {
   awake_events?: number | null;
   bedtime?: string | null;
   wake_time?: string | null;
+  session_kind?: string | null;
   session_breakdown?: SleepSessionData[] | null;
 };
 
@@ -35,10 +37,6 @@ type PRRow = {
   post_id: string | null;
   scope: string | null;
 };
-
-function avg(arr: number[]): number {
-  return arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 0;
-}
 
 function buildTopNight(r: SleepPostRow): TopNight {
   return {
@@ -111,7 +109,7 @@ export async function fetchUserStats(userId: string): Promise<UserStats> {
     currentStreak: streakRes.data?.current_streak ?? 0,
     longestStreak: streakRes.data?.longest_streak ?? 0,
     weeklyPosts,
-    avgAsleepMinutes: avg(weeklyPosts.map((p) => p.asleepMinutes)),
+    avgAsleepMinutes: averageAsleepMinutesByNight(weeklyPosts),
     prLongestSleep: findPR(prs, 'longest_sleep'),
     prShortestSleep: findPR(prs, 'shortest_sleep'),
     prMostWakes: findPR(prs, 'most_wakes'),
@@ -141,11 +139,11 @@ async function fetchLifetimeData(userId: string) {
     baseFilter().gt('deep_minutes', 0).order('deep_minutes', { ascending: false }).limit(3),
     baseFilter().gt('rem_minutes', 0).order('rem_minutes', { ascending: false }).limit(3),
     baseFilter().gt('core_minutes', 0).order('core_minutes', { ascending: false }).limit(3),
-    supabase.from('sleep_posts').select('asleep_minutes, bedtime, wake_time, session_breakdown, is_custom, source_device')
+    supabase.from('sleep_posts').select('sleep_date, asleep_minutes, bedtime, wake_time, session_kind, session_breakdown, is_custom, source_device')
       .eq('user_id', userId)
       .is('deleted_at', null)
       .not('asleep_minutes', 'is', null),
-    supabase.from('sleep_posts').select(`${cols}, bedtime, wake_time, session_breakdown`)
+    supabase.from('sleep_posts').select(`${cols}, bedtime, wake_time, session_kind, session_breakdown`)
       .eq('user_id', userId)
       .is('deleted_at', null)
       .not('asleep_minutes', 'is', null)
@@ -176,18 +174,28 @@ async function fetchLifetimeData(userId: string) {
 }
 
 function computeAggregateMetrics(
-  rows: Pick<SleepPostRow, 'asleep_minutes' | 'bedtime' | 'wake_time' | 'session_breakdown'>[],
+  rows: Pick<SleepPostRow, 'asleep_minutes' | 'bedtime' | 'wake_time' | 'session_breakdown' | 'sleep_date' | 'session_kind'>[],
 ) {
-  const totalNights = rows.length;
+  const totalNights = new Set(rows.map((r) => r.sleep_date)).size;
   if (totalNights === 0) {
     return { totalNights: 0, avgAsleepMinutes: 0, avgBedtime: null, avgWakeTime: null };
   }
 
   const avgAsleepMinutes = Math.round(rows.reduce((s, r) => s + (r.asleep_minutes ?? 0), 0) / totalNights);
-  const bedtimeMins = rows
+  const clocksByDate = new Map<string, (typeof rows)[number] & { asleep: number; isNap: boolean }>();
+  for (const r of rows) {
+    const asleep = r.asleep_minutes ?? 0;
+    const isNap = r.session_kind === 'nap';
+    const cur = clocksByDate.get(r.sleep_date);
+    if (!cur || shouldReplaceNightClocks(cur, { isNap, asleep })) {
+      clocksByDate.set(r.sleep_date, { ...r, asleep, isNap });
+    }
+  }
+  const clockRows = [...clocksByDate.values()];
+  const bedtimeMins = clockRows
     .map((r) => extractBedtimeMinutes(r.bedtime, r.session_breakdown))
     .filter((v): v is number => v !== null);
-  const wakeTimeMins = rows
+  const wakeTimeMins = clockRows
     .map((r) => extractWakeTimeMinutes(r.wake_time, r.session_breakdown))
     .filter((v): v is number => v !== null);
   const avgBedtimeMin = averageBedtimeMinutes(bedtimeMins);
@@ -207,6 +215,32 @@ function stageSharePct(stageMinutes: number, asleepMinutes: number): number | nu
 }
 
 function computeMonthlyBests(rows: SleepPostRow[]): MonthBest[] {
+  type NightRow = SleepPostRow & { longestSession: number };
+  const nights = new Map<string, NightRow>();
+  for (const r of rows) {
+    const asleep = r.asleep_minutes ?? 0;
+    const cur = nights.get(r.sleep_date);
+    if (!cur) {
+      nights.set(r.sleep_date, { ...r, longestSession: asleep });
+      continue;
+    }
+    cur.asleep_minutes = (cur.asleep_minutes ?? 0) + asleep;
+    cur.deep_minutes = (cur.deep_minutes ?? 0) + (r.deep_minutes ?? 0);
+    cur.rem_minutes = (cur.rem_minutes ?? 0) + (r.rem_minutes ?? 0);
+    cur.core_minutes = (cur.core_minutes ?? 0) + (r.core_minutes ?? 0);
+    cur.awake_events = (cur.awake_events ?? 0) + (r.awake_events ?? 0);
+    if (shouldReplaceNightClocks(
+      { isNap: cur.session_kind === 'nap', asleep: cur.longestSession },
+      { isNap: r.session_kind === 'nap', asleep },
+    )) {
+      cur.bedtime = r.bedtime;
+      cur.wake_time = r.wake_time;
+      cur.session_breakdown = r.session_breakdown;
+      cur.session_kind = r.session_kind;
+      cur.longestSession = asleep;
+    }
+  }
+
   type MonthAccum = MonthBest & {
     bedtimeSums: number[];
     wakeTimeSums: number[];
@@ -215,7 +249,7 @@ function computeMonthlyBests(rows: SleepPostRow[]): MonthBest[] {
   };
   const monthMap = new Map<string, MonthAccum>();
 
-  for (const r of rows) {
+  for (const r of nights.values()) {
     const month = r.sleep_date.slice(0, 7);
     const existing = monthMap.get(month);
     const bt = extractBedtimeMinutes(r.bedtime, r.session_breakdown);

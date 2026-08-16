@@ -1,19 +1,39 @@
 import type { SleepPost } from './types';
 import { getRecentSleepNightISOs } from './dates';
+import { pickNightOpenPost } from './sessionPost';
 import type { InsightChip } from './statsTypes';
 
 export type { InsightChip };
 
-export function weekChartNights(posts: SleepPost[]): Array<{ dateISO: string; post: SleepPost | null }> {
-  const byDate = new Map(posts.map((p) => [p.sleepDate, p]));
-  return getRecentSleepNightISOs(7).map((dateISO) => ({
-    dateISO,
-    post: byDate.get(dateISO) ?? null,
-  }));
+export type WeekChartNight = {
+  dateISO: string;
+  post: SleepPost | null;
+  asleepMinutes: number;
+};
+
+export function weekChartNights(posts: SleepPost[]): WeekChartNight[] {
+  const byDate = new Map<string, SleepPost[]>();
+  for (const post of posts) {
+    const list = byDate.get(post.sleepDate);
+    if (list) list.push(post);
+    else byDate.set(post.sleepDate, [post]);
+  }
+  return getRecentSleepNightISOs(7).map((dateISO) => {
+    const night = byDate.get(dateISO) ?? [];
+    return {
+      dateISO,
+      post: pickNightOpenPost(night),
+      asleepMinutes: night.reduce((sum, p) => sum + p.asleepMinutes, 0),
+    };
+  });
 }
 
 export function sleepDurationStdDev(posts: SleepPost[]): number | null {
-  const mins = posts.map((p) => p.asleepMinutes).filter((m) => m > 0);
+  const byDate = new Map<string, number>();
+  for (const post of posts) {
+    byDate.set(post.sleepDate, (byDate.get(post.sleepDate) ?? 0) + post.asleepMinutes);
+  }
+  const mins = [...byDate.values()].filter((m) => m > 0);
   if (mins.length < 3) return null;
   const mean = mins.reduce((a, b) => a + b, 0) / mins.length;
   const variance = mins.reduce((s, m) => s + (m - mean) ** 2, 0) / mins.length;

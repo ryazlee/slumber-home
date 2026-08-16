@@ -13,7 +13,7 @@ type Props = {
 export default function StatsWeekChart({ posts }: Props) {
   const nights = weekChartNights(posts);
   const logged = nights.filter((n) => n.post);
-  const maxMins = Math.max(...logged.map((n) => n.post!.asleepMinutes), 1);
+  const maxMins = Math.max(...logged.map((n) => n.asleepMinutes), 1);
 
   return (
     <div className="stats-card stats-week-chart">
@@ -23,10 +23,10 @@ export default function StatsWeekChart({ posts }: Props) {
       </div>
 
       <div className="stats-week-bars">
-        {nights.map(({ dateISO, post }) => {
+        {nights.map(({ dateISO, post, asleepMinutes }) => {
           const initial = new Date(`${dateISO}T12:00:00`)
             .toLocaleDateString('en-US', { weekday: 'narrow' });
-          const asleep = post?.asleepMinutes ?? 0;
+          const asleep = asleepMinutes;
           const barH = asleep > 0
             ? Math.max(6, Math.round((asleep / maxMins) * BAR_MAX))
             : 4;

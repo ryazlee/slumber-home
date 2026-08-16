@@ -47,6 +47,7 @@ export type PostRow = {
   source_device: string | null;
   is_custom?: boolean | null;
   session_kind?: 'overnight' | 'nap' | 'manual' | null;
+  session_kind_overridden?: boolean | null;
   session_started_at?: string | null;
   session_ended_at?: string | null;
   split_from_post_id?: string | null;
@@ -189,6 +190,7 @@ function mapPostRow(
     sourceDevice: row.source_device ?? 'Unknown',
     isCustom: row.is_custom === true,
     sessionKind: row.session_kind ?? undefined,
+    sessionKindOverridden: row.session_kind_overridden === true,
     sessionStartedAt: row.session_started_at ?? undefined,
     sessionEndedAt: row.session_ended_at ?? undefined,
     splitFromPostId: row.split_from_post_id ?? undefined,

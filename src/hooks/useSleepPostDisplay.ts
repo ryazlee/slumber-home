@@ -4,24 +4,20 @@ import type { PostSocialPatch } from '../components/PostSocial';
 import type { SleepPost } from '../lib/types';
 import { isManualSleepPost } from '../lib/sleepPostCustom';
 import { sleepPostDisplayTitle } from '../lib/sleepPostTitle';
-import { countNaps, hasNapDay } from '../lib/napDay';
 import { segmentsForPost } from '../lib/timeline';
 
-export function useSleepPostDisplay(post: SleepPost) {
+export function useSleepPostDisplay(
+  post: SleepPost,
+) {
   const { user } = useAuth();
   const isManual = isManualSleepPost(post);
   const isOwnPost = user?.id === post.userId;
   const canReadDream = Boolean(post.dreamLog) && (!post.blurDream || isOwnPost);
-  const isNapDay = !isManual && hasNapDay(post);
-  const napCount = countNaps(post.sessionBreakdown) || (isNapDay ? 1 : 0);
-  const napChipLabel = isNapDay
-    ? `☀️ ${napCount === 1 ? 'nap' : `${napCount} naps`}`
-    : null;
   const sessions = post.sessionBreakdown ?? [];
   const isSplitSessions = sessions.length > 1;
   const showWearableSleep = !isManual && post.asleepMinutes > 0;
   const timelineSegments = segmentsForPost(post);
-  const displayTitle = sleepPostDisplayTitle(post.title, post.sleepDate);
+  const displayTitle = sleepPostDisplayTitle(post.title, post.sleepDate, post.sessionKind);
   const footerDeviceLabel = useMemo(() => {
     if (isOwnPost) return null;
     if (isManual) return 'Manual log';
@@ -34,9 +30,6 @@ export function useSleepPostDisplay(post: SleepPost) {
     isManual,
     isOwnPost,
     canReadDream,
-    isNapDay,
-    napCount,
-    napChipLabel,
     sessions,
     isSplitSessions,
     showWearableSleep,

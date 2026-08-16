@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { filterWearableSleepRows } from './sleepPostCustom';
+import { averageAsleepMinutesByNight } from './sessionPost';
 import { normalizeUsername } from './username';
 import type { WebProfile } from './types';
 
@@ -40,7 +41,7 @@ export async function fetchProfileSummary(userId: string): Promise<WebProfile | 
   const [asleepRes, streakRes, friendsCountRes, postsCountRes, recordRes, friendStatus] = await Promise.all([
     supabase
       .from('sleep_posts')
-      .select('asleep_minutes, source_device, is_custom')
+      .select('asleep_minutes, sleep_date, source_device, is_custom')
       .eq('user_id', userId)
       .is('deleted_at', null)
       .order('created_at', { ascending: false })
@@ -56,11 +57,12 @@ export async function fetchProfileSummary(userId: string): Promise<WebProfile | 
     resolveFriendStatus(viewerId, userId),
   ]);
 
-  const asleepSamples = filterWearableSleepRows(asleepRes.data ?? [])
-    .map((p) => p.asleep_minutes as number);
-  const avgAsleepMinutes = asleepSamples.length > 0
-    ? Math.round(asleepSamples.reduce((s, m) => s + m, 0) / asleepSamples.length)
-    : 0;
+  const avgAsleepMinutes = averageAsleepMinutesByNight(
+    filterWearableSleepRows(asleepRes.data ?? []).map((p) => ({
+      sleepDate: p.sleep_date as string,
+      asleepMinutes: Number(p.asleep_minutes ?? 0),
+    })),
+  );
 
   const recordRow = Array.isArray(recordRes.data) ? recordRes.data[0] : recordRes.data;
 

@@ -77,6 +77,7 @@ export type SleepPost = {
   sourceDevice: string;
   isCustom?: boolean;
   sessionKind?: 'overnight' | 'nap' | 'manual';
+  sessionKindOverridden?: boolean;
   sessionStartedAt?: string;
   sessionEndedAt?: string;
   splitFromPostId?: string;
@@ -180,6 +181,7 @@ export type ChallengeContributionPost = {
   wakeTime: string | null;
   createdAt: string;
   isPrivate: boolean;
+  sessionKind?: 'overnight' | 'nap' | 'manual';
 };
 
 export type ClubRole = 'owner' | 'admin' | 'member';
