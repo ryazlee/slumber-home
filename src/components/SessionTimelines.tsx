@@ -62,7 +62,7 @@ function SessionBlock({
   }
 
   return (
-    <div className={`session-timeline-card${sessionIsNap ? ' session-timeline-card--nap' : ' session-timeline-card--overnight'}`}>
+    <div className="session-timeline-card">
       <div className="session-timeline-card-header">
         <SessionKindChip kind={sessionKind} always size="sm" />
       </div>

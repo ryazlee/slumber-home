@@ -1784,16 +1784,6 @@
   background: var(--bg);
 }
 
-.session-timeline-card--nap {
-  background: rgba(255, 149, 0, 0.08);
-  border-color: rgba(255, 149, 0, 0.33);
-}
-
-.session-timeline-card--overnight {
-  background: rgba(139, 92, 246, 0.08);
-  border-color: rgba(139, 92, 246, 0.33);
-}
-
 .session-timeline-card-header {
   display: flex;
   flex-direction: column;

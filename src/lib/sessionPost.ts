@@ -99,7 +99,7 @@ export function sessionKindChipLabel(
   opts?: { stacked?: boolean },
 ): string | null {
   if (kind === 'nap') return '☀️ Nap';
-  if (kind === 'overnight' && opts?.stacked) return 'Overnight';
+  if (kind === 'overnight' && opts?.stacked) return '🌙 Overnight';
   return null;
 }
 
