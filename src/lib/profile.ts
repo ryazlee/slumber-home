@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import { filterWearableSleepRows } from './sleepPostCustom';
 import { averageAsleepMinutesByNight } from './sessionPost';
+import { avatarRoleKeysFromProfile } from './avatarRoles';
 import { normalizeUsername } from './username';
 import type { WebProfile } from './types';
 
@@ -70,7 +71,8 @@ export async function fetchProfileSummary(userId: string): Promise<WebProfile | 
     id: row.id,
     username: row.username,
     avatarUrl: row.avatar_url ?? undefined,
-    userRoles: row.user_roles ?? undefined,
+    userRoles: avatarRoleKeysFromProfile(row.user_roles, row.is_premium),
+    isPremium: row.is_premium ?? false,
     friendsCount: typeof friendsCountRes.data === 'number' ? friendsCountRes.data : 0,
     postsCount: new Set(
       ((postsCountRes.data ?? []) as { sleep_date: string }[]).map((r) => r.sleep_date),

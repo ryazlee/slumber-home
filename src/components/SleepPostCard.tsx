@@ -76,6 +76,7 @@ export default function SleepPostCard({
               username={post.username}
               avatarUrl={post.avatarUrl}
               userRoles={post.userRoles}
+              isPremium={post.isPremium}
               showAvatar
               avatarSize="md"
               className="post-author-link"

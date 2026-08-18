@@ -2609,6 +2609,15 @@ button.app-back-link {
   text-decoration: underline;
 }
 
+.mention-link {
+  text-decoration: underline;
+  word-break: break-word;
+}
+
+.mention-link:hover {
+  opacity: 0.85;
+}
+
 .post-dream-mention-hint {
   margin: 0;
   font-size: 12px;

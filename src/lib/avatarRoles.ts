@@ -60,12 +60,39 @@ export function getCachedAvatarRoleStyles(): Map<string, AvatarRoleStyle> {
   return _styleMap ?? fallbackMap();
 }
 
-export function normalizeUserRoles(userRoles?: string[] | null): string[] {
-  if (!userRoles?.length) return [];
+function coerceRoleEntries(userRoles?: string[] | string | null): string[] {
+  if (userRoles == null || userRoles === '') return [];
+  if (Array.isArray(userRoles)) {
+    return userRoles.flatMap((entry) => coerceRoleEntries(entry));
+  }
+  const s = String(userRoles).trim();
+  if (!s) return [];
+  if (s.startsWith('{') && s.endsWith('}')) {
+    return s
+      .slice(1, -1)
+      .split(',')
+      .map((part) => part.trim().replace(/^"|"$/g, ''))
+      .filter(Boolean);
+  }
+  return [s];
+}
+
+export function avatarRoleKeysFromProfile(
+  userRoles?: string[] | string | null,
+  isPremium?: boolean | null,
+): string[] | undefined {
+  const roles = coerceRoleEntries(userRoles);
+  if (roles.length > 0) return roles;
+  if (isPremium) return ['premium'];
+  return undefined;
+}
+
+export function normalizeUserRoles(userRoles?: string[] | string | null): string[] {
+  if (!userRoles) return [];
   const known = getCachedAvatarRoleStyles();
   const seen = new Set<string>();
   const normalized: string[] = [];
-  for (const key of userRoles) {
+  for (const key of coerceRoleEntries(userRoles)) {
     if (known.has(key) && !seen.has(key)) {
       seen.add(key);
       normalized.push(key);
@@ -75,7 +102,10 @@ export function normalizeUserRoles(userRoles?: string[] | null): string[] {
 }
 
 /** First role in user_roles drives the avatar ring (matches iOS). */
-export function resolveAvatarRole(userRoles?: string[] | null): AvatarRoleStyle | undefined {
-  const first = normalizeUserRoles(userRoles)[0];
+export function resolveAvatarRole(
+  userRoles?: string[] | string | null,
+  isPremium?: boolean,
+): AvatarRoleStyle | undefined {
+  const first = normalizeUserRoles(userRoles)[0] ?? (isPremium ? 'premium' : undefined);
   return first ? getCachedAvatarRoleStyles().get(first) : undefined;
 }

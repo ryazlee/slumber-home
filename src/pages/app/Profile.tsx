@@ -110,6 +110,7 @@ export default function Profile() {
           username={profile.username}
           avatarUrl={profile.avatarUrl}
           userRoles={profile.userRoles}
+          isPremium={profile.isPremium}
           size="lg"
         />
         <div>

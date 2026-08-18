@@ -7,6 +7,7 @@ type UserLinkProps = {
   username: string;
   avatarUrl?: string;
   userRoles?: string[] | null;
+  isPremium?: boolean;
   showAvatar?: boolean;
   avatarSize?: 'sm' | 'md' | 'lg';
   showStreak?: boolean;
@@ -19,6 +20,7 @@ export default function UserLink({
   username,
   avatarUrl,
   userRoles,
+  isPremium,
   showAvatar = false,
   avatarSize = 'sm',
   showStreak = true,
@@ -37,6 +39,7 @@ export default function UserLink({
           username={username}
           avatarUrl={avatarUrl}
           userRoles={userRoles}
+          isPremium={isPremium}
           size={avatarSize}
         />
       )}

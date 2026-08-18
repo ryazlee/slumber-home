@@ -39,6 +39,7 @@ export type SleepPost = {
   username: string;
   avatarUrl?: string;
   userRoles?: string[];
+  isPremium?: boolean;
   title: string;
   sleepDate: string;
   bedtime: string;
@@ -92,6 +93,7 @@ export type WebProfile = {
   username: string;
   avatarUrl?: string;
   userRoles?: string[];
+  isPremium?: boolean;
   friendsCount: number;
   postsCount: number;
   streak: number;

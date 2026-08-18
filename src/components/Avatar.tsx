@@ -51,6 +51,7 @@ type AvatarProps = {
   username: string;
   avatarUrl?: string;
   userRoles?: string[] | null;
+  isPremium?: boolean;
   size?: 'compact' | 'sm' | 'md' | 'featured' | 'lg';
   className?: string;
 };
@@ -68,10 +69,11 @@ export default function Avatar({
   username,
   avatarUrl,
   userRoles,
+  isPremium,
   size = 'md',
   className = '',
 }: AvatarProps) {
-  const role = resolveAvatarRole(userRoles);
+  const role = resolveAvatarRole(userRoles, isPremium);
   const slotClass = `${SLOT_CLASS[size]} ${className}`.trim();
   const initials = username.slice(0, 2).toUpperCase();
   const faceStyle: CSSProperties = { background: avatarColorFromName(userId || username) };

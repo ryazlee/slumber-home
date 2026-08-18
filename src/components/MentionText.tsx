@@ -15,9 +15,9 @@ export default function MentionText({ children, className, onMentionPress }: Men
 
   return (
     <span className={className}>
-      {segments.map((seg, i) => (
-        seg.type === 'mention' ? (
-          onMentionPress ? (
+      {segments.map((seg, i) => {
+        if (seg.type === 'mention') {
+          return onMentionPress ? (
             <button
               key={`${seg.username}-${i}`}
               type="button"
@@ -34,11 +34,25 @@ export default function MentionText({ children, className, onMentionPress }: Men
             <span key={`${seg.username}-${i}`} className="mention-handle">
               @{seg.username}
             </span>
-          )
-        ) : (
-          <span key={`text-${i}`}>{seg.value}</span>
-        )
-      ))}
+          );
+        }
+        if (seg.type === 'link') {
+          return (
+            <a
+              key={`link-${i}`}
+              className="mention-handle mention-link"
+              href={seg.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              {seg.value}
+            </a>
+          );
+        }
+        return <span key={`text-${i}`}>{seg.value}</span>;
+      })}
     </span>
   );
 }

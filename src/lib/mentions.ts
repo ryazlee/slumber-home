@@ -1,5 +1,6 @@
 /** @username mention parsing. */
 
+import { findUrlSpans } from './linkify';
 import { USERNAME_MENTION_PATTERN } from './username';
 
 export function extractMentionUsernames(text: string): string[] {
@@ -19,9 +20,11 @@ export function extractMentionUsernames(text: string): string[] {
 
 export type MentionSegment =
   | { type: 'text'; value: string }
-  | { type: 'mention'; username: string };
+  | { type: 'mention'; username: string }
+  | { type: 'link'; value: string; href: string };
 
-export function parseMentionSegments(text: string): MentionSegment[] {
+function parseMentionOnlySegments(text: string): MentionSegment[] {
+  if (!text) return [];
   const regex = new RegExp(`@(${USERNAME_MENTION_PATTERN})`, 'gi');
   const segments: MentionSegment[] = [];
   let lastIndex = 0;
@@ -39,6 +42,28 @@ export function parseMentionSegments(text: string): MentionSegment[] {
     segments.push({ type: 'text', value: text.slice(lastIndex) });
   }
 
+  return segments;
+}
+
+export function parseMentionSegments(text: string): MentionSegment[] {
+  const urls = findUrlSpans(text);
+  if (urls.length === 0) {
+    const mentions = parseMentionOnlySegments(text);
+    return mentions.length ? mentions : [{ type: 'text', value: text }];
+  }
+
+  const segments: MentionSegment[] = [];
+  let lastIndex = 0;
+  for (const url of urls) {
+    if (url.start > lastIndex) {
+      segments.push(...parseMentionOnlySegments(text.slice(lastIndex, url.start)));
+    }
+    segments.push({ type: 'link', value: url.display, href: url.href });
+    lastIndex = url.end;
+  }
+  if (lastIndex < text.length) {
+    segments.push(...parseMentionOnlySegments(text.slice(lastIndex)));
+  }
   return segments.length ? segments : [{ type: 'text', value: text }];
 }
 

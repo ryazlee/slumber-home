@@ -5,14 +5,15 @@ import { countWakes } from './wakes';
 import { SLEEP_POST_FEED_SELECT } from './sleepPostSelect';
 import { filterPrTypesByVisibility, recentPrWindowStart } from './pr';
 import { filterWearableSleepRows } from './sleepPostCustom';
-import { countDistinctDatesInWindow } from './sessionPost';
+import { avatarRoleKeysFromProfile } from './avatarRoles';
 
 export const PAGE_SIZE = 20;
 
 type AuthorProfile = {
   username: string;
   avatar_url: string | null;
-  user_roles?: string[] | null;
+  user_roles?: string[] | string | null;
+  is_premium?: boolean | null;
   show_best_prs?: boolean | null;
   show_worst_prs?: boolean | null;
 };
@@ -154,7 +155,8 @@ function mapPostRow(
     userId: row.user_id,
     username,
     avatarUrl: authorProfile?.avatar_url ?? undefined,
-    userRoles: authorProfile?.user_roles ?? undefined,
+    userRoles: avatarRoleKeysFromProfile(authorProfile?.user_roles, authorProfile?.is_premium),
+    isPremium: authorProfile?.is_premium ?? undefined,
     title: row.title,
     sleepDate: row.sleep_date,
     bedtime: row.bedtime ?? '—',
@@ -212,7 +214,7 @@ export async function enrichSleepPostRows(rows: PostRow[]): Promise<SleepPost[]>
       .select('post_id, record_type, scope')
       .in('post_id', postIds)
       .not('post_id', 'is', null),
-    supabase.from('profiles').select('id, username, avatar_url, user_roles, show_best_prs, show_worst_prs').in('id', authorUserIds),
+    supabase.from('profiles').select('id, username, avatar_url, user_roles, is_premium, show_best_prs, show_worst_prs').in('id', authorUserIds),
     fetchRecentWindowPostCounts(rows),
     fetchAuthorWearablePostCounts(authorUserIds),
   ]);
