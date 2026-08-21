@@ -90,7 +90,11 @@ export default function AdminTags() {
   );
 
   return (
-    <AdminSection className="admin-tags" error={error}>
+    <AdminSection
+      className="admin-tags"
+      error={error}
+      lead="The factor-tag catalog people pick when logging a night. Usage lives under People → Tag usage."
+    >
       <AdminListToolbar
         actions={!showForm ? (
           <button className="admin-button" type="button" onClick={() => {

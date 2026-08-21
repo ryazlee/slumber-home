@@ -21,9 +21,25 @@ import { buildAdminUserSearchColumns } from './userGridColumns';
 
 type QuickFilter = 'new' | 'premium' | 'never-posted' | 'inactive' | null;
 
+const QUICK_FILTERS: { id: Exclude<QuickFilter, null>; label: string }[] = [
+  { id: 'new', label: 'New this week' },
+  { id: 'premium', label: 'Premium' },
+  { id: 'never-posted', label: 'Never posted' },
+  { id: 'inactive', label: 'Inactive 14d' },
+];
+
+const QUICK_FILTER_LABEL: Record<Exclude<QuickFilter, null>, string> = {
+  new: 'users who joined this week',
+  premium: 'Premium users',
+  'never-posted': 'users who have never posted',
+  inactive: 'users with no post in 14 days',
+};
+
 export default function AdminUsers() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const urlFilter = searchParams.get('filter') as QuickFilter;
+  const urlFilter = (QUICK_FILTERS.some((item) => item.id === searchParams.get('filter'))
+    ? searchParams.get('filter')
+    : null) as QuickFilter;
   const urlQuery = searchParams.get('q') ?? '';
 
   const [query, setQuery] = useState(urlQuery);
@@ -74,14 +90,20 @@ export default function AdminUsers() {
   }, []);
 
   useEffect(() => {
-    if (urlFilter && urlFilter !== quickFilter) {
-      setQuickFilter(urlFilter);
-    }
-  }, [urlFilter, quickFilter]);
+    setQuickFilter(urlFilter);
+  }, [urlFilter]);
 
   useEffect(() => {
     setQuery(urlQuery);
   }, [urlQuery]);
+
+  const writeSearchParams = (filter: QuickFilter, nextQuery = query) => {
+    const params = new URLSearchParams();
+    const trimmed = nextQuery.trim();
+    if (trimmed) params.set('q', trimmed);
+    if (filter) params.set('filter', filter);
+    setSearchParams(params);
+  };
 
   const resetFilters = () => {
     setQuery('');
@@ -107,11 +129,7 @@ export default function AdminUsers() {
   const toggleQuickFilter = (next: QuickFilter) => {
     const value = quickFilter === next ? null : next;
     setQuickFilter(value);
-    if (value) {
-      setSearchParams({ filter: value });
-    } else {
-      setSearchParams({});
-    }
+    writeSearchParams(value);
   };
 
   const columns = useMemo(
@@ -128,7 +146,11 @@ export default function AdminUsers() {
   };
 
   return (
-    <AdminSection className="admin-users" error={error}>
+    <AdminSection
+      className="admin-users"
+      error={error}
+      lead="Search anyone, or tap a chip to slice the list. Active chips toggle off — or use All users."
+    >
       <AdminFilterBar
         showReset={hasFilters}
         onReset={resetFilters}
@@ -166,7 +188,7 @@ export default function AdminUsers() {
             value={quickFilter === 'new' ? '7' : joinedWithin}
             onChange={(e) => {
               setQuickFilter(null);
-              setSearchParams({});
+              writeSearchParams(null);
               setJoinedWithin(e.target.value);
             }}
           >
@@ -191,12 +213,16 @@ export default function AdminUsers() {
       </AdminFilterBar>
 
       <div className="admin-quick-chips" role="group" aria-label="Quick filters">
-        {([
-          ['new', 'New this week'],
-          ['premium', 'Premium'],
-          ['never-posted', 'Never posted'],
-          ['inactive', 'Inactive 14d'],
-        ] as const).map(([id, label]) => (
+        <button
+          type="button"
+          className={`admin-tab${quickFilter == null ? ' active' : ''}`}
+          onClick={() => {
+            if (quickFilter != null) toggleQuickFilter(quickFilter);
+          }}
+        >
+          All users
+        </button>
+        {QUICK_FILTERS.map(({ id, label }) => (
           <button
             key={id}
             type="button"
@@ -207,6 +233,19 @@ export default function AdminUsers() {
           </button>
         ))}
       </div>
+
+      {quickFilter ? (
+        <div className="admin-filter-active">
+          <span>Showing {QUICK_FILTER_LABEL[quickFilter]}.</span>
+          <button
+            type="button"
+            className="admin-button admin-button-ghost admin-button-sm"
+            onClick={() => toggleQuickFilter(quickFilter)}
+          >
+            Show all users
+          </button>
+        </div>
+      ) : null}
 
       <AdminListToolbar>
         <AdminTableSummary>

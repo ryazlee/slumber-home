@@ -161,7 +161,11 @@ export default function AdminPremium() {
   const savingGrant = updatePremiumMutation.isPending && actingUserId === selectedUserId;
 
   return (
-    <AdminSection className="admin-premium" error={error}>
+    <AdminSection
+      className="admin-premium"
+      error={error}
+      lead="Who has Premium, who’s expiring, and grants you can extend."
+    >
       {loading && !metrics ? (
         <p className="admin-muted">Loading Premium metrics…</p>
       ) : metrics ? (

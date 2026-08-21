@@ -14,23 +14,43 @@ export type AdminNavGroup = {
 };
 
 export const ADMIN_PAGE_TITLES: Record<string, string> = {
-  '/admin': 'Analytics',
+  '/admin': 'Health',
+  '/admin/analytics': 'Activity',
+  '/admin/tag-usage': 'Tag usage',
+  '/admin/dreams': 'Dreams',
   '/admin/posts': 'Posts',
   '/admin/reports': 'Reports',
   '/admin/users': 'Users',
-  '/admin/community': 'Community',
+  '/admin/community': 'Clubs',
   '/admin/premium': 'Premium',
   '/admin/notify': 'Notify',
-  '/admin/configure/tags': 'Tags',
+  '/admin/configure/tags': 'Tag catalog',
   '/admin/configure/roles': 'Roles',
 };
 
 function buildAdminNavGroups(pendingReports = 0): AdminNavGroup[] {
   return [
     {
-      label: 'Overview',
+      label: 'Health',
       items: [
-        { to: '/admin', label: 'Analytics', end: true },
+        { to: '/admin', label: 'Snapshot', end: true },
+      ],
+    },
+    {
+      label: 'People',
+      items: [
+        { to: '/admin/users', label: 'Users' },
+        { to: '/admin/analytics', label: 'Activity' },
+        { to: '/admin/tag-usage', label: 'Tag usage' },
+        { to: '/admin/dreams', label: 'Dreams' },
+        { to: '/admin/community', label: 'Clubs' },
+        { to: '/admin/premium', label: 'Premium' },
+      ],
+    },
+    {
+      label: 'Actions',
+      items: [
+        { to: '/admin/notify', label: 'Notify' },
       ],
     },
     {
@@ -45,18 +65,9 @@ function buildAdminNavGroups(pendingReports = 0): AdminNavGroup[] {
       ],
     },
     {
-      label: 'People',
-      items: [
-        { to: '/admin/users', label: 'Users' },
-        { to: '/admin/community', label: 'Community' },
-        { to: '/admin/premium', label: 'Premium' },
-        { to: '/admin/notify', label: 'Notify' },
-      ],
-    },
-    {
       label: 'Configure',
       items: [
-        { to: '/admin/configure/tags', label: 'Tags' },
+        { to: '/admin/configure/tags', label: 'Tag catalog' },
         { to: '/admin/configure/roles', label: 'Roles' },
       ],
     },

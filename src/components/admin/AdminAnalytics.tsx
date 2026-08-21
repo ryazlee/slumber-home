@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
   type AdminTagRow,
   type AnalyticsFilters,
@@ -12,20 +12,20 @@ import { useAdminAnalyticsBundle, useAppVersions } from '../../hooks/useAdmin';
 import type { AdminAnalyticsScreenProps } from './adminAnalyticsTypes';
 import AdminActivityChart from './AdminActivityChart';
 import AdminAnalyticsFilters from './AdminAnalyticsFilters';
-import AdminHealthSnapshot from './AdminHealthSnapshot';
 import AdminMetricCard from './AdminMetricCard';
 import AdminSection, { AdminTableSummary } from './AdminSection';
-import AdminTabs from './AdminTabs';
 
-type AnalyticsTab = 'health' | 'overview' | 'tags';
+export type AdminAnalyticsView = 'overview' | 'tags' | 'dreams';
 
-const TABS: { id: AnalyticsTab; label: string }[] = [
-  { id: 'health', label: 'Health' },
-  { id: 'overview', label: 'Overview' },
-  { id: 'tags', label: 'Tags' },
-];
+type Props = AdminAnalyticsScreenProps & {
+  view: AdminAnalyticsView;
+};
 
-type Props = AdminAnalyticsScreenProps;
+const VIEW_LEAD: Record<AdminAnalyticsView, string> = {
+  overview: 'Signups, posts, and comments for a chosen date range — use this when the Health snapshot’s rolling window isn’t enough.',
+  tags: 'Which factor tags people put on nights in this range.',
+  dreams: 'How often sleep posts include a dream log.',
+};
 
 function FilterSummary({
   rangeLabel,
@@ -46,6 +46,7 @@ function FilterSummary({
 }
 
 export default function AdminAnalytics({
+  view,
   range,
   preset,
   appVersion,
@@ -54,8 +55,6 @@ export default function AdminAnalytics({
   onAppVersionChange,
 }: Props) {
   const { refreshing } = useAdmin();
-  const [tab, setTab] = useState<AnalyticsTab>('health');
-  const showRangeFilters = tab !== 'health';
 
   const filters = useMemo<AnalyticsFilters>(() => ({
     start: range.start,
@@ -81,39 +80,31 @@ export default function AdminAnalytics({
   const postsPerActive = metrics && metrics.active_users > 0
     ? (metrics.posts / metrics.active_users).toFixed(1)
     : '—';
+  const dreamRate = metrics && metrics.posts > 0
+    ? `${Math.round((metrics.posts_with_dreams / metrics.posts) * 1000) / 10}%`
+    : '—';
 
   return (
-    <AdminSection className="admin-overview">
-      <AdminTabs
-        ariaLabel="Analytics sections"
-        active={tab}
-        onChange={setTab}
-        tabs={TABS}
+    <AdminSection className="admin-overview" lead={VIEW_LEAD[view]}>
+      <AdminAnalyticsFilters
+        range={range}
+        preset={preset}
+        appVersion={appVersion}
+        versions={versions}
+        versionsLoading={versionsLoading}
+        loading={(loading || fetching || refreshing) && !metrics}
+        onPresetChange={onPresetChange}
+        onRangeChange={onRangeChange}
+        onAppVersionChange={onAppVersionChange}
       />
 
-      {showRangeFilters ? (
-        <AdminAnalyticsFilters
-          range={range}
-          preset={preset}
-          appVersion={appVersion}
-          versions={versions}
-          versionsLoading={versionsLoading}
-          loading={(loading || fetching || refreshing) && !metrics}
-          onPresetChange={onPresetChange}
-          onRangeChange={onRangeChange}
-          onAppVersionChange={onAppVersionChange}
-        />
-      ) : null}
+      {error ? <p className="admin-error admin-error-banner">{error}</p> : null}
 
-      {tab === 'health' ? <AdminHealthSnapshot /> : null}
+      {loading && !metrics ? <p className="admin-muted">Loading analytics…</p> : null}
 
-      {showRangeFilters && error ? <p className="admin-error admin-error-banner">{error}</p> : null}
-
-      {showRangeFilters && loading && !metrics ? <p className="admin-muted">Loading analytics…</p> : null}
-
-      {showRangeFilters && metrics ? (
+      {metrics ? (
         <div className={fetching || refreshing ? 'admin-analytics-panel-wrap--refreshing' : undefined}>
-          {tab === 'overview' && (
+          {view === 'overview' && (
             <OverviewPanel
               metrics={metrics}
               activity={activity}
@@ -124,8 +115,17 @@ export default function AdminAnalytics({
             />
           )}
 
-          {tab === 'tags' && (
+          {view === 'tags' && (
             <TagsPanel tags={tags} rangeLabel={rangeLabel} versionLabel={versionLabel} />
+          )}
+
+          {view === 'dreams' && (
+            <DreamsPanel
+              metrics={metrics}
+              dreamRate={dreamRate}
+              rangeLabel={rangeLabel}
+              versionLabel={versionLabel}
+            />
           )}
         </div>
       ) : null}
@@ -151,10 +151,6 @@ function OverviewPanel({
   return (
     <div className="admin-analytics-panel">
       <FilterSummary rangeLabel={rangeLabel} versionLabel={versionLabel} metrics={metrics} />
-      <p className="admin-muted admin-panel-lead">
-        Headline metrics and daily trends for the selected range. Browse and fix individual posts on{' '}
-        <Link to="/admin/posts">Posts</Link>.
-      </p>
 
       <div className="admin-metric-grid admin-metric-grid--hero">
         <AdminMetricCard
@@ -248,6 +244,8 @@ function TagsPanel({
     <div className="admin-analytics-panel">
       <p className="admin-muted admin-panel-lead">
         Tag usage on posts created {rangeLabel} · {versionLabel}
+        {' · '}
+        <Link to="/admin/configure/tags">Edit catalog</Link>
       </p>
       {usedTags.length === 0 ? (
         <p className="admin-muted">No tagged posts in this range.</p>
@@ -267,6 +265,44 @@ function TagsPanel({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function DreamsPanel({
+  metrics,
+  dreamRate,
+  rangeLabel,
+  versionLabel,
+}: {
+  metrics: AnalyticsMetrics;
+  dreamRate: string;
+  rangeLabel: string;
+  versionLabel: string;
+}) {
+  return (
+    <div className="admin-analytics-panel">
+      <FilterSummary rangeLabel={rangeLabel} versionLabel={versionLabel} metrics={metrics} />
+      <div className="admin-metric-grid admin-metric-grid--hero">
+        <AdminMetricCard
+          label="Dream log rate"
+          value={dreamRate}
+          sub={`${metrics.posts_with_dreams} of ${metrics.posts} posts`}
+          to="/admin/posts"
+        />
+        <AdminMetricCard
+          label="Posts with dreams"
+          value={metrics.posts_with_dreams}
+          sub={rangeLabel}
+          to="/admin/posts"
+        />
+        <AdminMetricCard
+          label="Sleep posts"
+          value={metrics.posts}
+          sub={rangeLabel}
+          to="/admin/posts"
+        />
+      </div>
     </div>
   );
 }

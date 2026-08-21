@@ -117,7 +117,7 @@ export default function SleepPostCard({
 
           <SessionTimelines post={post} variant="card" />
 
-          <PostStageMetrics data={post} />
+          <PostStageMetrics data={post} scrollable />
         </div>
       ) : null}
 

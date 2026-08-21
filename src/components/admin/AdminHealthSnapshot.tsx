@@ -11,7 +11,7 @@ import AdminCohortChart from './AdminCohortChart';
 import AdminMetricCard from './AdminMetricCard';
 import AdminSubsection from './AdminSubsection';
 import AdminVersionChart from './AdminVersionChart';
-import { formatNumber } from './format';
+import { formatNumber, metricDelta } from './format';
 
 type HealthWindow = 1 | 7 | 30;
 
@@ -29,6 +29,23 @@ function pct(part: number, whole: number): string {
 function healthWindowLabel(days: number): string {
   if (days === 1) return '1 day';
   return `${days} days`;
+}
+
+function priorPeriodLabel(days: HealthWindow): string {
+  if (days === 1) return 'vs prior day';
+  if (days === 7) return 'vs prior week';
+  return 'vs prior 30d';
+}
+
+function deltaProps(
+  current: number,
+  previous: number | undefined,
+  label: string,
+  invertDelta = false,
+) {
+  const delta = metricDelta(current, previous);
+  if (delta == null || previous == null) return {};
+  return { delta, previous, deltaLabel: label, invertDelta };
 }
 
 export default function AdminHealthSnapshot() {
@@ -56,6 +73,8 @@ export default function AdminHealthSnapshot() {
     : '—';
   const inflatedWindow = health?.data_quality.inflated_stage_posts_window ?? 0;
   const inflatedTotal = health?.data_quality.inflated_stage_posts_total ?? 0;
+  const previous = health?.previous;
+  const vsPrior = priorPeriodLabel(windowDays);
 
   const repairAllInflated = async () => {
     if (!window.confirm(
@@ -132,12 +151,19 @@ export default function AdminHealthSnapshot() {
                 value={health.activation.signups}
                 sub={`${health.activation.first_time_posters} first-time posters`}
                 to="/admin/users?filter=new"
+                {...deltaProps(health.activation.signups, previous?.activation.signups, vsPrior)}
               />
               <AdminMetricCard
                 label="Never logged sleep"
                 value={health.activation.never_posted_in_window}
                 sub={health.activation.never_posted_in_window > 0 ? 'View users' : 'In signup window'}
                 to="/admin/users?filter=never-posted"
+                {...deltaProps(
+                  health.activation.never_posted_in_window,
+                  previous?.activation.never_posted_in_window,
+                  vsPrior,
+                  true,
+                )}
               />
               <AdminMetricCard
                 label="Inactive posters"
@@ -161,18 +187,20 @@ export default function AdminHealthSnapshot() {
                 value={health.engagement.posts}
                 sub={`${health.engagement.wearable_posts} wearable · ${health.engagement.manual_posts} manual`}
                 to="/admin/posts"
+                {...deltaProps(health.engagement.posts, previous?.engagement.posts, vsPrior)}
               />
               <AdminMetricCard
                 label="Active posters"
                 value={health.engagement.active_posters}
                 sub={`${postsPerActive} posts per poster`}
                 to="/admin/users"
+                {...deltaProps(health.engagement.active_posters, previous?.engagement.active_posters, vsPrior)}
               />
               <AdminMetricCard
                 label="Dream log rate"
                 value={dreamRate}
                 sub={`${health.engagement.posts_with_dreams} with dream text`}
-                to="/admin/posts"
+                to="/admin/dreams"
               />
               <AdminMetricCard
                 label="Push enabled"

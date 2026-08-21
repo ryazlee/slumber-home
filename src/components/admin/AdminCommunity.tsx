@@ -18,12 +18,12 @@ import AdminTabs from './AdminTabs';
 import { gridActionsColumn } from './gridColumnHelpers';
 import { dateColumn } from './dateColumn';
 
-type Tab = 'overview' | 'challenges' | 'clubs';
+type Tab = 'clubs' | 'challenges' | 'overview';
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'challenges', label: 'Challenges' },
   { id: 'clubs', label: 'Clubs' },
+  { id: 'challenges', label: 'Challenges' },
+  { id: 'overview', label: 'Overview' },
 ];
 
 function formatGoalMinutes(minutes: number): string {
@@ -32,7 +32,7 @@ function formatGoalMinutes(minutes: number): string {
 }
 
 export default function AdminCommunity() {
-  const [tab, setTab] = useState<Tab>('overview');
+  const [tab, setTab] = useState<Tab>('clubs');
   const [statusFilter, setStatusFilter] = useState('');
   const [actingId, setActingId] = useState<string | null>(null);
 
@@ -157,7 +157,11 @@ export default function AdminCommunity() {
   ], []);
 
   return (
-    <AdminSection className="admin-community" error={error}>
+    <AdminSection
+      className="admin-community"
+      error={error}
+      lead="Clubs people belong to, and the sleep challenges they’re running."
+    >
       <AdminTabs
         ariaLabel="Community sections"
         active={tab}

@@ -154,7 +154,11 @@ export default function AdminNotify() {
   };
 
   return (
-    <AdminSection className="admin-notify" error={searchError}>
+    <AdminSection
+      className="admin-notify"
+      error={searchError}
+      lead="Send a push to one person, or broadcast an announcement to a slice of users."
+    >
       <div className="admin-split">
         <AdminPanel
           step={1}

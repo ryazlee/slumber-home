@@ -2724,6 +2724,40 @@ a.admin-metric-card--link:focus-visible {
   color: var(--text-dim);
 }
 
+.admin-metric-delta {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-metric-delta--up {
+  color: var(--success);
+}
+
+.admin-metric-delta--down {
+  color: var(--danger);
+}
+
+.admin-metric-delta--flat {
+  color: var(--text-dim);
+}
+
+.admin-filter-active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  font-size: 13px;
+  color: var(--text);
+}
+
 .admin-tabs-sub {
   margin-top: -4px;
 }

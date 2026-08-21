@@ -107,7 +107,11 @@ export default function AdminRoles() {
   );
 
   return (
-    <AdminSection className="admin-roles" error={error}>
+    <AdminSection
+      className="admin-roles"
+      error={error}
+      lead="Admin and avatar roles. Assign them on a user from People → Users."
+    >
       <AdminListToolbar
         actions={!showForm ? (
           <button className="admin-button" type="button" onClick={() => {

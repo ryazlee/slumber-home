@@ -133,23 +133,29 @@ export type RecentUserRow = {
   last_post_at?: string | null;
 };
 
+export type HealthWindowActivation = {
+  signups: number;
+  first_time_posters: number;
+  never_posted_in_window: number;
+};
+
+export type HealthWindowEngagement = {
+  posts: number;
+  wearable_posts: number;
+  manual_posts: number;
+  posts_with_dreams: number;
+  active_posters: number;
+  comments: number;
+  kudos: number;
+};
+
 export type HealthMetrics = {
   days: number;
-  activation: {
-    signups: number;
-    first_time_posters: number;
-    never_posted_in_window: number;
+  activation: HealthWindowActivation & {
     never_posted_total: number;
     inactive_posters: number;
   };
-  engagement: {
-    posts: number;
-    wearable_posts: number;
-    manual_posts: number;
-    posts_with_dreams: number;
-    active_posters: number;
-    comments: number;
-    kudos: number;
+  engagement: HealthWindowEngagement & {
     users_with_push: number;
   };
   retention: {
@@ -159,6 +165,15 @@ export type HealthMetrics = {
   data_quality: {
     inflated_stage_posts_window: number;
     inflated_stage_posts_total: number;
+  };
+  /** Same-length window immediately before the current one. Omitted on older RPCs. */
+  previous?: {
+    activation: HealthWindowActivation;
+    engagement: HealthWindowEngagement;
+    retention: {
+      wau: number;
+      mau: number;
+    };
   };
 };
 
