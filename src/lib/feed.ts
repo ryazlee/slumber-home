@@ -6,6 +6,7 @@ import { SLEEP_POST_FEED_SELECT } from './sleepPostSelect';
 import { filterPrTypesByVisibility, recentPrWindowStart } from './pr';
 import { filterWearableSleepRows } from './sleepPostCustom';
 import { avatarRoleKeysFromProfile } from './avatarRoles';
+import { countDistinctDatesInWindow } from './sessionPost';
 
 export const PAGE_SIZE = 20;
 
@@ -287,7 +288,7 @@ export async function enrichSleepPostRows(rows: PostRow[]): Promise<SleepPost[]>
       userId,
       username: profile?.username ?? 'unknown',
       avatarUrl: profile?.avatar_url ?? undefined,
-      userRoles: profile?.user_roles ?? undefined,
+      userRoles: avatarRoleKeysFromProfile(profile?.user_roles, profile?.is_premium),
     };
   }
 
