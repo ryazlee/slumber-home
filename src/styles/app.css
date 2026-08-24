@@ -4,7 +4,7 @@
   flex-direction: column;
   min-width: 0;
   max-width: 100%;
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 .app-main {
@@ -12,7 +12,7 @@
   background: var(--bg);
   min-width: 0;
   max-width: 100%;
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 @media (max-width: 767px) {
@@ -26,7 +26,16 @@
     padding-block: 14px 20px;
     min-width: 0;
     max-width: 100%;
-    overflow-x: clip;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .app-page--feed,
+  .post-list,
+  .post-night-group,
+  .post-card {
+    max-width: 100%;
+    min-width: 0;
   }
 
   .app-page-header {
@@ -162,7 +171,7 @@
   padding-block: clamp(20px, 2.5vw, 28px) clamp(28px, 3vw, 40px);
   box-sizing: border-box;
   min-width: 0;
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 .app-page--feed {
@@ -719,15 +728,19 @@
 .post-list,
 .challenge-list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
+  width: 100%;
   min-width: 0;
   max-width: 100%;
 }
 
 .post-night-group {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 6px;
   min-width: 0;
+  max-width: 100%;
 }
 
 .post-card,
@@ -790,6 +803,15 @@
   gap: 8px;
   color: var(--text);
   text-decoration: none;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.user-link-name {
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-link:hover {
@@ -798,10 +820,6 @@
 
 .user-link:hover .user-link-name {
   text-decoration: underline;
-}
-
-.user-link-name {
-  font-weight: 600;
 }
 
 .user-link-streak {
@@ -1032,6 +1050,8 @@
   font-weight: 600;
   margin: 0 0 12px;
   letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .post-meta-strip {
@@ -1631,6 +1651,8 @@
 
 .sleep-timeline {
   margin: 0;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .sleep-timeline .hypno-labels {
@@ -1829,6 +1851,8 @@
 .sleep-timeline-scrub-host {
   position: relative;
   overflow: visible;
+  min-width: 0;
+  max-width: 100%;
   --scrub-tooltip-reserve: 32px;
 }
 
@@ -1844,6 +1868,8 @@
 .sleep-timeline-chart {
   display: flex;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   background: var(--border);
 }
@@ -1853,7 +1879,7 @@
   align-items: center;
   justify-content: center;
   flex: 1;
-  min-width: 4px;
+  min-width: 0;
   background: rgba(245, 158, 11, 0.12);
   border-left: 1px solid rgba(245, 158, 11, 0.45);
   border-right: 1px solid rgba(245, 158, 11, 0.45);
@@ -1898,6 +1924,8 @@
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 16px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .post-tag {
@@ -1914,6 +1942,8 @@
   font-size: 15px;
   line-height: 1.45;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .post-dream {
@@ -1926,6 +1956,9 @@
   background: #1b1829;
   border: 1px solid #2d2640;
   border-left: 3px solid var(--deep);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .post-dream-badge {
@@ -1963,6 +1996,7 @@
   font-style: italic;
   color: #e9d5ff;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
@@ -2040,11 +2074,17 @@
   border-top: 1px solid var(--border);
   font-size: 14px;
   color: var(--text-dim);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .post-source {
   margin-left: auto;
   color: var(--text-dim);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .post-social-empty {
