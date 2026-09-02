@@ -57,10 +57,18 @@ export default function AdminPostRawJson({ data }: Props) {
           <dd>{stringField(data, 'session_kind') ?? '—'}</dd>
         </div>
       </dl>
-      <div className="admin-post-raw-toolbar">
-        <AdminCopyButton value={json} label="Copy JSON" title="Copy JSON" />
+      <div className="admin-json-block">
+        <div className="admin-post-raw-toolbar">
+          <span className="admin-post-raw-toolbar-label">JSON</span>
+          <AdminCopyButton
+            value={json}
+            label="Copy JSON"
+            title="Copy JSON"
+            className="admin-button admin-button-sm"
+          />
+        </div>
+        <pre className="admin-json-pre">{json}</pre>
       </div>
-      <pre className="admin-json-pre">{json}</pre>
     </div>
   );
 }

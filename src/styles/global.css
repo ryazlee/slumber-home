@@ -3270,10 +3270,30 @@ a.admin-metric-card--link:focus-visible {
   color: var(--text-dim);
 }
 
+.admin-json-block {
+  margin-top: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
 .admin-post-raw-toolbar {
   display: flex;
-  justify-content: flex-end;
-  margin: 0 0 8px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px 8px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+
+.admin-post-raw-toolbar-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .admin-json-pre {
@@ -3281,9 +3301,9 @@ a.admin-metric-card--link:focus-visible {
   max-height: min(70vh, 720px);
   overflow: auto;
   padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 12px;
   line-height: 1.45;
