@@ -5,3 +5,4 @@ export function scrollAdminPanelIntoView(id: string) {
 }
 
 export const ADMIN_CATALOG_FORM_ID = 'admin-catalog-form';
+export const ADMIN_POST_RAW_ID = 'admin-post-raw';

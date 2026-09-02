@@ -1,16 +1,21 @@
 import { useCallback } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { patchPostInCache } from '../../lib/patchPostCache';
-import { getOptionalQueryErrorMessage } from '../../lib/queryError';
+import AdminPostRawSection from '../../components/admin/AdminPostRawSection';
 import PostDetailView from '../../components/PostDetailView';
 import type { PostSocialPatch } from '../../components/PostSocial';
+import { useAuth } from '../../context/AuthContext';
+import { useIsModerator } from '../../hooks/useAdmin';
 import { usePost } from '../../hooks/usePost';
+import { patchPostInCache } from '../../lib/patchPostCache';
+import { getOptionalQueryErrorMessage } from '../../lib/queryError';
 
 export default function PostDetail() {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const fromAdmin = searchParams.get('from') === 'admin';
+  const { session } = useAuth();
+  const isModerator = useIsModerator(Boolean(session)).data === true;
   const qc = useQueryClient();
   const { data: post, isLoading, error } = usePost(id);
 
@@ -52,6 +57,10 @@ export default function PostDetail() {
       </header>
 
       <PostDetailView post={post} onSocialPatch={handleSocialPatch} />
+
+      {isModerator ? (
+        <AdminPostRawSection postId={post.id} defaultOpen={fromAdmin} />
+      ) : null}
     </div>
   );
 }

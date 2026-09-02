@@ -3,9 +3,10 @@ import { useState } from 'react';
 type Props = {
   value: string;
   label?: string;
+  title?: string;
 };
 
-export default function AdminCopyButton({ value, label = 'Copy' }: Props) {
+export default function AdminCopyButton({ value, label = 'Copy', title }: Props) {
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
@@ -19,7 +20,7 @@ export default function AdminCopyButton({ value, label = 'Copy' }: Props) {
   };
 
   return (
-    <button type="button" className="admin-copy-btn" onClick={copy} title={`Copy ${value}`}>
+    <button type="button" className="admin-copy-btn" onClick={copy} title={title ?? `Copy ${value}`}>
       {copied ? 'Copied' : label}
     </button>
   );

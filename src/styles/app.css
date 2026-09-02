@@ -1039,6 +1039,44 @@
   color: var(--text-muted);
 }
 
+.manual-sleep-block--detail {
+  border-radius: 16px;
+  padding: 14px 16px;
+  gap: 6px;
+}
+
+.sleep-times-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sleep-times-block {
+  display: grid;
+  gap: 3px;
+}
+
+.sleep-times-block--end {
+  text-align: right;
+}
+
+.sleep-times-label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.sleep-times-value {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sleep-times-arrow {
+  padding: 0 8px;
+  font-size: 16px;
+  color: var(--text-dim);
+}
+
 .manual-sleep-footnote {
   margin: 4px 0 0;
   font-size: 12px;

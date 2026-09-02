@@ -5,12 +5,11 @@ import type { RecentPostRow } from '../../lib/admin';
 import { formatRangeLabel } from '../../lib/analyticsRange';
 import { formatRecalcStagesError } from '../../lib/adminPostStages';
 import { useAdmin } from '../../context/AdminContext';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { usePaginatedFilters } from '../../hooks/usePaginatedFilters';
 import {
   useAdminPostsPageData,
   useAppVersions,
-  useRecalculateSleepPostStages,
-  useRecalculateSleepPostStagesBulk,
   useRepairDoubledSleepPostStages,
   useRepairDoubledSleepPostStagesBulk,
   useAdminSoftDeletePostFromGrid,
@@ -25,11 +24,19 @@ import AdminGridActions from './AdminGridActions';
 import AdminGridClientFilterHint from './AdminGridClientFilterHint';
 import AdminListToolbar from './AdminListToolbar';
 import AdminMetricCard from './AdminMetricCard';
+import AdminPostRawPanel from './AdminPostRawPanel';
 import AdminSection, { AdminTableSummary } from './AdminSection';
+import { ADMIN_POST_RAW_ID, scrollAdminPanelIntoView } from './adminScroll';
 import { gridActionsColumn } from './gridColumnHelpers';
 import { buildRecentPostColumns } from './postGridColumns';
 
 const POST_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+type RawPostTarget = {
+  id: string;
+  title?: string | null;
+  username?: string | null;
+};
 
 type Props = AdminAnalyticsScreenProps & {
   userId?: string | null;
@@ -50,6 +57,7 @@ export default function AdminPosts({
   const [actingPostId, setActingPostId] = useState<string | null>(null);
   const [postIdLookup, setPostIdLookup] = useState('');
   const [lookupError, setLookupError] = useState<string | null>(null);
+  const [rawPost, setRawPost] = useState<RawPostTarget | null>(null);
 
   const baseFilters = useMemo(() => ({
     start: range.start,
@@ -68,8 +76,6 @@ export default function AdminPosts({
   const versionsLoading = versionsQuery.isLoading;
 
   const { metrics, activity, posts, postsTotal, loading, fetching, error } = useAdminPostsPageData(filters);
-  const recalcMutation = useRecalculateSleepPostStages();
-  const bulkMutation = useRecalculateSleepPostStagesBulk();
   const repairMutation = useRepairDoubledSleepPostStages();
   const repairBulkMutation = useRepairDoubledSleepPostStagesBulk();
   const softDeleteMutation = useAdminSoftDeletePostFromGrid();
@@ -93,23 +99,25 @@ export default function AdminPosts({
     [wearablePosts],
   );
 
-  const recalculatePost = useCallback(async (post: RecentPostRow) => {
-    if (!window.confirm(`Recalculate core / deep / REM for “${post.title}” from raw_samples?`)) return;
-    setStageMessage(null);
-    setActingPostId(post.id);
-    try {
-      const result = await recalcMutation.mutateAsync(post.id);
-      setStageMessage(
-        result.changed
-          ? `Updated stages for ${post.title}.`
-          : `No change for ${post.title} — values already matched raw_samples.`,
-      );
-    } catch (err: unknown) {
-      setStageMessage(formatRecalcStagesError(err));
-    } finally {
-      setActingPostId(null);
+  const closeRaw = useCallback(() => setRawPost(null), []);
+
+  const openRaw = useCallback((target: RawPostTarget) => {
+    setLookupError(null);
+    setRawPost(target);
+    scrollAdminPanelIntoView(ADMIN_POST_RAW_ID);
+  }, []);
+
+  useEscapeKey(Boolean(rawPost), closeRaw);
+
+  const parsePostId = useCallback((rawId: string): string | null => {
+    const id = rawId.trim();
+    if (!POST_ID_RE.test(id)) {
+      setLookupError('Enter a valid post UUID.');
+      return null;
     }
-  }, [recalcMutation]);
+    setLookupError(null);
+    return id;
+  }, []);
 
   const repairPost = useCallback(async (post: RecentPostRow) => {
     if (!window.confirm(
@@ -148,35 +156,29 @@ export default function AdminPosts({
   }, [softDeleteMutation]);
 
   const openPostById = useCallback((rawId: string) => {
-    const id = rawId.trim();
-    if (!POST_ID_RE.test(id)) {
-      setLookupError('Enter a valid post UUID.');
-      return;
-    }
-    setLookupError(null);
+    const id = parsePostId(rawId);
+    if (!id) return;
     navigate(`/post/${id}?from=admin`);
-  }, [navigate]);
+  }, [navigate, parsePostId]);
 
-  const recalculateLoadedWearable = async () => {
-    const ids = wearablePosts.map((post) => post.id);
-    if (!ids.length) {
-      setStageMessage('No wearable posts loaded in this table.');
-      return;
-    }
-    if (!window.confirm(`Recalculate stages for ${ids.length} loaded wearable post(s)?`)) return;
-    setStageMessage(null);
-    try {
-      const result = await bulkMutation.mutateAsync(ids);
-      const failed = result.errors.length;
-      setStageMessage(
-        failed
-          ? `Fixed ${result.fixed}, unchanged ${result.skipped}, failed ${failed}.`
-          : `Fixed ${result.fixed} post(s)${result.skipped ? ` · ${result.skipped} already correct` : ''}.`,
-      );
-    } catch (err: unknown) {
-      setStageMessage(formatRecalcStagesError(err));
-    }
-  };
+  const openRawById = useCallback((rawId: string) => {
+    const id = parsePostId(rawId);
+    if (!id) return;
+    const match = posts.find((post) => post.id === id);
+    openRaw({
+      id,
+      title: match?.title,
+      username: match?.username,
+    });
+  }, [openRaw, parsePostId, posts]);
+
+  const viewRawPost = useCallback((post: RecentPostRow) => {
+    openRaw({
+      id: post.id,
+      title: post.title,
+      username: post.username,
+    });
+  }, [openRaw]);
 
   const repairLoadedInflated = async () => {
     const ids = inflatedWearablePosts.map((post) => post.id);
@@ -218,14 +220,13 @@ export default function AdminPosts({
     }
   };
 
-  const recalculating = recalcMutation.isPending || bulkMutation.isPending
-    || repairMutation.isPending || repairBulkMutation.isPending
+  const acting = repairMutation.isPending || repairBulkMutation.isPending
     || softDeleteMutation.isPending || repairAllMutation.isPending;
 
   const columns = useMemo<GridColDef<RecentPostRow>[]>(() => [
     ...buildRecentPostColumns({
       actingPostId,
-      onRecalculate: recalculatePost,
+      onViewRaw: viewRawPost,
       onRepair: repairPost,
       onSoftDelete: softDeletePost,
     }),
@@ -246,14 +247,14 @@ export default function AdminPosts({
         </AdminGridActions>
       ),
     },
-  ], [actingPostId, recalculatePost, repairPost, softDeletePost]);
+  ], [actingPostId, viewRawPost, repairPost, softDeletePost]);
 
   return (
     <AdminSection
       className="admin-posts"
       lead={userId
         ? 'Posts for one user in the selected date range.'
-        : 'Browse sleep posts in the selected date range (paginated). Repair inflated stage minutes, recalculate from raw_samples, soft-delete, or open a post. Lookup any post by ID (not shown in the friends feed). Bulk actions apply to the current page.'}
+        : 'Browse sleep posts in the selected date range (paginated). Inspect the raw sleep_posts row, repair inflated stage minutes, soft-delete, or open a post. Lookup any post by ID (not shown in the friends feed). Bulk repair applies to the current page.'}
       error={error}
     >
       <AdminAnalyticsFilters
@@ -287,10 +288,17 @@ export default function AdminPosts({
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  openPostById(postIdLookup);
+                  openRawById(postIdLookup);
                 }
               }}
             />
+            <button
+              type="button"
+              className="admin-button admin-button-ghost"
+              onClick={() => openRawById(postIdLookup)}
+            >
+              Raw
+            </button>
             <button
               type="button"
               className="admin-button admin-button-ghost"
@@ -302,6 +310,16 @@ export default function AdminPosts({
           {lookupError ? <p className="admin-error admin-filter-note">{lookupError}</p> : null}
         </AdminFilterField>
       </AdminFilterBar>
+
+      {rawPost ? (
+        <AdminPostRawPanel
+          postId={rawPost.id}
+          title={rawPost.title}
+          username={rawPost.username}
+          onClose={closeRaw}
+        />
+      ) : null}
+
       {!loading && metrics ? (
         <>
           <AdminTableSummary>
@@ -344,7 +362,7 @@ export default function AdminPosts({
                 <button
                   type="button"
                   className="admin-button admin-button-ghost"
-                  disabled={recalculating}
+                  disabled={acting}
                   onClick={() => void repairAllInflated()}
                 >
                   {repairAllMutation.isPending ? 'Repairing…' : 'Repair inflated (50)'}
@@ -352,20 +370,12 @@ export default function AdminPosts({
                 <button
                   type="button"
                   className="admin-button admin-button-ghost"
-                  disabled={recalculating || inflatedWearablePosts.length === 0}
+                  disabled={acting || inflatedWearablePosts.length === 0}
                   onClick={() => void repairLoadedInflated()}
                 >
                   {repairBulkMutation.isPending
                     ? 'Repairing…'
                     : `Repair inflated on page (${inflatedWearablePosts.length})`}
-                </button>
-                <button
-                  type="button"
-                  className="admin-button admin-button-ghost"
-                  disabled={recalculating || wearablePosts.length === 0}
-                  onClick={() => void recalculateLoadedWearable()}
-                >
-                  {bulkMutation.isPending ? 'Recalculating…' : `Recalc page wearable (${wearablePosts.length})`}
                 </button>
               </>
             )}
@@ -400,6 +410,7 @@ export default function AdminPosts({
               loading={fetching || refreshing}
               label="Sleep posts"
               ignoreDiacritics
+              getRowClassName={(params) => (params.id === rawPost?.id ? 'admin-grid-row-editing' : '')}
               serverPagination={{
                 rowCount: postsTotal,
                 paginationModel,

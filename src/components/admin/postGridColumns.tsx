@@ -7,7 +7,7 @@ import { gridActionsColumn, idCodeColumn } from './gridColumnHelpers';
 
 export type RecentPostColumnOptions = {
   actingPostId?: string | null;
-  onRecalculate?: (post: RecentPostRow) => void;
+  onViewRaw?: (post: RecentPostRow) => void;
   onRepair?: (post: RecentPostRow) => void;
   onSoftDelete?: (post: RecentPostRow) => void;
 };
@@ -55,7 +55,7 @@ function postSourceLabel(row: RecentPostRow): string {
 export function buildRecentPostColumns(
   options: RecentPostColumnOptions = {},
 ): GridColDef<RecentPostRow>[] {
-  const { actingPostId = null, onRecalculate, onRepair, onSoftDelete } = options;
+  const { actingPostId = null, onViewRaw, onRepair, onSoftDelete } = options;
 
   const cols: GridColDef<RecentPostRow>[] = [
     idCodeColumn<RecentPostRow>('id', 'Post ID'),
@@ -136,12 +136,12 @@ export function buildRecentPostColumns(
     dateColumn('created_at', 'Logged'),
   ];
 
-  if (onRecalculate || onRepair || onSoftDelete) {
+  if (onViewRaw || onRepair || onSoftDelete) {
     cols.push({
-      field: 'recalculate_stages',
+      field: 'post_actions',
       headerName: 'Actions',
       ...gridActionsColumn,
-      width: onSoftDelete ? (onRepair ? 196 : 156) : (onRepair ? 156 : 120),
+      width: onSoftDelete ? (onRepair ? 196 : 156) : (onRepair ? 156 : 88),
       renderCell: ({ row }) => {
         const wearable = isWearablePost(row);
         const busy = actingPostId === row.id;
@@ -174,16 +174,16 @@ export function buildRecentPostColumns(
                 {busy ? '…' : 'Repair'}
               </AdminGridAction>
             ) : null}
-            {onRecalculate ? (
+            {onViewRaw ? (
               <AdminGridAction
-                disabled={!wearable || busy}
-                title="Sum stage minutes from raw_samples"
+                disabled={busy}
+                title="Inspect the stored sleep_posts row"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onRecalculate(row);
+                  onViewRaw(row);
                 }}
               >
-                {busy ? '…' : 'Recalc'}
+                Raw
               </AdminGridAction>
             ) : null}
           </AdminGridActions>

@@ -570,23 +570,15 @@ export type RecalculateSleepStagesBulkResult = {
   errors: { post_id: string; error: string }[];
 };
 
-export async function recalculateSleepPostStages(postId: string): Promise<RecalculateSleepStagesResult> {
-  const { data, error } = await supabase.rpc('admin_recalculate_sleep_post_stages', {
+export type AdminPostRaw = Record<string, unknown>;
+
+export async function fetchAdminPost(postId: string): Promise<AdminPostRaw | null> {
+  const { data, error } = await supabase.rpc('admin_get_post', {
     p_post_id: postId,
   });
   if (error) throw error;
-  return data as RecalculateSleepStagesResult;
-}
-
-export async function recalculateSleepPostStagesBulk(
-  postIds: string[],
-): Promise<RecalculateSleepStagesBulkResult> {
-  const { data, error } = await supabase.rpc('admin_recalculate_sleep_post_stages_bulk', {
-    p_post_ids: postIds,
-  });
-  if (error) throw error;
-  const row = data as RecalculateSleepStagesBulkResult | null;
-  return row ?? { fixed: 0, skipped: 0, errors: [] };
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+  return data as AdminPostRaw;
 }
 
 export type RepairDoubledSleepStagesResult = RecalculateSleepStagesResult & {

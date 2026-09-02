@@ -28,8 +28,7 @@ import {
   adminDeleteComment,
   checkIsModerator,
   formatAdminRpcError,
-  recalculateSleepPostStages,
-  recalculateSleepPostStagesBulk,
+  fetchAdminPost,
   repairDoubledSleepPostStages,
   repairDoubledSleepPostStagesBulk,
   broadcastAdminNotification,
@@ -444,23 +443,12 @@ export function useSendAdminNotification() {
   });
 }
 
-export function useRecalculateSleepPostStages() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (postId: string) => recalculateSleepPostStages(postId),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['admin', 'posts'] });
-    },
-  });
-}
-
-export function useRecalculateSleepPostStagesBulk() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (postIds: string[]) => recalculateSleepPostStagesBulk(postIds),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['admin', 'posts'] });
-    },
+export function useAdminPost(postId: string | null) {
+  return useQuery({
+    queryKey: queryKeys.admin.postRaw(postId ?? ''),
+    queryFn: () => fetchAdminPost(postId!),
+    enabled: Boolean(postId),
+    ...adminQueryOptions,
   });
 }
 

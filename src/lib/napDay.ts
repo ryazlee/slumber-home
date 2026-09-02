@@ -3,12 +3,18 @@ import type { SleepSessionData } from './types';
 export const NAP_SESSION_MAX_MINUTES = 120;
 export const SPLIT_GAP_THRESHOLD_MINUTES = 90;
 export const MAIN_SLEEP_MIN_MINUTES = 240;
+export const NIGHTTIME_BEDTIME_END_MINUTES = 6 * 60;
+export const NIGHTTIME_BEDTIME_START_MINUTES = 21 * 60;
+
+/** Main sleep ends before this; daytime naps start here (noon). */
 export const MORNING_WAKE_END_MINUTES = 12 * 60;
 export const DAYTIME_WAKE_START_MINUTES = MORNING_WAKE_END_MINUTES;
 export const DAYTIME_WAKE_END_MINUTES = 21 * 60;
 
-export function parseClockToMinutes(label: string): number | null {
-  const match = label.trim().match(/^(\d{1,2}):(\d{2})\s*([AaPp][Mm])$/);
+export function parseClockToMinutes(label: string | null | undefined): number | null {
+  if (!label || label === '—') return null;
+  const normalized = label.trim().replace(/\u202f/g, ' ');
+  const match = normalized.match(/^(\d{1,2}):(\d{2})\s*([AaPp][Mm])$/);
   if (!match) return null;
 
   let hour = Number(match[1]);
@@ -43,6 +49,14 @@ export function hasMultipleSessions(input: {
   return (input.sessionBreakdown?.length ?? 0) > 1;
 }
 
+export function hasCompletedSplitSleep(input: {
+  sessionBreakdown?: SleepSessionData[];
+}): boolean {
+  const sessions = input.sessionBreakdown ?? [];
+  if (sessions.length < 2) return false;
+  return classifySessionNaps(sessions).some((isNap) => !isNap);
+}
+
 export function hasNapDay(input: {
   bedtime: string;
   wakeTime: string;
@@ -65,13 +79,13 @@ export function isDaytimeWake(wakeTime: string): boolean {
 function isNighttimeBedtime(bedtime: string): boolean {
   const mins = parseClockToMinutes(bedtime);
   if (mins === null) return false;
-  return mins >= 21 * 60 || mins < 6 * 60;
+  return mins >= NIGHTTIME_BEDTIME_START_MINUTES || mins < NIGHTTIME_BEDTIME_END_MINUTES;
 }
 
 function isLateMorningBedtime(bedtime: string): boolean {
   const mins = parseClockToMinutes(bedtime);
   if (mins === null) return false;
-  return mins >= 6 * 60 && mins < MORNING_WAKE_END_MINUTES;
+  return mins >= NIGHTTIME_BEDTIME_END_MINUTES && mins < MORNING_WAKE_END_MINUTES;
 }
 
 function isMorningWake(wakeTime: string): boolean {

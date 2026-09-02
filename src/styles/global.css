@@ -1139,12 +1139,13 @@ h1 {
   position: sticky;
   top: 0;
   height: 100vh;
-  overflow-y: auto;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
 .admin-sidebar-brand {
   padding: 0 8px 4px;
+  flex-shrink: 0;
 }
 
 .admin-sidebar-eyebrow {
@@ -1210,11 +1211,15 @@ h1 {
 }
 
 .admin-sidebar-footer {
-  margin-top: auto;
+  flex-shrink: 0;
+  margin-top: 0;
   padding-top: 16px;
   border-top: 1px solid var(--border);
   display: grid;
   gap: 10px;
+  background: #101012;
+  position: relative;
+  z-index: 1;
 }
 
 .admin-sidebar-user {
@@ -2775,6 +2780,8 @@ a.admin-metric-card--link:focus-visible {
   gap: 18px;
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .admin-nav-group {
@@ -3261,6 +3268,32 @@ a.admin-metric-card--link:focus-visible {
 .admin-user-post-meta {
   font-size: 12px;
   color: var(--text-dim);
+}
+
+.admin-post-raw-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 8px;
+}
+
+.admin-json-pre {
+  margin: 0;
+  max-height: min(70vh, 720px);
+  overflow: auto;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre;
+  color: var(--text-muted);
+}
+
+.post-detail-admin-raw {
+  margin-top: 28px;
+  padding-top: 8px;
 }
 
 .admin-notify-broadcast {
@@ -4102,6 +4135,7 @@ a.admin-metric-card--link:focus-visible {
     width: min(304px, calc(100vw - 48px));
     height: 100dvh;
     max-height: 100dvh;
+    overflow: hidden;
     padding: 20px 14px;
     padding-top: max(20px, env(safe-area-inset-top));
     padding-bottom: max(20px, env(safe-area-inset-bottom));

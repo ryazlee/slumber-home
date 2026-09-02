@@ -9,6 +9,22 @@ type Props = {
 
 const hasTime = (value?: string | null): boolean => Boolean(value && value !== '—');
 
+function SleepTimesRow({ bedtime, wakeTime }: { bedtime: string; wakeTime: string }) {
+  return (
+    <div className="sleep-times-row">
+      <div className="sleep-times-block">
+        <span className="sleep-times-label">Bedtime</span>
+        <span className="sleep-times-value">{bedtime}</span>
+      </div>
+      <span className="sleep-times-arrow" aria-hidden>→</span>
+      <div className="sleep-times-block sleep-times-block--end">
+        <span className="sleep-times-label">Wake up</span>
+        <span className="sleep-times-value">{wakeTime}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function ManualLogSleepBlock({ post, variant = 'card' }: Props) {
   const hasBedtime = hasTime(post.bedtime);
   const hasWake = hasTime(post.wakeTime);
@@ -24,7 +40,7 @@ export default function ManualLogSleepBlock({ post, variant = 'card' }: Props) {
         : null;
 
   return (
-    <div className="manual-sleep-block">
+    <div className={`manual-sleep-block${isDetail ? ' manual-sleep-block--detail' : ''}`}>
       <p className="manual-sleep-label">Manual log</p>
       {hasDuration && (
         <div className="manual-sleep-duration-row">
@@ -34,7 +50,11 @@ export default function ManualLogSleepBlock({ post, variant = 'card' }: Props) {
           {post.vibe ? <PostVibe vibe={post.vibe} showLabel={isDetail} /> : null}
         </div>
       )}
-      {timeLine && <p className="manual-sleep-times">{timeLine}</p>}
+      {timeLine && (
+        isDetail && hasBedtime && hasWake
+          ? <SleepTimesRow bedtime={post.bedtime!} wakeTime={post.wakeTime!} />
+          : <p className="manual-sleep-times">{timeLine}</p>
+      )}
       <p className="manual-sleep-footnote">Not counted in stats or challenges.</p>
     </div>
   );
