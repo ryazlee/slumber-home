@@ -1,4 +1,4 @@
-/** Keep in sync with `lib/sleepPostSelect.ts` in the mobile app. */
+/** Keep in sync with `lib/sleep/sleepPostSelect.ts` in the mobile app (raw list columns). Compact hypnogram columns are app-only (migration 160). */
 export const SLEEP_POST_FEED_SELECT = [
   'id',
   'user_id',
